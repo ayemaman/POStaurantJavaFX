@@ -12,7 +12,10 @@ TextField{
 }
 
 GridPane {
--fx-background-color:white;
+-fx-background-color:black;
+}
+Region {
+-fx-background-color:black;
 }
 
 .DubButton{

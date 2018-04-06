@@ -173,7 +173,7 @@ public class UsersScreenController {
             userButtons=new ArrayList<>();
             List<User> users = userService.getAllActiveUsers();
             for (User u: users) {
-                String text =""+u.getFirst_name().substring(0,1)+u.getLast_name()+System.lineSeparator()+u.getPosition();
+                String text =""+u.getFirstName().substring(0,1)+u.getLastName()+System.lineSeparator()+u.getPosition();
                 Button button = new Button(text);
                 button.setPrefHeight(70.0);
                 button.setPrefWidth(95.0);
