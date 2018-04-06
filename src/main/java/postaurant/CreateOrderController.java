@@ -32,6 +32,7 @@ public class CreateOrderController {
 
     @Value("/FXML/TableAlreadyExists.fxml")
     private Resource tableAlreadyExists;
+    //vot tut novij comment
 
     private StringProperty buffer = new SimpleStringProperty("");
     private int tableNum=-1;
