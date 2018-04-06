@@ -1,0 +1,61 @@
+BorderPane {
+	-fx-background-color: blue;
+}
+
+
+VBox{
+    -fx-background-color: blue;
+}
+
+TextField{
+    -fx-focus-color: transparent;
+}
+
+GridPane {
+-fx-background-color:white;
+}
+
+.DubButton{
+    -fx-background-color: radial-gradient(center 50% -40%, radius 200%, green 45%, grey 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.ManagerButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, pink 45%, grey 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.UserButton:hover{
+-fx-background-color:grey
+}
+.UserButton:pressed{
+ -fx-background-color:black;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+Button{
+    -fx-background-color: radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+
+Button:hover {
+       -fx-background-color:#b8ee36;
+}
+Button:pressed {
+    -fx-background-color:#80c800;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+Button:Text {
+    -fx-fill: white;
+    -fx-effect: dropshadow( gaussian , #a30000 , 0,0,0,2 );
+}
