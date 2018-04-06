@@ -1,10 +1,10 @@
 BorderPane {
-	-fx-background-color: blue;
+	-fx-background-color: black;
 }
 
 
 VBox{
-    -fx-background-color: blue;
+    -fx-background-color:black;
 }
 
 TextField{

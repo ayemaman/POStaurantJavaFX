@@ -41,9 +41,9 @@
    <left>
       <VBox prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="New User" />
+            <Button fx:id="newUserButton" mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="New User" />
             <Region prefHeight="200.0" prefWidth="200.0" />
-            <Button mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="Manager Screen" />
+            <Button fx:id="managerScreenButton" mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="Manager Screen" />
          </children>
          <padding>
             <Insets left="10.0" />

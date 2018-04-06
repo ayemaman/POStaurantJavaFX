@@ -84,11 +84,18 @@ public class UserDao implements UserDatabase{
         return items;
     }
 
-    private final String retriveAllActiveUsers = "SELECT * FROM dubdubs ORDER BY position";
+    private final String retriveAllActiveUsers = "SELECT * FROM dubdubs ORDER BY position, first_name";
 
     @Override
     public List<User> retrieveAllActiveUsers() {
         return jdbcTemplate.query(retriveAllActiveUsers,new UserMapper());
+    }
+
+    private final String saveNewUserSQL = "INSERT INTO dubdubs (first_name,last_name,position) VALUES(?,?,?)";
+
+    @Override
+    public void saveNewUser(User user) {
+        jdbcTemplate.update(saveNewUserSQL,user.getFirst_name(), user.getLast_name(), user.getPosition());
     }
 
 

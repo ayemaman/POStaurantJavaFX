@@ -12,5 +12,6 @@ public interface UserDatabase {
     boolean openTableExists(String value);
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
+    void saveNewUser(User user);
 }
 

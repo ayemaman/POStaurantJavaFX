@@ -88,4 +88,10 @@ public class UserService {
         return users;
     }
 
+    public void saveNewUser(User user){
+        userDatabase.saveNewUser(user);
+    }
+
+
+
 }

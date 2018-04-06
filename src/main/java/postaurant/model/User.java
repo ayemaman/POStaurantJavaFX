@@ -13,7 +13,12 @@ public class User {
     private List<Order> userOpenOrders;
 
     public User(){
+    }
 
+    public User(String first_name, String last_name, String position){
+        setFirst_name(first_name);
+        setLast_name(last_name);
+        setPosition(position);
     }
     public String getUserID() {
         return userID;
