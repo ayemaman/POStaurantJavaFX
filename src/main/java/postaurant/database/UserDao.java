@@ -2,10 +2,12 @@ package postaurant.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.lang.Nullable;
+import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.model.Order;
@@ -95,19 +97,26 @@ public class UserDao implements UserDatabase{
 
     @Override
     public void saveNewUser(User user) {
-        jdbcTemplate.update(saveNewUserSQL,user.getFirst_name(), user.getLast_name(), user.getPosition());
+            jdbcTemplate.update(saveNewUserSQL, user.getFirstName(), user.getLastName(), user.getPosition());
+
     }
 
 
     private static final class UserMapper implements RowMapper<User>{
         @Override
-        public User mapRow(ResultSet rs, int i) throws SQLException {
-            User user = new User();
-            user.setFirst_name(rs.getString("first_name"));
-            user.setLast_name(rs.getString("last_name"));
-            user.setUserID(rs.getString("dub_id"));
-            user.setPosition(rs.getString("position"));
-            return user;
+        public User mapRow(ResultSet rs, int i) {
+            try {
+                User user = new User();
+                System.out.println(rs.getString("first_name"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setUserID(rs.getString("dub_id"));
+                user.setPosition(rs.getString("position"));
+                return user;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 

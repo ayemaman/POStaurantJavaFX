@@ -17,17 +17,17 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.NewUserScreenController">
    <children>
-      <SplitPane dividerPositions="0.6231527093596059" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+      <SplitPane dividerPositions="0.6231527093596059" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="600.0">
                <children>
                   <HBox alignment="CENTER" prefHeight="250.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox alignment="CENTER" prefHeight="250.0" prefWidth="410.0">
+                        <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="400.0">
                            <children>
                               <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Label text="Name:">
+                                    <Label text="Name:" textFill="#d8ff2c">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin></Label>
@@ -35,7 +35,7 @@
                                  </children></HBox>
                               <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Label text="Surname:">
+                                    <Label text="Surname:" textFill="#d8ff2c">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin></Label>
@@ -44,7 +44,7 @@
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Label text="Position:">
+                                    <Label text="Position:" textFill="#d8ff2c">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin></Label>
@@ -53,10 +53,10 @@
                               </HBox>
                            </children>
                            <HBox.margin>
-                              <Insets right="40.0" />
+                              <Insets />
                            </HBox.margin>
                         </VBox>
-                        <VBox alignment="CENTER_RIGHT" prefHeight="250.0" prefWidth="150.0">
+                        <VBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="200.0">
                            <children>
                               <Button fx:id="goBackButton" mnemonicParsing="false" prefHeight="70.0" prefWidth="130.0" text="GO BACK">
                                  <VBox.margin>

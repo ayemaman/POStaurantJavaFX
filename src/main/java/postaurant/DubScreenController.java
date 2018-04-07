@@ -156,7 +156,7 @@ public class DubScreenController {
 
     public void setUser(User user) {
         this.user=user;
-        this.userID.setText(user.getFirst_name());
+        this.userID.setText(user.getFirstName());
         this.page = 0;
         createTableButtons(user);
         setTables(true);

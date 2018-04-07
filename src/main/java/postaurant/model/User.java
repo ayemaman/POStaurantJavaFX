@@ -1,23 +1,24 @@
 package postaurant.model;
 
 import org.springframework.stereotype.Component;
+import postaurant.exception.InputValidationException;
 
 import java.util.List;
 
 @Component
 public class User {
     private String userID;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
     private String position;
     private List<Order> userOpenOrders;
 
     public User(){
     }
 
-    public User(String first_name, String last_name, String position){
-        setFirst_name(first_name);
-        setLast_name(last_name);
+    public User(String firstName, String lastName, String position)throws InputValidationException{
+        setFirstName(firstName);
+        setLastName(lastName);
         setPosition(position);
     }
     public String getUserID() {
@@ -28,22 +29,30 @@ public class User {
         this.userID = userID;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) throws InputValidationException {
+        if(firstName.matches("(\\p{Alpha}){2,30}")) {
+            this.firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
+        }
+        else{
+            throw new InputValidationException();
+        }
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName(){
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) throws InputValidationException {
+        if (lastName.matches("([A-Za-z]){2,30}")) {
+            this.lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
+        } else {
+            throw new InputValidationException();
+        }
     }
-
     public String getPosition() {
         return position;
     }
@@ -61,6 +70,6 @@ public class User {
     }
 
     public String toString(){
-        return getFirst_name()+getLast_name()+getUserID()+getPosition();
+        return getFirstName()+getLastName()+getUserID()+getPosition();
     }
 }
