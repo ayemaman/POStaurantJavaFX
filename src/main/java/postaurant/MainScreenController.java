@@ -64,20 +64,20 @@ public class MainScreenController {
         });
 
         loginButton.setOnAction(e -> {
-            try{
-                FXMLLoader loader=loaderService.getLoader(loginForm.getURL());
-                Parent root=loader.load();
-                Scene scene=new Scene(root);
+            try {
+                FXMLLoader loader = loaderService.getLoader(loginForm.getURL());
+                Parent root = loader.load();
+                Scene scene = new Scene(root);
                 scene.getStylesheets().add("POStaurant.css");
-                Stage stage=new Stage();
+                Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.setScene(scene);
                 stage.showAndWait();
-                LogInController controller=loader.getController();
-                user=controller.getUser();
-                if(user!=null) {
-                    try {
+                LogInController controller = loader.getController();
+                user = controller.getUser();
+                if (user != null) {
+                    try{
                         if (user.getPosition().equals("MANAGER")) {
                             loader = loaderService.getLoader(managerForm.getURL());
                             Parent parent = loader.load();
@@ -86,20 +86,23 @@ public class MainScreenController {
                             stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                             stage.setScene(scene);
                             stage.show();
+                        } else {
+                            loader = loaderService.getLoader(dubScreenForm.getURL());
+                            Parent parent = loader.load();
+                            DubScreenController dubscreen = loader.getController();
+                            dubscreen.setUser(user);
+                            scene = new Scene(parent);
+                            scene.getStylesheets().add("POStaurant.css");
+                            stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                            stage.setScene(scene);
+                            stage.show();
                         }
-                    } catch (NullPointerException e1) {
-                        loader = loaderService.getLoader(dubScreenForm.getURL());
-                        Parent parent = loader.load();
-                        DubScreenController dubscreen = loader.getController();
-                        dubscreen.setUser(user);
-                        scene = new Scene(parent);
-                        scene.getStylesheets().add("POStaurant.css");
-                        stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-                        stage.setScene(scene);
-                        stage.show();
+                    }catch (Exception e2){
+                        e2.printStackTrace();
                     }
                 }
-            }catch (Exception e1) {
+            }
+            catch (Exception e1) {
                 e1.printStackTrace();
             }
         });

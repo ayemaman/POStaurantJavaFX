@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.Order;
 import postaurant.model.User;
+import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class DubScreenController {
 
     private final UserService userService;
     private final FXMLoaderService loaderService;
+    private final ButtonCreationService buttonCreationService;
 
     @Value("/FXML/TableWindow.fxml")
     private Resource tableWindowForm;
@@ -46,7 +48,7 @@ public class DubScreenController {
     @Value("/FXML/CreateOrder.fxml")
     private Resource createOrderForm;
 
-    private  User user;
+    private User user;
     @FXML
     private TextField timeField;
     @FXML
@@ -58,9 +60,10 @@ public class DubScreenController {
     private final Integer startTime = 1;
     private Integer seconds = startTime;
 
-    public DubScreenController(UserService userService, FXMLoaderService loaderService) {
-        this.userService =userService;
+    public DubScreenController(UserService userService, FXMLoaderService loaderService, ButtonCreationService buttonCreationService) {
+        this.userService = userService;
         this.loaderService = loaderService;
+        this.buttonCreationService=buttonCreationService;
     }
 
     public void initialize() {
@@ -99,36 +102,36 @@ public class DubScreenController {
     }
 
 
-        @FXML
-        private void handleNewTableButton(ActionEvent event) {
-            try {
-                FXMLLoader loader = loaderService.getLoader(createOrderForm.getURL());
-                Parent root = loader.load();
-                Scene scene = new Scene(root);
-                scene.getStylesheets().add("mainScreen.css");
-                Stage stage = new Stage();
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.initStyle(StageStyle.UNDECORATED);
+    @FXML
+    private void handleNewTableButton(ActionEvent event) {
+        try {
+            FXMLLoader loader = loaderService.getLoader(createOrderForm.getURL());
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add("mainScreen.css");
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setScene(scene);
+            stage.showAndWait();
+            CreateOrderController controller = loader.getController();
+            int tableNum = controller.getTableNum();
+            if (tableNum != -1) {
+                loader = loaderService.getLoader(tableWindowForm.getURL());
+                Parent parent = loader.load();
+                TableWindowController tableWindowController = loader.getController();
+                tableWindowController.setTableNo(tableNum);
+                scene = new Scene(parent);
+                scene.getStylesheets().add("POStaurant.css");
+                stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);
-                stage.showAndWait();
-                CreateOrderController controller = loader.getController();
-                int tableNum = controller.getTableNum();
-                if (tableNum != -1) {
-                    loader=loaderService.getLoader(tableWindowForm.getURL());
-                    Parent parent= loader.load();
-                    TableWindowController tableWindowController=loader.getController();
-                    tableWindowController.setTableNo(tableNum);
-                    scene=new Scene(parent);
-                    scene.getStylesheets().add("POStaurant.css");
-                    stage=(Stage) ((Node)event.getSource()).getScene().getWindow();
-                    stage.setScene(scene);
-                    stage.show();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
+                stage.show();
             }
-
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
+
+    }
 
 
     public void doTime() {
@@ -155,12 +158,11 @@ public class DubScreenController {
     }
 
     public void setUser(User user) {
-        this.user=user;
+        this.user = user;
         this.userID.setText(user.getFirstName());
         this.page = 0;
-        createTableButtons(user);
+        this.tableButtonList=buttonCreationService.createTableButtons(user);
         setTables(true);
-
     }
 
     public void setTables(boolean forward) {
@@ -230,19 +232,4 @@ public class DubScreenController {
     }
 
 
-    public void createTableButtons(User user) {
-        try {
-            List<Order> tables = userService.getUserOrders(user);
-            for (Order o: tables) {
-                String text =""+o.getTableNo();
-                Button button = new Button(text);
-                button.setPrefHeight(70.0);
-                button.setPrefWidth(95.0);
-                button.setMnemonicParsing(false);
-                tableButtonList.add(button);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

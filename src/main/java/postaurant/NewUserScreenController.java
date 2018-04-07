@@ -33,12 +33,6 @@ import java.net.URL;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NewUserScreenController {
 
-    private StringProperty name = new SimpleStringProperty("");
-    private StringProperty surname = new SimpleStringProperty("");
-    private TextField currentTextField;
-    private boolean wasUserSaved = false;
-    private User user = null;
-
 
     private FXMLoaderService fxmLoaderService;
     private UserService userService;
@@ -56,6 +50,11 @@ public class NewUserScreenController {
     private TextField surnameField;
     @FXML
     private ChoiceBox<String> choicePosition;
+    private StringProperty name = new SimpleStringProperty("");
+    private StringProperty surname = new SimpleStringProperty("");
+    private TextField currentTextField;
+    private boolean wasUserSaved = false;
+    private User user = null;
 
 
     public NewUserScreenController(FXMLoaderService fxmLoaderService, UserService userService) {
@@ -65,6 +64,7 @@ public class NewUserScreenController {
 
 
     public void initialize() {
+        currentTextField=nameField;
         nameField.textProperty().bind(name);
         surnameField.textProperty().bind(surname);
         ObservableList<String> positionList = FXCollections.observableArrayList("DUBDUB", "MANAGER");
