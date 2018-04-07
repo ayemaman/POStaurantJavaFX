@@ -7,12 +7,20 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -24,6 +32,7 @@ import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.exception.InputValidationException;
 import postaurant.model.User;
+import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
 import java.net.URL;
 
@@ -36,6 +45,7 @@ public class NewUserScreenController {
 
     private FXMLoaderService fxmLoaderService;
     private UserService userService;
+    private ButtonCreationService buttonCreationService;
 
     @Value("FXML/WrongInputWindow.fxml")
     private Resource wrongInputForm;
@@ -50,16 +60,25 @@ public class NewUserScreenController {
     private TextField surnameField;
     @FXML
     private ChoiceBox<String> choicePosition;
+    @FXML
+    private AnchorPane keyboard;
+    @FXML
+    private GridPane keyboardGrid;
+    private boolean lowercase=true;
+
     private StringProperty name = new SimpleStringProperty("");
     private StringProperty surname = new SimpleStringProperty("");
     private TextField currentTextField;
+
+
     private boolean wasUserSaved = false;
     private User user = null;
 
 
-    public NewUserScreenController(FXMLoaderService fxmLoaderService, UserService userService) {
+    public NewUserScreenController(FXMLoaderService fxmLoaderService, UserService userService, ButtonCreationService buttonCreationService) {
         this.fxmLoaderService = fxmLoaderService;
         this.userService = userService;
+        this.buttonCreationService=buttonCreationService;
     }
 
 
@@ -71,6 +90,13 @@ public class NewUserScreenController {
         choicePosition.setValue("DUBDUB");
         choicePosition.setItems(positionList);
 
+        ColumnConstraints constraints=new ColumnConstraints();
+        constraints.setHalignment(HPos.CENTER);
+        keyboardGrid.getColumnConstraints().add(constraints);
+
+        setKeyboard(true);
+
+
         goBackButton.setOnAction(e -> {
             exitWindow(goBackButton);
             goBackButton.getScene().getWindow().hide();
@@ -81,7 +107,7 @@ public class NewUserScreenController {
 
         saveUserButton.setOnAction(e -> {
             try {
-                user = new User(nameField.getText(), surnameField.getText(), choicePosition.getValue());
+                user = new User(name.getValue(), surname.getValue(), choicePosition.getValue());
                 userService.saveNewUser(this.user);
                 exitWindow(saveUserButton);
                 goBackButton.getScene().getWindow().hide();
@@ -118,6 +144,28 @@ public class NewUserScreenController {
         } else if (button.getId().equals("saveUserButton")) {
             setWasUserSaved(true);
         }
+    }
+
+    private void setKeyboard(boolean lowercase){
+        int x=0;
+        int y=0;
+        for(int i=0; i< (keyboardGrid.getChildren().size());){
+            keyboardGrid.getChildren().remove(keyboardGrid.getChildren().get(i));
+        }
+
+        for(Button button: buttonCreationService.createKeyboardButtons(lowercase)){
+            button.setOnAction(event-> onKeyboardPress(event));
+            this.lowercase=lowercase;
+            keyboardGrid.add(button, x,y);
+            if(x>8){
+                x=0;
+                y++;
+            }else {
+                x++;
+            }
+        }
+
+
 
     }
 
@@ -131,8 +179,15 @@ public class NewUserScreenController {
         if (stringProperty != null) {
             Button button = (Button) event.getSource();
             switch (button.getText()) {
+                case "":
+                        setKeyboard(!lowercase);
+                        break;
                 case "<--":
-                    stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
+                    if(!stringProperty.getValue().equals("")) {
+                        stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
+                    }
+                    break;
+                case "UP":
                     break;
                 default:
                     stringProperty.set(stringProperty.getValue() + button.getText());
@@ -140,30 +195,7 @@ public class NewUserScreenController {
 
             }
         }
+
     }
 }
-/*
-private void buttonAction(Button button) {
-        if (button.getText().equals("DELETE")) {
-            buffer.setValue("");
-        } else if (button.getText().equals("EXIT")) {
-            button.getScene().getWindow().hide();
-        } else {
-            if (buffer.getValue().length() < 5) {
-                String string = button.getText();
-                buffer.set(buffer.getValue() + string);
-            }
-        }
-
-
-    public void onKeyBoardButtonClick(ActionEvent event, TextField textField){
-        Button button=(Button) event.getSource();
-        String buffer=button.getText();
-        if(buffer.equals("<--")){
-            textField.
-
-        }
-    }
-*/
-
 
