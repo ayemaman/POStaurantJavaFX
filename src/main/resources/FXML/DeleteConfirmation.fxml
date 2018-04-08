@@ -10,18 +10,18 @@
 
 <AnchorPane prefHeight="150.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.DeleteConfirmationController">
    <children>
-      <VBox alignment="CENTER" prefHeight="75.0" prefWidth="100.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
+      <VBox fx:id="topConfirmationBox" alignment="CENTER" prefHeight="75.0" prefWidth="100.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
          <children>
             <Label text="Are you sure you want to delete this user:" textFill="#eb0101" />
             <Region prefHeight="20.0" prefWidth="200.0" />
             <Label fx:id="userLabel" text="Label" textFill="#ffbf00" />
          </children>
       </VBox>
-      <HBox alignment="CENTER" prefHeight="75.0" prefWidth="200.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
+      <HBox fx:id="bottomConfirmationBox" alignment="CENTER" prefHeight="75.0" prefWidth="200.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
          <children>
-            <Button fx:id="yesButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="YES" />
+            <Button fx:id="yesButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" text="YES" />
             <Region prefHeight="200.0" prefWidth="30.0" />
-            <Button fx:id="noButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="NO" />
+            <Button fx:id="noButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" text="NO" />
          </children>
       </HBox>
    </children>

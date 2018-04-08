@@ -13,5 +13,6 @@ public interface UserDatabase {
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
     void saveNewUser(User user);
+    void blockUser(User user);
 }
 

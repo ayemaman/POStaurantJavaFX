@@ -92,6 +92,8 @@ public class UserService {
         userDatabase.saveNewUser(user);
     }
 
+    public void blockUser(User user){userDatabase.blockUser(user);}
+    }
 
 
-}
+

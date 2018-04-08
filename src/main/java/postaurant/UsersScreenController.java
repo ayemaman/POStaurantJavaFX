@@ -67,10 +67,10 @@ public class UsersScreenController {
                  stage.initModality(Modality.APPLICATION_MODAL);
                  stage.initStyle(StageStyle.UNDECORATED);
                  stage.setScene(scene);
-                 stage.showAndWait();
                  NewUserScreenController newUserScreenController=loader.getController();
-                 if(newUserScreenController.getWasUserSaved()){
-                     this.setUserButtons();
+                 stage.showAndWait();
+                 if(newUserScreenController.getWasUserSaved()) {
+                     setUserButtons();
                  }
 
              }catch (IOException ioe1){
@@ -215,6 +215,9 @@ public class UsersScreenController {
                  stage.initStyle(StageStyle.UNDECORATED);
                  stage.setScene(scene);
                  stage.showAndWait();
+                 if(userInfoScreenController.wasDeleted()){
+                     setUserButtons();
+                 }
              } catch (Exception e1) {
                  e1.printStackTrace();
              }

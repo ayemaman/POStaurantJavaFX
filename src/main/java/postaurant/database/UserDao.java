@@ -86,7 +86,7 @@ public class UserDao implements UserDatabase{
         return items;
     }
 
-    private final String retriveAllActiveUsers = "SELECT * FROM dubdubs ORDER BY position, first_name";
+    private final String retriveAllActiveUsers = "SELECT * FROM dubdubs WHERE accessible=1 ORDER BY position, first_name";
 
     @Override
     public List<User> retrieveAllActiveUsers() {
@@ -100,6 +100,12 @@ public class UserDao implements UserDatabase{
             jdbcTemplate.update(saveNewUserSQL, user.getFirstName(), user.getLastName(), user.getPosition());
 
     }
+    private final String blockUserSQL = "UPDATE dubdubs SET accessible=0 WHERE dub_id=?";
+
+    @Override
+    public void blockUser(User user) {
+        jdbcTemplate.update(blockUserSQL,user.getUserID());
+    }
 
 
     private static final class UserMapper implements RowMapper<User>{
@@ -112,6 +118,13 @@ public class UserDao implements UserDatabase{
                 user.setLastName(rs.getString("last_name"));
                 user.setUserID(rs.getString("dub_id"));
                 user.setPosition(rs.getString("position"));
+                int access=rs.getInt("accessible");
+                if(access==1){
+                    user.setAccessible(true);
+                }
+                else {
+                    user.setAccessible(false);
+                }
                 return user;
             }catch(Exception e){
                 e.printStackTrace();

@@ -12,6 +12,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String position;
+    private boolean accessible;
     private List<Order> userOpenOrders;
 
     public User(){
@@ -60,6 +61,13 @@ public class User {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public boolean isAccessible(){
+        return accessible;
+    }
+    public void setAccessible(boolean accessible){
+        this.accessible=accessible;
     }
 
     public List<Order> getUserOpenOrders() {

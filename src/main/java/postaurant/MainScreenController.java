@@ -38,6 +38,9 @@ public class MainScreenController {
     @Value("/FXML/ManagerScreen.fxml")
     private Resource managerForm;
 
+    @Value("/FXML/AccessBlocked.fxml")
+    private Resource accessBlockedForm;
+
 
 
     private final FXMLoaderService loaderService;
@@ -54,11 +57,11 @@ public class MainScreenController {
         this.loaderService = loaderService;
     }
 
-    public void initialize(){
-        timeButton.setOnAction(e->{
-            try{
+    public void initialize() {
+        timeButton.setOnAction(e -> {
+            try {
                 doTime();
-            }catch (Exception e1){
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });
@@ -77,32 +80,43 @@ public class MainScreenController {
                 LogInController controller = loader.getController();
                 user = controller.getUser();
                 if (user != null) {
-                    try{
-                        if (user.getPosition().equals("MANAGER")) {
-                            loader = loaderService.getLoader(managerForm.getURL());
-                            Parent parent = loader.load();
-                            scene = new Scene(parent);
-                            scene.getStylesheets().add("POStaurant.css");
-                            stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-                            stage.setScene(scene);
-                            stage.show();
-                        } else {
-                            loader = loaderService.getLoader(dubScreenForm.getURL());
-                            Parent parent = loader.load();
-                            DubScreenController dubscreen = loader.getController();
-                            dubscreen.setUser(user);
-                            scene = new Scene(parent);
-                            scene.getStylesheets().add("POStaurant.css");
-                            stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-                            stage.setScene(scene);
-                            stage.show();
+                    if (user.isAccessible()) {
+                        try {
+                            if (user.getPosition().equals("MANAGER")) {
+                                loader = loaderService.getLoader(managerForm.getURL());
+                                Parent parent = loader.load();
+                                scene = new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+                            } else {
+                                loader = loaderService.getLoader(dubScreenForm.getURL());
+                                Parent parent = loader.load();
+                                DubScreenController dubscreen = loader.getController();
+                                dubscreen.setUser(user);
+                                scene = new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+                            }
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
                         }
-                    }catch (Exception e2){
-                        e2.printStackTrace();
+                    }
+                    else{
+                        Parent parent = loaderService.getLoader(accessBlockedForm.getURL()).load();
+                        Scene scene1=new Scene(parent);
+                        scene1.getStylesheets().add("POStaurant.css");
+                        Stage stage1=new Stage();
+                        stage1.initModality(Modality.APPLICATION_MODAL);
+                        stage1.initStyle(StageStyle.UNDECORATED);
+                        stage1.setScene(scene1);
+                        stage1.showAndWait();
                     }
                 }
-            }
-            catch (Exception e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });

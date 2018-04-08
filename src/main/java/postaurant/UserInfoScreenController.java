@@ -25,6 +25,7 @@ import postaurant.service.UserService;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserInfoScreenController {
     private User user;
+    private boolean wasDeleted=false;
 
     private FXMLoaderService fxmLoaderService;
     private UserService userService;
@@ -64,6 +65,10 @@ public class UserInfoScreenController {
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.setScene(scene);
                 stage.showAndWait();
+                if (deleteConfirmationController.wasDeleted()) {
+                    wasDeleted=deleteConfirmationController.wasDeleted();
+                    deleteUserButton.getScene().getWindow().hide();
+                }
             }catch (Exception e1){
                 e1.printStackTrace();
             }
@@ -79,6 +84,9 @@ public class UserInfoScreenController {
         nameTextField.textProperty().bind(user.getNameProperty());
         surnameTextField.textProperty().bind(user.getSurnameProperty());
         positionTextField.textProperty().bind(user.getPositionProperty());
+    }
+    public boolean wasDeleted(){
+        return wasDeleted;
     }
 
 }
