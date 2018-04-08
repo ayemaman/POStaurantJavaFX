@@ -22,6 +22,10 @@ Region {
 -fx-background-color:black;
 }
 
+Label{
+-fx-text-fill:yellow;
+}
+
 .DubButton{
     -fx-background-color: radial-gradient(center 50% -40%, radius 200%, green 45%, grey 50%);
     -fx-background-radius: 8,7,6;

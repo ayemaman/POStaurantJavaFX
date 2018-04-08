@@ -28,6 +28,7 @@ import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,11 +43,17 @@ public class DubScreenController {
     private final FXMLoaderService loaderService;
     private final ButtonCreationService buttonCreationService;
 
+    @Value("/FXML/POStaurant.fxml")
+    private Resource mainScreenForm;
+
     @Value("/FXML/TableWindow.fxml")
     private Resource tableWindowForm;
 
     @Value("/FXML/CreateOrder.fxml")
     private Resource createOrderForm;
+
+    @Value("/POStaurant.css")
+    private Resource css;
 
     private User user;
     @FXML
@@ -72,7 +79,17 @@ public class DubScreenController {
 
     @FXML
     private void handleExitButton(ActionEvent event) {
-        ((Node) event.getSource()).getScene().getWindow().hide();
+        try {
+            Parent parent = loaderService.getLoader(mainScreenForm.getURL()).load();
+            Scene scene=new Scene(parent);
+            scene.getStylesheets().add(css.getURL().toString());
+            Stage stage=(Stage)((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -108,7 +125,7 @@ public class DubScreenController {
             FXMLLoader loader = loaderService.getLoader(createOrderForm.getURL());
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            scene.getStylesheets().add("mainScreen.css");
+            scene.getStylesheets().add(css.getURL().toString());
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UNDECORATED);

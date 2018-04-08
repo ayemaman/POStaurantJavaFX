@@ -88,8 +88,8 @@ public class UserService {
         return users;
     }
 
-    public void saveNewUser(User user){
-        userDatabase.saveNewUser(user);
+    public User saveNewUser(User user){
+        return userDatabase.saveNewUser(user);
     }
 
     public void blockUser(User user){userDatabase.blockUser(user);}

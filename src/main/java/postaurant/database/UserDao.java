@@ -94,11 +94,12 @@ public class UserDao implements UserDatabase{
     }
 
     private final String saveNewUserSQL = "INSERT INTO dubdubs (first_name,last_name,position) VALUES(?,?,?)";
+    private final String getLastSavedUserSQL = "SELECT * FROM (SELECT * FROM dubdubs ORDER BY date_added DESC) WHERE ROWNUM=1";
 
     @Override
-    public void saveNewUser(User user) {
+    public User saveNewUser(User user) {
             jdbcTemplate.update(saveNewUserSQL, user.getFirstName(), user.getLastName(), user.getPosition());
-
+            return jdbcTemplate.queryForObject(getLastSavedUserSQL, new UserMapper());
     }
     private final String blockUserSQL = "UPDATE dubdubs SET accessible=0 WHERE dub_id=?";
 

@@ -12,7 +12,7 @@ public interface UserDatabase {
     boolean openTableExists(String value);
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
-    void saveNewUser(User user);
+    User saveNewUser(User user);
     void blockUser(User user);
 }
 

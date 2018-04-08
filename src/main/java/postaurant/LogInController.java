@@ -35,6 +35,8 @@ public class LogInController {
 
     @Value("/FXML/noID.fxml")
     private Resource noID;
+    @Value("/POStaurant.css")
+    private Resource css;
 
     @FXML
     private TextField userID;
@@ -89,7 +91,7 @@ public class LogInController {
                 URL url = noID.getURL();
                 Parent root = fxmlLoaderService.getLoader(url).load();
                 Scene scene = new Scene(root);
-                scene.getStylesheets().add("mainScreen.css");
+                scene.getStylesheets().add(css.getURL().toString());
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initStyle(StageStyle.UNDECORATED);

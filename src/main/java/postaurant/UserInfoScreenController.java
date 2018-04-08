@@ -30,7 +30,7 @@ public class UserInfoScreenController {
     private FXMLoaderService fxmLoaderService;
     private UserService userService;
 
-    @Value("FXML/DeleteConfirmation.fxml")
+    @Value("FXML/ConfirmationDelete.fxml")
     private Resource confirmationForm;
 
     @FXML
@@ -56,8 +56,8 @@ public class UserInfoScreenController {
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(confirmationForm.getURL());
                 Parent root = loader.load();
-                DeleteConfirmationController deleteConfirmationController=loader.getController();
-                deleteConfirmationController.setUser(user);
+                ConfirmationDeleteController confirmationDeleteController =loader.getController();
+                confirmationDeleteController.setUser(user);
                 Scene scene = new Scene(root);
                 scene.getStylesheets().add("POStaurant.css");
                 Stage stage = new Stage();
@@ -65,8 +65,8 @@ public class UserInfoScreenController {
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.setScene(scene);
                 stage.showAndWait();
-                if (deleteConfirmationController.wasDeleted()) {
-                    wasDeleted=deleteConfirmationController.wasDeleted();
+                if (confirmationDeleteController.wasDeleted()) {
+                    wasDeleted= confirmationDeleteController.wasDeleted();
                     deleteUserButton.getScene().getWindow().hide();
                 }
             }catch (Exception e1){

@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -32,6 +33,8 @@ import postaurant.exception.InputValidationException;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -45,6 +48,8 @@ public class NewUserScreenController {
     private UserService userService;
     private ButtonCreationService buttonCreationService;
 
+    @Value("FXML/ConfirmationSave.fxml")
+    private Resource confirmationForm;
     @Value("FXML/WrongInputWindow.fxml")
     private Resource wrongInputForm;
 
@@ -98,7 +103,6 @@ public class NewUserScreenController {
 
 
         goBackButton.setOnAction(e -> {
-            exitWindow(goBackButton);
             goBackButton.getScene().getWindow().hide();
         });
 
@@ -108,10 +112,8 @@ public class NewUserScreenController {
         saveUserButton.setOnAction(e -> {
             try {
                 user = new User(name.getValue(), surname.getValue(), choicePosition.getValue());
-                userService.saveNewUser(this.user);
-                exitWindow(saveUserButton);
-                goBackButton.getScene().getWindow().hide();
-            } catch (InputValidationException wrongUserData) {
+            }
+            catch (InputValidationException wrongUserData) {
                 try {
                     URL url = wrongInputForm.getURL();
                     Parent root = fxmLoaderService.getLoader(url).load();
@@ -122,7 +124,22 @@ public class NewUserScreenController {
                     stage.initStyle(StageStyle.UNDECORATED);
                     stage.setScene(scene);
                     stage.showAndWait();
+
                 } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+            if (user != null) {
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(confirmationForm.getURL());
+                    Parent parent = loader.load();
+                    ConfirmationSaveController confirmationSaveController = loader.getController();
+                    confirmationSaveController.setUser(user);
+                    Scene scene = new Scene(parent);
+                    Stage stage = new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             }
@@ -138,13 +155,6 @@ public class NewUserScreenController {
         return this.wasUserSaved;
     }
 
-    private void exitWindow(Button button) {
-        if (button.getId().equals("goBackButton")) {
-            setWasUserSaved(false);
-        } else if (button.getId().equals("saveUserButton")) {
-            setWasUserSaved(true);
-        }
-    }
 
     private void setKeyboard(boolean lowercase){
         int x=0;
