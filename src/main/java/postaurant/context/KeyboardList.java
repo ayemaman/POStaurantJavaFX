@@ -86,9 +86,6 @@ import java.util.ArrayList;
         }
 
         public ArrayList<String> getQwerty() {
-            for(String s:qwerty) {
-                System.out.println(s);
-            }
             return qwerty;
         }
 

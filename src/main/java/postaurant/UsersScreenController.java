@@ -1,5 +1,6 @@
 package postaurant;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -37,6 +38,8 @@ public class UsersScreenController {
      private Resource newUserForm;
     @Value("FXML/ManagerScreen.fxml")
     private Resource managerScreenForm;
+    @Value("FXML/UserInfoScreen.fxml")
+    private Resource userInfoForm;
 
      @FXML
      private GridPane gridPane;
@@ -173,7 +176,7 @@ public class UsersScreenController {
             userButtons=new ArrayList<>();
             List<User> users = userService.getAllActiveUsers();
             for (User u: users) {
-                String text =""+u.getFirstName().substring(0,1)+u.getLastName()+System.lineSeparator()+u.getPosition();
+                String text =""+u.getUserID()+System.lineSeparator()+u.getFirstName().substring(0,1)+u.getLastName()+System.lineSeparator()+u.getPosition();
                 Button button = new Button(text);
                 button.setPrefHeight(70.0);
                 button.setPrefWidth(95.0);
@@ -185,6 +188,7 @@ public class UsersScreenController {
                 }else if (u.getPosition().equals("MANAGER")){
                     button.getStyleClass().add("ManagerButton");
                 }
+                button.setOnAction(this::handleUserButtons);
                 userButtons.add(button);
             }
         } catch (Exception e) {
@@ -192,4 +196,26 @@ public class UsersScreenController {
         }
     }
 
-}
+    public void handleUserButtons(ActionEvent event){
+             try {
+                 FXMLLoader loader = fxmLoaderService.getLoader(userInfoForm.getURL());
+                 Parent root = loader.load();
+                 UserInfoScreenController userInfoScreenController = loader.getController();
+                 Button button=(Button) event.getSource();
+                 User user=userService.getUser(button.getText().substring(0,4));
+                 userInfoScreenController.setUser(user);
+                 Scene scene = new Scene(root);
+                 scene.getStylesheets().add("POStaurant.css");
+                 Stage stage = new Stage();
+                 stage.initModality(Modality.APPLICATION_MODAL);
+                 stage.initStyle(StageStyle.UNDECORATED);
+                 stage.setScene(scene);
+                 stage.showAndWait();
+             } catch (Exception e1) {
+                 e1.printStackTrace();
+             }
+
+         }
+
+    }
+

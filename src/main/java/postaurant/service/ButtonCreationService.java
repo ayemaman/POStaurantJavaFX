@@ -48,59 +48,69 @@ public class ButtonCreationService {
     public ArrayList<Button> createKeyboardButtons(boolean lowercase) {
 
         ArrayList<String> list= (keyboardList.getQwerty());
-        for(int i=0;i<list.size();i++){
-            System.out.println("LIST on positon "+i+" "+list.get(i));
-        }
         ArrayList<Button> keyboardButtonList = new ArrayList<>();
         for(int i=0;i<10;i++) {
-            Button button = new Button(list.get(i));
-            button.setPrefWidth(55.0);
-            button.setPrefWidth(40.0);
+            Button button = new Button();
+            button.setText(list.get(i));
+            button.setMinWidth(55.0);
             button.setMnemonicParsing(false);
             keyboardButtonList.add(button);
         }
-        if (lowercase){
+        if (lowercase) {
             for (int i = 10; i < 40; i++) {
-                Button button=new Button();
-                if(list.get(i).equals("")){
-                    ImageView caps=new ImageView();
-                    try{
-                    Image image=new Image(upArrow.getURL().toString());
-                    caps.setImage(image);
-                    button.setGraphic(caps);
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
-                }else {
-                    button = new Button(list.get(i));
-                }
-                button.setPrefWidth(55.0);
-                button.setPrefWidth(40.0);
+                Button button = new Button();
+                button.setMinWidth(55.0);
                 button.setMnemonicParsing(false);
-
-                keyboardButtonList.add(button);
-            }
-        }else {
-            for (int i = 40; i < list.size(); i++) {
-                Button button = new Button(list.get(i));
-                if(list.get(i).equals("")){
-                    ImageView caps=new ImageView();
-                    try{
-                        Image image=new Image(upArrow.getURL().toString());
+                if (list.get(i).equals("")) {
+                    ImageView caps = new ImageView();
+                    caps.setFitHeight(20);
+                    caps.setFitWidth(30);
+                    try {
+                        Image image = new Image(upArrow.getURL().toString());
                         caps.setImage(image);
                         button.setGraphic(caps);
-                    }catch (IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }else {
-                    button = new Button(list.get(i));
                 }
-                button.setPrefWidth(55.0);
-                button.setPrefWidth(40.0);
-                button.setMnemonicParsing(false);
+                else{
+                    button.setText(list.get(i));
+                }
                 keyboardButtonList.add(button);
             }
         }
+        else {
+            for (int i = 40; i < list.size(); i++) {
+                Button button = new Button(list.get(i));
+                button.setMinWidth(55.0);
+                button.setMnemonicParsing(false);
+                if (list.get(i).equals("")) {
+                    ImageView caps = new ImageView();
+                    caps.setFitHeight(20);
+                    caps.setFitWidth(30);
+                    try {
+                        Image image = new Image(upArrow.getURL().toString());
+                        caps.setImage(image);
+                        button.setGraphic(caps);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    button.setText(list.get(i));
+                }
+                keyboardButtonList.add(button);
+            }
+        }
+        Button delete=new Button("DELETE");
+        delete.setMinHeight(35);
+        keyboardButtonList.add(delete);
+
+        Button spacebar=new Button();
+        spacebar.setMinWidth(475);
+        spacebar.setMinHeight(35);
+        spacebar.setMnemonicParsing(false);
+        keyboardButtonList.add(spacebar);
+
         return keyboardButtonList;
     }
 

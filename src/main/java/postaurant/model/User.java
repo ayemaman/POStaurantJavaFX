@@ -1,5 +1,6 @@
 package postaurant.model;
 
+import javafx.beans.property.SimpleStringProperty;
 import org.springframework.stereotype.Component;
 import postaurant.exception.InputValidationException;
 
@@ -67,6 +68,19 @@ public class User {
 
     public void setUserOpenOrders(List<Order> userOpenOrders) {
         this.userOpenOrders = userOpenOrders;
+    }
+
+    public SimpleStringProperty getIDProperty(){
+        return new SimpleStringProperty(getUserID());
+    }
+    public SimpleStringProperty getNameProperty(){
+        return new SimpleStringProperty(getFirstName());
+    }
+    public SimpleStringProperty getSurnameProperty(){
+        return new SimpleStringProperty(getLastName());
+    }
+    public SimpleStringProperty getPositionProperty(){
+        return new SimpleStringProperty(getPosition());
     }
 
     public String toString(){

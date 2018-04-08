@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,10 +17,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -35,7 +33,7 @@ import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
 import java.net.URL;
-
+import java.util.ArrayList;
 
 
 @Component
@@ -64,6 +62,8 @@ public class NewUserScreenController {
     private AnchorPane keyboard;
     @FXML
     private GridPane keyboardGrid;
+    @FXML
+    private HBox spacebarHBox;
     private boolean lowercase=true;
 
     private StringProperty name = new SimpleStringProperty("");
@@ -152,21 +152,28 @@ public class NewUserScreenController {
         for(int i=0; i< (keyboardGrid.getChildren().size());){
             keyboardGrid.getChildren().remove(keyboardGrid.getChildren().get(i));
         }
+        for(int i=0;i<spacebarHBox.getChildren().size();){
+            spacebarHBox.getChildren().remove(spacebarHBox.getChildren().get(i));
+        }
 
-        for(Button button: buttonCreationService.createKeyboardButtons(lowercase)){
-            button.setOnAction(event-> onKeyboardPress(event));
-            this.lowercase=lowercase;
-            keyboardGrid.add(button, x,y);
-            if(x>8){
-                x=0;
+        ArrayList<Button> buttonList=buttonCreationService.createKeyboardButtons(lowercase);
+
+        for(int i=0; i<buttonList.size()-2;i++) {
+            buttonList.get(i).setOnAction(this::onKeyboardPress);
+            this.lowercase = lowercase;
+            keyboardGrid.add(buttonList.get(i), x, y);
+            if (x > 8) {
+                x = 0;
                 y++;
-            }else {
+            } else {
                 x++;
             }
         }
-
-
-
+        buttonList.get(40).setOnAction(this::onKeyboardPress);
+        buttonList.get(41).setOnAction(this::onKeyboardPress);
+        spacebarHBox.getChildren().add(buttonList.get(40));
+        spacebarHBox.getChildren().add(buttonList.get(41));
+        spacebarHBox.setMargin(buttonList.get(40),new Insets(0,60,0,3));
     }
 
     public void onKeyboardPress(ActionEvent event) {
@@ -187,8 +194,10 @@ public class NewUserScreenController {
                         stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
                     }
                     break;
-                case "UP":
+                case "DELETE":
+                        stringProperty.set("");
                     break;
+
                 default:
                     stringProperty.set(stringProperty.getValue() + button.getText());
                     break;
