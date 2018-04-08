@@ -26,11 +26,14 @@ public class ManagerScreenController {
 
     @Value("/FXML/UsersScreen.fxml")
     private Resource usersForm;
+    @Value("FXML/POStaurant.fxml")
+    private Resource postaurantForm;
     @Value("POStaurant.css")
     private Resource css;
 
     @FXML
     private Button usersButton;
+    @FXML Button exitButton;
 
     public ManagerScreenController(FXMLoaderService fxmLoaderService, UserService userService){
         this.fxmLoaderService=fxmLoaderService;
@@ -52,6 +55,20 @@ public class ManagerScreenController {
             }catch (Exception e1){
                 System.out.println(e1);
         }
+        });
+
+        exitButton.setOnAction(e->{
+            try {
+                FXMLLoader loader = fxmLoaderService.getLoader(postaurantForm.getURL());
+                Parent parent = loader.load();
+                Scene scene = new Scene(parent);
+                scene.getStylesheets().add("" + css.getURL());
+                Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }catch (Exception e1){
+                e1.printStackTrace();
+            }
         });
     }
 

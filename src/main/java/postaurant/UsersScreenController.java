@@ -45,6 +45,8 @@ public class UsersScreenController {
      private GridPane gridPane;
      @FXML private Button newUserButton;
      @FXML private Button managerScreenButton;
+     @FXML private Button upButton;
+     @FXML private Button downButton;
 
 
      public UsersScreenController(UserService userService, FXMLoaderService fxmLoaderService){
@@ -53,6 +55,8 @@ public class UsersScreenController {
      }
 
     public void initialize() {
+         upButton.setOnAction(e-> setUsers(false));
+         downButton.setOnAction(e-> setUsers(true));
          newUserButton.setOnAction(e->{
              try {
                  FXMLLoader loader=fxmLoaderService.getLoader(newUserForm.getURL());

@@ -69,6 +69,8 @@ public class UserInfoScreenController {
             }
 
         });
+
+        goBackButton.setOnAction(e->goBackButton.getScene().getWindow().hide());
     }
 
     public void setUser(User user){

@@ -11,6 +11,10 @@ TextField{
     -fx-focus-color: transparent;
 }
 
+HBox{
+-fx-background-color:black;
+}
+
 GridPane {
 -fx-background-color:black;
 }
