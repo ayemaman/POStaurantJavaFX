@@ -28,12 +28,17 @@ public class ManagerScreenController {
     private Resource usersForm;
     @Value("FXML/POStaurant.fxml")
     private Resource postaurantForm;
+    @Value("/FXML/MenuScreen.fxml")
+    private Resource menuForm;
     @Value("POStaurant.css")
     private Resource css;
 
     @FXML
     private Button usersButton;
-    @FXML Button exitButton;
+    @FXML
+    private Button exitButton;
+    @FXML
+    private Button menuButton;
 
     public ManagerScreenController(FXMLoaderService fxmLoaderService, UserService userService){
         this.fxmLoaderService=fxmLoaderService;
@@ -56,6 +61,11 @@ public class ManagerScreenController {
                 System.out.println(e1);
         }
         });
+
+        menuButton.setOnAction(e->{
+
+        });
+
 
         exitButton.setOnAction(e->{
             try {

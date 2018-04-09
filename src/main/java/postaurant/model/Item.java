@@ -1,7 +1,9 @@
 package postaurant.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Item {
     private String id;
@@ -9,7 +11,7 @@ public class Item {
     private double price;
     private String type;
     private String cat;
-    private List<Ingredient> recipe=new ArrayList<>();
+    private Map<Ingredient,Integer> recipe=new HashMap<>();
     private int availability;
     private String kitchen_status;
 
@@ -53,16 +55,16 @@ public class Item {
         this.cat = cat;
     }
 
-    public List<Ingredient> getRecipe() {
+    public Map<Ingredient,Integer> getRecipe() {
         return recipe;
     }
 
-    public void setRecipe(List<Ingredient> recipe) {
+    public void setRecipe(HashMap<Ingredient,Integer> recipe) {
         this.recipe = recipe;
     }
 
-    public void addIngredient(Ingredient ingredient){
-        getRecipe().add(ingredient);
+    public void addIngredient(Ingredient ingredient, Integer amount){
+        getRecipe().put(ingredient,amount);
     }
 
     public int getAvailability() {
@@ -82,6 +84,10 @@ public class Item {
     }
 
     public String toString(){
-        return this.name;
+        String buffer="Name:"+ getName()+" ID: "+getId()+" Section: "+getCat()+" ";
+        for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
+            buffer+="Ingr:"+entry.getKey()+" Amount:/"+entry.getValue()+" ";
+        }
+        return buffer;
     }
 }

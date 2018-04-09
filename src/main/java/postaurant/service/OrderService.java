@@ -17,7 +17,6 @@ public class OrderService {
 
     public List<String> getItemsForSection(String section){
         return userDatabase.retrieveItemsForSection(section);
-
     }
 
 }

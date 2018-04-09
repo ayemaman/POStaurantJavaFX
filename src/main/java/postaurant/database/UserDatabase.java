@@ -1,10 +1,12 @@
 package postaurant.database;
 
+import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface UserDatabase {
     User getUser(String userId);
@@ -14,5 +16,7 @@ public interface UserDatabase {
     List<User> retrieveAllActiveUsers();
     User saveNewUser(User user);
     void blockUser(User user);
+    List<Item> getMenu();
+    List<Item> getItem(String itemID);
 }
 

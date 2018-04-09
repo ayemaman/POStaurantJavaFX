@@ -1,19 +1,29 @@
 package postaurant.service;
 
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import postaurant.context.FXMLoaderService;
 import postaurant.context.KeyboardList;
+import postaurant.model.Ingredient;
+import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 @Component
 public class ButtonCreationService {
 
@@ -22,10 +32,14 @@ public class ButtonCreationService {
     private Resource upArrow;
     private final UserService userService;
     private final KeyboardList keyboardList;
+    private final MenuService menuService;
+    private final FXMLoaderService fxmLoaderService;
 
-    public ButtonCreationService(UserService userService, KeyboardList keyboardList) {
+    public ButtonCreationService(UserService userService, KeyboardList keyboardList, MenuService menuService, FXMLoaderService fxmLoaderService) {
         this.userService = userService;
         this.keyboardList=keyboardList;
+        this.menuService=menuService;
+        this.fxmLoaderService=fxmLoaderService;
     }
 
     public ArrayList<Button> createTableButtons(User user) {
@@ -115,9 +129,46 @@ public class ButtonCreationService {
         return keyboardButtonList;
     }
 
+    public ArrayList<Tab> createSectionTabs(){
+        ArrayList<Tab> tabs=new ArrayList<>();
+        Map<String, List<Item>> sectionsWithItems= menuService.getSectionsWithItems();
+        for (Map.Entry<String, List<Item> > entry : sectionsWithItems.entrySet()){
 
+            GridPane gridPane=new GridPane();
+            gridPane.setAlignment(Pos.CENTER);
 
+            AnchorPane anchorPane=new AnchorPane();
+            anchorPane.setPrefWidth(428);
+            anchorPane.setPrefHeight(500);
+            anchorPane.getChildren().add(gridPane);
+            anchorPane.setLeftAnchor(gridPane,0.0);
+            anchorPane.setRightAnchor(gridPane,0.0);
+            anchorPane.setTopAnchor(gridPane,0.0);
+            anchorPane.setBottomAnchor(gridPane,0.0);
 
+            Tab sectionTab=new Tab(entry.getKey());
+            sectionTab.setContent(anchorPane);
+            tabs.add(sectionTab);
+        }
+        for(Tab t:tabs){
+            System.out.println(t);
+        }
+        return tabs;
+    }
 
+    public ArrayList<Button> createItemButtonsForSection(String section){
+        ArrayList<Button> buttons=new ArrayList<>();
+        Map<String, List<Item>> sectionsWithItems= menuService.getSectionsWithItems();
+        List<Item> items=sectionsWithItems.get(section);
+        for(Item i:items){
+            Button button=new Button(i.getId()+"\n"+i.getName());
+            button.setMinHeight(120);
+            button.setMinWidth(100);
+            button.setMnemonicParsing(false);
+            button.setId("itemButton");
+            buttons.add(button);
+        }
+        return buttons;
+    }
 
 }

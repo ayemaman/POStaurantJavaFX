@@ -4,10 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
+import postaurant.model.Ingredient;
 import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class UserService {
@@ -32,41 +34,42 @@ public class UserService {
 
     public List<Order> getUserOrders(User user){
         try{
-            int order=0;
-            int item=0;
+            int orderInt=0;
+            int itemInt=0;
             List<Order> sorted= userDatabase.retrieveUserOrders(user);
             for (Order o:sorted){
                 System.out.println(o);
             }
             System.out.println("--------------");
 
-            while(order<sorted.size()-1) {
-                if (sorted.get(order).getOrderID() == sorted.get(order + 1).getOrderID()) {
-                    if (sorted.get(order).getOrderItems().get(item).getId().equals(sorted.get(order + 1).getOrderItems().get(0).getId())) {
-                        sorted.get(order).getOrderItems().get(item).addIngredient(sorted.get(order + 1).getOrderItems().get(0).getRecipe().get(0));
-                        sorted.remove(order + 1);
-                        System.out.println("item= "+item);
-                        System.out.println("order= "+order);
+            while(orderInt<sorted.size()-1) {
+                if (sorted.get(orderInt).getOrderID() == sorted.get(orderInt + 1).getOrderID()) {
+                    if (sorted.get(orderInt).getOrderItems().get(itemInt).getId().equals(sorted.get(orderInt + 1).getOrderItems().get(0).getId())) {
+                        Map.Entry<Ingredient,Integer> entry = sorted.get(orderInt + 1).getOrderItems().get(0).getRecipe().entrySet().iterator().next();
+                        sorted.get(orderInt).getOrderItems().get(itemInt).addIngredient(entry.getKey(),entry.getValue());
+                        sorted.remove(orderInt + 1);
+                        System.out.println("item= "+itemInt);
+                        System.out.println("order= "+orderInt);
                         for (Order o:sorted){
                             System.out.println(o);
                         }
                         System.out.println("--------------");
                     } else {
-                        sorted.get(order).addItem(sorted.get(order + 1).getOrderItems().get(0));
-                        item++;
-                        sorted.remove(order+1);
-                        System.out.println("item= "+item);
-                        System.out.println("order= "+order);
+                        sorted.get(orderInt).addItem(sorted.get(orderInt + 1).getOrderItems().get(0));
+                        itemInt++;
+                        sorted.remove(orderInt+1);
+                        System.out.println("item= "+itemInt);
+                        System.out.println("order= "+orderInt);
                         for (Order o:sorted){
                             System.out.println(o);
                         }
                         System.out.println("--------------");
                     }
                 } else {
-                    order++;
-                    item = 0;
-                    System.out.println("item= "+item);
-                    System.out.println("order= "+order);
+                    orderInt++;
+                    itemInt = 0;
+                    System.out.println("item= "+itemInt);
+                    System.out.println("order= "+orderInt);
                     for (Order o:sorted){
                         System.out.println(o);
                     }

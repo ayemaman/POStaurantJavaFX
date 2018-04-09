@@ -26,6 +26,7 @@ import postaurant.context.FXMLoaderService;
 import postaurant.model.Order;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
+import postaurant.service.MenuService;
 import postaurant.service.UserService;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class DubScreenController {
     private final UserService userService;
     private final FXMLoaderService loaderService;
     private final ButtonCreationService buttonCreationService;
+    private final MenuService menuService;
 
     @Value("/FXML/POStaurant.fxml")
     private Resource mainScreenForm;
@@ -67,10 +69,11 @@ public class DubScreenController {
     private final Integer startTime = 1;
     private Integer seconds = startTime;
 
-    public DubScreenController(UserService userService, FXMLoaderService loaderService, ButtonCreationService buttonCreationService) {
+    public DubScreenController(UserService userService, FXMLoaderService loaderService, ButtonCreationService buttonCreationService, MenuService menuService) {
         this.userService = userService;
         this.loaderService = loaderService;
         this.buttonCreationService=buttonCreationService;
+        this.menuService=menuService;
     }
 
     public void initialize() {
@@ -94,7 +97,7 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
-        userService.getAllActiveUsers();
+       buttonCreationService.createItemButtonsForSection("burgers");
         doTime();
     }
 

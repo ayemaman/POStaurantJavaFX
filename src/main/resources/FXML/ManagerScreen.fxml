@@ -53,7 +53,7 @@
                <GridPane.margin>
                   <Insets />
                </GridPane.margin></Button>
-             <Button mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Menu" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+             <Button fx:id="menuButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Menu" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin></Button>

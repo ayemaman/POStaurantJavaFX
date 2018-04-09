@@ -40,6 +40,7 @@ public class POStaurant extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
         User user=new User();
         user.setFirstName("lox");
         URL url=sample.getURL();

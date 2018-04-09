@@ -5,9 +5,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Order {
     private double tableNo;
@@ -96,10 +94,14 @@ public class Order {
         String buffer="";
         for(Item i: getOrderItems()){
             buffer+=i+" ";
-            for(Ingredient ingr: i.getRecipe()){
-                buffer+=ingr.getName()+"/ ";
+            Iterator it=i.getRecipe().entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry pair=(Map.Entry)it.next();
+                Ingredient ingr=(Ingredient)pair.getKey();
+                int quantity=(Integer)pair.getValue();
+                buffer+=ingr.getName()+" Qty.: "+quantity+"/ ";
             }
-
+//
         }
         return "Order ID: "+getOrderID()+" Order Items: "+ buffer;
 

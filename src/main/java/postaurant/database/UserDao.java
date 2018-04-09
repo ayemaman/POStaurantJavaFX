@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class UserDao implements UserDatabase{
 
@@ -45,13 +46,15 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.queryForObject(retrieveUser, new UserMapper(), userId);
     }
 
-    private final String retrieveUserOrders="SELECT o.order_id, o.table_no, o.time_opened, o.status, ohi.i_id, it.i_name, it.i_price, ohi.kitchen_status, ihi.i_id, ihi.ingr_id, i.ingr_name, i.ingr_amount \n" +
-            "FROM orders o \n" +
-            "RIGHT OUTER JOIN order_has_item ohi ON o.order_id=ohi.order_id \n" +
-            "RIGHT OUTER JOIN item_has_ingredient ihi ON ohi.i_id=ihi.i_id \n" +
-            "RIGHT OUTER JOIN items it ON ihi.i_id=it.i_id \n" +
-            "RIGHT OUTER JOIN ingredients i ON ihi.ingr_id=i.ingr_id \n" +
-            "WHERE dub_id=? AND status='OPEN' ORDER BY table_no";
+    private final String retrieveUserOrders="SELECT *\n" +
+            "FROM orders\n" +
+            "NATURAL JOIN order_has_item\n" +
+            "NATURAL JOIN items\n" +
+            "NATURAL JOIN item_has_ingredient\n" +
+            "NATURAL JOIN ingredients\n" +
+            "WHERE dub_id=? AND status='OPEN'\n" +
+            "ORDER BY table_no";
+
 
 
     @Override
@@ -77,12 +80,7 @@ public class UserDao implements UserDatabase{
         } catch (Exception e) {
             logger.error("error retrieving items for selection", e);
         }
-        if(items.isEmpty()){
-            System.out.println("pusto blja");
-        }
-        for(String s:items){
-            System.out.println(s);
-        }
+
         return items;
     }
 
@@ -106,6 +104,26 @@ public class UserDao implements UserDatabase{
     @Override
     public void blockUser(User user) {
         jdbcTemplate.update(blockUserSQL,user.getUserID());
+    }
+
+    private final String getMenuSQL="SELECT *\n" +
+            "FROM items\n" +
+            "NATURAL JOIN item_has_ingredient\n" +
+            "NATURAL JOIN ingredients\n"+
+            "ORDER BY i_id";
+    @Override
+    public List<Item> getMenu() {
+        return jdbcTemplate.query(getMenuSQL,new ItemMapper());
+    }
+
+    private final String getEmptyItemSQL="SELECT * FROM items\n" +
+            "NATURAL JOIN item_has_ingredient\n" +
+            "NATURAL JOIN ingredients\n"+
+            "WHERE i_id=?";
+
+    @Override
+    public List<Item> getItem(String itemID) {
+        return jdbcTemplate.query(getEmptyItemSQL,new ItemMapper(), itemID);
     }
 
 
@@ -150,14 +168,37 @@ public class UserDao implements UserDatabase{
             item.setPrice(rs.getDouble("i_price"));
             item.setKitchen_status(rs.getString("kitchen_status"));
 
+
             Ingredient ingredient=new Ingredient();
+            Integer quantity=rs.getInt("ingr_quantity");
             ingredient.setId(rs.getString("ingr_id"));
             ingredient.setName(rs.getString("ingr_name"));
             ingredient.setAmount(rs.getInt("ingr_amount"));
 
-            item.addIngredient(ingredient);
+            item.addIngredient(ingredient,quantity);
             order.addItem(item);
             return order;
+        }
+    }
+
+    private static final class ItemMapper implements RowMapper<Item>{
+        @Override
+        public Item mapRow(ResultSet rs, int i) throws SQLException{
+            Item item=new Item();
+            item.setId(rs.getString("i_id"));
+            item.setName(rs.getString("i_name"));
+            item.setPrice(rs.getDouble("i_price"));
+            item.setCat(rs.getString("i_section"));
+
+            Ingredient ingredient=new Ingredient();
+            Integer quantity=rs.getInt("ingr_quantity");
+            ingredient.setId(rs.getString("ingr_id"));
+            ingredient.setName(rs.getString("ingr_name"));
+            ingredient.setAmount(rs.getInt("ingr_amount"));
+
+
+            item.addIngredient(ingredient,quantity);
+            return item;
         }
     }
 
