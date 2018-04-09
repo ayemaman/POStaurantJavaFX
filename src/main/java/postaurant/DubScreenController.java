@@ -97,7 +97,6 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
-       buttonCreationService.createItemButtonsForSection("burgers");
         doTime();
     }
 

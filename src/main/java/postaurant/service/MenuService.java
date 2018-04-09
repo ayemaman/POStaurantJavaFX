@@ -39,7 +39,6 @@ public class MenuService {
                 map.put(item.getCat(),recipe);
             }
         }
-
         return map;
     }
 

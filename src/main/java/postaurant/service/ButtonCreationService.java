@@ -8,7 +8,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -136,7 +138,16 @@ public class ButtonCreationService {
 
             GridPane gridPane=new GridPane();
             gridPane.setAlignment(Pos.CENTER);
-
+            for (int i = 0; i < 4; i++) {
+                ColumnConstraints colConst = new ColumnConstraints();
+                colConst.setPercentWidth(428.0 / 4);
+                gridPane.getColumnConstraints().add(colConst);
+            }
+            for (int i = 0; i < 4; i++) {
+                RowConstraints rowConst = new RowConstraints();
+                rowConst.setPercentHeight(500/4);
+                gridPane.getRowConstraints().add(rowConst);
+            }
             AnchorPane anchorPane=new AnchorPane();
             anchorPane.setPrefWidth(428);
             anchorPane.setPrefHeight(500);
@@ -149,9 +160,6 @@ public class ButtonCreationService {
             Tab sectionTab=new Tab(entry.getKey());
             sectionTab.setContent(anchorPane);
             tabs.add(sectionTab);
-        }
-        for(Tab t:tabs){
-            System.out.println(t);
         }
         return tabs;
     }

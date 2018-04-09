@@ -132,7 +132,6 @@ public class UserDao implements UserDatabase{
         public User mapRow(ResultSet rs, int i) {
             try {
                 User user = new User();
-                System.out.println(rs.getString("first_name"));
                 user.setFirstName(rs.getString("first_name"));
                 user.setLastName(rs.getString("last_name"));
                 user.setUserID(rs.getString("dub_id"));

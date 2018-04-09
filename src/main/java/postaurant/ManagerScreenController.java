@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -13,8 +14,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
-import postaurant.service.UserService;
+import postaurant.service.ButtonCreationService;
 
+import java.util.List;
 
 
 @Component
@@ -22,14 +24,17 @@ import postaurant.service.UserService;
 public class ManagerScreenController {
 
     private final FXMLoaderService fxmLoaderService;
-    private final UserService userService;
+    private final ButtonCreationService buttonCreationService;
 
     @Value("/FXML/UsersScreen.fxml")
     private Resource usersForm;
-    @Value("FXML/POStaurant.fxml")
+
+    @Value("/FXML/POStaurant.fxml")
     private Resource postaurantForm;
+
     @Value("/FXML/MenuScreen.fxml")
     private Resource menuForm;
+
     @Value("POStaurant.css")
     private Resource css;
 
@@ -40,9 +45,9 @@ public class ManagerScreenController {
     @FXML
     private Button menuButton;
 
-    public ManagerScreenController(FXMLoaderService fxmLoaderService, UserService userService){
+    public ManagerScreenController(FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService){
         this.fxmLoaderService=fxmLoaderService;
-        this.userService=userService;
+        this.buttonCreationService=buttonCreationService;
     }
     public void initialize(){
         usersButton.setOnAction(e-> {
@@ -53,7 +58,6 @@ public class ManagerScreenController {
                 usersScreenController.setUserButtons();
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(""+css.getURL());
-                System.out.println(scene.getStylesheets().get(0));
                 Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
@@ -63,7 +67,22 @@ public class ManagerScreenController {
         });
 
         menuButton.setOnAction(e->{
-
+            try{
+                FXMLLoader loader=fxmLoaderService.getLoader(menuForm.getURL());
+                Parent parent=loader.load();
+                MenuScreenController menuScreenController=loader.getController();
+                List<Tab> list=buttonCreationService.createSectionTabs();
+                menuScreenController.setSectionTabList(list);
+                menuScreenController.setItemButtonList(buttonCreationService.createItemButtonsForSection(list.get(0).getText()));
+                menuScreenController.setSectionTabs();
+                Scene scene= new Scene(parent);
+                scene.getStylesheets().add(""+css.getURL());
+                Stage stage= (Stage)((Node) e.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }catch (Exception e1){
+               e1.printStackTrace();
+            }
         });
 
 

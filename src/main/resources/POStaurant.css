@@ -1,30 +1,4 @@
-BorderPane {
-	-fx-background-color: black;
-}
 
-
-VBox{
-    -fx-background-color:black;
-}
-
-TextField{
-    -fx-focus-color: transparent;
-}
-
-HBox{
--fx-background-color:black;
-}
-
-GridPane {
--fx-background-color:black;
-}
-Region {
--fx-background-color:black;
-}
-
-Label{
--fx-text-fill:yellow;
-}
 
 .DubButton{
     -fx-background-color: radial-gradient(center 50% -40%, radius 200%, green 45%, grey 50%);
