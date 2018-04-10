@@ -20,5 +20,7 @@ public interface UserDatabase {
     List<Item> getMenu();
     List<Item> getItem(String itemID);
     List<Ingredient> getAllIngredients();
+    Ingredient getIngredient(String id);
+
 }
 

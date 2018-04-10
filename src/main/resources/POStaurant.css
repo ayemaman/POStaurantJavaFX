@@ -44,3 +44,18 @@ Button:Text {
     -fx-fill: white;
     -fx-effect: dropshadow( gaussian , #a30000 , 0,0,0,2 );
 }
+
+ToggleButton:pressed{
+    -fx-background-color:red;
+}
+
+ToggleButton{
+    -fx-background-color:green;
+}
+
+.AvailabilityONButton{
+-fx-background-color:green;
+}
+
+.AvailabilityOFFButton{
+-fx-background-color:red;}

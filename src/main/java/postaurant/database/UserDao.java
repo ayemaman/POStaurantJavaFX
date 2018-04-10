@@ -2,11 +2,9 @@ package postaurant.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.lang.Nullable;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
@@ -18,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class UserDao implements UserDatabase{
 
@@ -133,6 +130,13 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.query(getAllIngredientsSQL, new IngredientMapper());
     }
 
+    private final String getIngredientSQL="SELECT * FROM ingredients WHERE ingr_id=?";
+
+    @Override
+    public Ingredient getIngredient(String id){
+        return jdbcTemplate.queryForObject(getIngredientSQL,new IngredientMapper(),id);
+    }
+
 
     private static final class UserMapper implements RowMapper<User>{
         @Override
@@ -169,11 +173,14 @@ public class UserDao implements UserDatabase{
             order.setStatus(rs.getString("status"));
 
             Item item=new Item();
-            item.setId(rs.getString("i_id"));
-            item.setName(rs.getString("i_name"));
-            item.setPrice(rs.getDouble("i_price"));
-            item.setKitchen_status(rs.getString("kitchen_status"));
-
+            try {
+                item.setId(rs.getString("i_id"));
+                item.setName(rs.getString("i_name"));
+                item.setPrice(rs.getDouble("i_price"));
+                item.setKitchen_status(rs.getString("kitchen_status"));
+            }catch (InputValidationException e){
+                e.printStackTrace();
+            }
 
             Ingredient ingredient=new Ingredient();
             Integer quantity=rs.getInt("ingr_quantity");
@@ -191,10 +198,14 @@ public class UserDao implements UserDatabase{
         @Override
         public Item mapRow(ResultSet rs, int i) throws SQLException{
             Item item=new Item();
-            item.setId(rs.getString("i_id"));
-            item.setName(rs.getString("i_name"));
-            item.setPrice(rs.getDouble("i_price"));
-            item.setCat(rs.getString("i_section"));
+            try {
+                item.setId(rs.getString("i_id"));
+                item.setName(rs.getString("i_name"));
+                item.setPrice(rs.getDouble("i_price"));
+                item.setSection(rs.getString("i_section"));
+            }catch (InputValidationException e){
+                e.printStackTrace();
+            }
 
             Ingredient ingredient=new Ingredient();
             Integer quantity=rs.getInt("ingr_quantity");

@@ -31,12 +31,12 @@ public class MenuService {
         }
 
         for(Item item:fullItemList){
-            if(map.containsKey(item.getCat())){
-                map.get(item.getCat()).add(item);
+            if(map.containsKey(item.getSection())){
+                map.get(item.getSection()).add(item);
             }else{
                 List<Item> recipe=new ArrayList<>();
                 recipe.add(item);
-                map.put(item.getCat(),recipe);
+                map.put(item.getSection(),recipe);
             }
         }
         return map;
@@ -55,6 +55,10 @@ public class MenuService {
 
     public List<Ingredient> getAllIngredients(){
         return userDatabase.getAllIngredients();
+    }
+
+    public Ingredient getIngredient(String id){
+        return userDatabase.getIngredient(id);
     }
 
 }

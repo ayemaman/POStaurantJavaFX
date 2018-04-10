@@ -48,6 +48,9 @@ public class MenuScreenController {
 
     @Value("/FXML/ItemInfoScreen.fxml")
     private Resource itemInfoForm;
+    @Value("/POStaurant.css")
+    private Resource css;
+
 
     @FXML
     private TabPane sectionTabPane;
@@ -100,10 +103,9 @@ public class MenuScreenController {
                     Parent parent=loader.load();
                     ItemInfoScreenController itemInfoScreenController=loader.getController();
                     itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
-                    System.out.println(b.getText());
-                    System.out.println(menuService.getItem("cheeseburger200"));
-                    itemInfoScreenController.setup(menuService.getItem("cheeseburger200"));
+                    itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0,b.getText().indexOf("\n"))));
                     Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                     stage.setScene(scene);
                     stage.show();

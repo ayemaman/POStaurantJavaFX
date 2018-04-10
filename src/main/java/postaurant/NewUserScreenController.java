@@ -166,7 +166,7 @@ public class NewUserScreenController {
             spacebarHBox.getChildren().remove(spacebarHBox.getChildren().get(i));
         }
 
-        ArrayList<Button> buttonList=buttonCreationService.createKeyboardButtons(lowercase);
+        ArrayList<Button> buttonList=buttonCreationService.createKeyboardButtons(lowercase,55,475,30);
 
         for(int i=0; i<buttonList.size()-2;i++) {
             buttonList.get(i).setOnAction(this::onKeyboardPress);

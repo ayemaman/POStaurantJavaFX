@@ -1,6 +1,7 @@
 package postaurant.service;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -62,21 +63,21 @@ public class ButtonCreationService {
         return tableButtonList;
     }
 
-    public ArrayList<Button> createKeyboardButtons(boolean lowercase) {
+    public ArrayList<Button> createKeyboardButtons(boolean lowercase, double buttonWidth, double spacebarWidth, double height) {
 
         ArrayList<String> list= (keyboardList.getQwerty());
         ArrayList<Button> keyboardButtonList = new ArrayList<>();
         for(int i=0;i<10;i++) {
             Button button = new Button();
             button.setText(list.get(i));
-            button.setMinWidth(55.0);
+            button.setMinWidth(buttonWidth);
             button.setMnemonicParsing(false);
             keyboardButtonList.add(button);
         }
         if (lowercase) {
             for (int i = 10; i < 40; i++) {
                 Button button = new Button();
-                button.setMinWidth(55.0);
+                button.setMinWidth(buttonWidth);
                 button.setMnemonicParsing(false);
                 if (list.get(i).equals("")) {
                     ImageView caps = new ImageView();
@@ -99,7 +100,7 @@ public class ButtonCreationService {
         else {
             for (int i = 40; i < list.size(); i++) {
                 Button button = new Button(list.get(i));
-                button.setMinWidth(55.0);
+                button.setMinWidth(buttonWidth);
                 button.setMnemonicParsing(false);
                 if (list.get(i).equals("")) {
                     ImageView caps = new ImageView();
@@ -119,12 +120,13 @@ public class ButtonCreationService {
             }
         }
         Button delete=new Button("DELETE");
-        delete.setMinHeight(35);
+        delete.setMinHeight(height);
+        delete.setMinWidth(buttonWidth);
         keyboardButtonList.add(delete);
 
         Button spacebar=new Button();
-        spacebar.setMinWidth(475);
-        spacebar.setMinHeight(35);
+        spacebar.setMinWidth(spacebarWidth);
+        spacebar.setMinHeight(height);
         spacebar.setMnemonicParsing(false);
         keyboardButtonList.add(spacebar);
 
@@ -193,5 +195,6 @@ public class ButtonCreationService {
         }
         return buttons;
     }
+
 
 }
