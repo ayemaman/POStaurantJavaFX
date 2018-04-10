@@ -179,4 +179,18 @@ public class ButtonCreationService {
         return buttons;
     }
 
+    public ArrayList<Button> createIngridientButtons(){
+        ArrayList<Button> buttons=new ArrayList<>();
+        List<Ingredient> list=menuService.getAllIngredients();
+        for(Ingredient i:list){
+            Button button=new Button(i.getName().substring(0,i.getName().indexOf(" "))+"\n"+i.getName().substring(i.getName().indexOf(" ")+1)+"\n"+i.getAmount());
+            button.setMinWidth(73);
+            button.setMinHeight(82.5);
+            button.setMnemonicParsing(false);
+            button.setId("IngredientButton");
+            buttons.add(button);
+        }
+        return buttons;
+    }
+
 }

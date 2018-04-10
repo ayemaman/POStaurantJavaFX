@@ -1,5 +1,6 @@
 package postaurant.database;
 
+import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
@@ -18,5 +19,6 @@ public interface UserDatabase {
     void blockUser(User user);
     List<Item> getMenu();
     List<Item> getItem(String itemID);
+    List<Ingredient> getAllIngredients();
 }
 

@@ -126,6 +126,13 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.query(getEmptyItemSQL,new ItemMapper(), itemID);
     }
 
+    private final String getAllIngredientsSQL="SELECT * FROM ingredients";
+
+    @Override
+    public List<Ingredient> getAllIngredients() {
+        return jdbcTemplate.query(getAllIngredientsSQL, new IngredientMapper());
+    }
+
 
     private static final class UserMapper implements RowMapper<User>{
         @Override
@@ -198,6 +205,17 @@ public class UserDao implements UserDatabase{
 
             item.addIngredient(ingredient,quantity);
             return item;
+        }
+    }
+
+    private static final class IngredientMapper implements RowMapper<Ingredient>{
+        @Override
+        public Ingredient mapRow(ResultSet rs, int i) throws SQLException{
+            Ingredient ingredient=new Ingredient();
+            ingredient.setId(rs.getString("ingr_id"));
+            ingredient.setName(rs.getString("ingr_name"));
+            ingredient.setAmount(rs.getInt("ingr_amount"));
+            return ingredient;
         }
     }
 

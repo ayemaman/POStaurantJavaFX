@@ -1,12 +1,21 @@
 package postaurant;
 
 
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
@@ -18,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -34,6 +44,9 @@ public class MenuScreenController {
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
+
+    @Value("/FXML/ItemInfoScreen.fxml")
+    private Resource itemInfoForm;
 
     @FXML
     private TabPane sectionTabPane;
@@ -79,6 +92,23 @@ public class MenuScreenController {
         }
         AnchorPane anchorPane=(AnchorPane)sectionTabPane.getTabs().get(0).getContent();
         GridPane gridPane =(GridPane)anchorPane.getChildren().get(0);
+        for(Button b: itemButtonList){
+            b.setOnAction(event -> {
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
+                    Parent parent=loader.load();
+                    ItemInfoScreenController itemInfoScreenController=loader.getController();
+                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
+                    itemInfoScreenController.setup();
+                    Scene scene = new Scene(parent);
+                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            });
+        }
         setItemButtonsForSection(gridPane, true);
 
     }

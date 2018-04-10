@@ -53,4 +53,8 @@ public class MenuService {
         return itemWithIngredients;
     }
 
+    public List<Ingredient> getAllIngredients(){
+        return userDatabase.getAllIngredients();
+    }
+
 }

@@ -97,6 +97,7 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
+
         doTime();
     }
 
