@@ -44,13 +44,13 @@ public class MenuService {
 
     public Item getItem(String itemID){
         List<Item> list=userDatabase.getItem(itemID);
-        for(int i=0;i<list.size();){
-            Map.Entry<Ingredient,Integer> entry=list.get(i).getRecipe().entrySet().iterator().next();
-            list.get(i).addIngredient(entry.getKey(),entry.getValue());
-            list.remove(i+1);
+        for(Item i:list){
+            for(Map.Entry<Ingredient, Integer> entry: i.getRecipe().entrySet()) {
+                list.get(0).addIngredient(entry.getKey(), entry.getValue());
+            }
         }
-        Item itemWithIngredients=list.get(0);
-        return itemWithIngredients;
+        Item item=list.get(0);
+        return item;
     }
 
     public List<Ingredient> getAllIngredients(){

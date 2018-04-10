@@ -17,6 +17,7 @@ import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
+import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import javafx.fxml.FXML;
@@ -99,7 +100,9 @@ public class MenuScreenController {
                     Parent parent=loader.load();
                     ItemInfoScreenController itemInfoScreenController=loader.getController();
                     itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
-                    itemInfoScreenController.setup();
+                    System.out.println(b.getText());
+                    System.out.println(menuService.getItem("cheeseburger200"));
+                    itemInfoScreenController.setup(menuService.getItem("cheeseburger200"));
                     Scene scene = new Scene(parent);
                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                     stage.setScene(scene);

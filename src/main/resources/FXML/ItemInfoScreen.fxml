@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.ItemInfoScreenController">
    <children>
@@ -107,9 +108,9 @@
                                     <Insets bottom="1.0" />
                                  </VBox.margin>
                               </Button>
-                              <TableView prefHeight="300.0" prefWidth="200.0">
+                              <TableView fx:id="ingredientTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="200.0">
                                 <columns>
-                                  <TableColumn prefWidth="199.0" text="Recipe" />
+                                  <TableColumn fx:id="recipeColumn" prefWidth="199.0" text="Recipe" />
                                 </columns>
                               </TableView>
                            </children>
@@ -133,10 +134,13 @@
                               <Insets bottom="1.0" left="5.0" right="5.0" top="1.0" />
                            </HBox.margin>
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="82.5" prefWidth="73.0" text="Button">
+                              <Button mnemonicParsing="false" prefHeight="82.5" prefWidth="73.0" text="blabla">
                                  <GridPane.margin>
                                     <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                  </GridPane.margin>
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
                               </Button>
                               <Button mnemonicParsing="false" prefHeight="82.5" prefWidth="73.0" text="Button" GridPane.columnIndex="1">
                                  <GridPane.margin>

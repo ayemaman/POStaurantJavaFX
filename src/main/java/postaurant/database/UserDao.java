@@ -126,7 +126,7 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.query(getEmptyItemSQL,new ItemMapper(), itemID);
     }
 
-    private final String getAllIngredientsSQL="SELECT * FROM ingredients";
+    private final String getAllIngredientsSQL="SELECT * FROM ingredients ORDER BY ingr_name";
 
     @Override
     public List<Ingredient> getAllIngredients() {

@@ -86,7 +86,7 @@ public class Item {
     public String toString(){
         String buffer="Name:"+ getName()+" ID: "+getId()+" Section: "+getCat()+" ";
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
-            buffer+="Ingr:"+entry.getKey()+" Amount:/"+entry.getValue()+" ";
+            buffer+="Ingr:"+entry.getKey()+" Amount:"+entry.getValue()+"/ ";
         }
         return buffer;
     }
