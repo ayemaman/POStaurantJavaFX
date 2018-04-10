@@ -10,16 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -48,7 +45,7 @@ public class NewUserScreenController {
     private UserService userService;
     private ButtonCreationService buttonCreationService;
 
-    @Value("FXML/ConfirmationSave.fxml")
+    @Value("FXML/ConfirmationUserSave.fxml")
     private Resource confirmationForm;
     @Value("FXML/WrongInputWindow.fxml")
     private Resource wrongInputForm;
@@ -133,8 +130,8 @@ public class NewUserScreenController {
                 try {
                     FXMLLoader loader = fxmLoaderService.getLoader(confirmationForm.getURL());
                     Parent parent = loader.load();
-                    ConfirmationSaveController confirmationSaveController = loader.getController();
-                    confirmationSaveController.setUser(user);
+                    ConfirmationUserSaveController confirmationUserSaveController = loader.getController();
+                    confirmationUserSaveController.setUser(user);
                     Scene scene = new Scene(parent);
                     Stage stage = new Stage();
                     stage.setScene(scene);

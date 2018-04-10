@@ -2,22 +2,24 @@ package postaurant;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.exception.InputValidationException;
@@ -26,6 +28,8 @@ import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +56,13 @@ public class ItemInfoScreenController {
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
 
+    @Value("/FXML/ItemWrongInputWindow.fxml")
+    private Resource wrongInputForm;
+    @Value("/FXML/MenuScreen.fxml")
+    private Resource menuScreenForm;
+    @Value("/FXML/ConfirmationItemSave.fxml")
+    private Resource confirmationSaveForm;
+
     @FXML
     private TextField  nameField;
     @FXML
@@ -63,6 +74,8 @@ public class ItemInfoScreenController {
 
     @FXML
     private Button saveButton;
+    @FXML
+    private Button exitButton;
     @FXML
     private Button removeButton;
     @FXML
@@ -110,23 +123,121 @@ public class ItemInfoScreenController {
            }
         });
 
+        exitButton.setOnAction(e->{
+            try {
+                FXMLLoader loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
+                Parent parent=loader.load();
+                Scene scene=new Scene(parent);
+                Stage stage=(Stage)((Node) e.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }catch (IOException ioE){
+                ioE.printStackTrace();
+
+            }
+        });
+
         saveButton.setOnAction(e-> {
-                    try {
-                        int avail;
-                        if (availabilityButton.getId().equals("AvailabilityONButton")) {
-                            avail = 1;
-                        } else {
-                            avail = 0;
-                        }
-                        HashMap<Ingredient, Integer> recipe = new HashMap<>();
-                        for (Ingredient i : ingredientsList) {
-                            recipe.merge(i, 1, (a, b) -> a + b);
-                        }
-                        Item item = new Item(name.getValue(), Double.parseDouble(price.getValue()), type.getValue(), section.getValue(), avail, recipe);
-                        System.out.println(item);
-                    }catch (Exception e1){
-                        e1.printStackTrace();
-                    }
+            try {
+                int avail;
+                if (availabilityButton.getId().equals("AvailabilityONButton")) {
+                    avail = 1;
+                } else {
+                    avail = 0;
+                }
+                HashMap<Ingredient, Integer> recipe = new HashMap<>();
+                for (Ingredient i : ingredientsList) {
+                    recipe.merge(i, 1, (a, b) -> a + b);
+                }
+                Item item = new Item();
+                try {
+                    item.setName(name.getValue());
+                } catch (InputValidationException eName) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("name");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }
+                try {
+                    item.setPrice(Double.parseDouble(price.getValue()));
+                } catch (Exception ePrice) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("price");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+
+                }
+                try {
+                    item.setType(type.get());
+                } catch (InputValidationException eType) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("type");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+
+                }
+                try {
+                    item.setSection(section.getValue());
+                } catch (InputValidationException eSection) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("section");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+
+                }
+                try {
+                    item.setAvailability(avail);
+                } catch (InputValidationException eAvailability) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("availability");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }
+                try {
+                    item.setRecipe(recipe);
+                } catch (InputValidationException eRecipe) {
+                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent parent=loader.load();
+                    ItemWrongInputController itemWrongInputController=loader.getController();
+                    itemWrongInputController.setErrorLabelText("recipe");
+                    Scene scene=new Scene(parent);
+                    Stage stage=new Stage();
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }
+                FXMLLoader loader=fxmLoaderService.getLoader(confirmationSaveForm.getURL());
+                Parent parent=loader.load();
+                ConfirmationItemSaveController confirmationItemSaveController=loader.getController();
+                confirmationItemSaveController.setup(item);
+                Scene scene=new Scene(parent);
+                Stage stage=new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+            }catch (IOException ioE){
+                ioE.printStackTrace();
+            }
+
+
                 });
 
         nameField.setOnMouseClicked(e->this.currentTextField=nameField);
@@ -137,6 +248,10 @@ public class ItemInfoScreenController {
     }
 
     public void setup(Item item){
+        name.setValue(item.getName());
+        price.setValue(""+item.getPrice());
+        type.setValue(item.getType());
+        section.setValue(item.getSection());
         this.page=0;
         addOnActionToIngredientButtons();
         setIngredientButtons(this.page,this.ingredientGrid, 12,true,ingredientButtonList);

@@ -4,7 +4,9 @@ import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
+import postaurant.model.User;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Component
@@ -45,11 +47,16 @@ public class MenuService {
     public Item getItem(String itemID){
         List<Item> list=userDatabase.getItem(itemID);
         for(Item i:list){
+            System.out.println(i);
             for(Map.Entry<Ingredient, Integer> entry: i.getRecipe().entrySet()) {
                 list.get(0).addIngredient(entry.getKey(), entry.getValue());
             }
         }
-        Item item=list.get(0);
+
+        Item item=new Item();
+        if(!list.isEmpty()) {
+            item = list.get(0);
+        }
         return item;
     }
 
@@ -61,4 +68,11 @@ public class MenuService {
         return userDatabase.getIngredient(id);
     }
 
+    /*public Item saveNewItem(Item item){
+        if(getItem(item.getId()==null))
+
+        }
+        return getItem(item.getId());
+    }
+*/
 }

@@ -26,14 +26,15 @@ public class Item {
         setSection(section);
         setAvailability(availability);
         setRecipe(recipe);
+        setId();
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId() {
+        this.id=name+price;
     }
 
     public String getName() {
@@ -42,7 +43,7 @@ public class Item {
 
     public void setName(String name) throws InputValidationException {
         if(name.matches("(\\p{ASCII}){2,30}")){
-        this.name = name;
+        this.name = name.toUpperCase();
         }else{
             throw new InputValidationException();
         }
@@ -66,7 +67,7 @@ public class Item {
 
     public void setType(String type) throws InputValidationException {
         if (type.matches("(\\p{Alpha}){2,30}")) {
-            this.type = type;
+            this.type = type.toUpperCase();
         } else {
             throw new InputValidationException();
         }
@@ -78,7 +79,7 @@ public class Item {
 
     public void setSection(String section) throws InputValidationException {
         if (section.matches("(\\p{Alpha}){2,30}")) {
-            this.section = section;
+            this.section = section.toUpperCase();
         } else {
             throw new InputValidationException();
         }
@@ -105,7 +106,7 @@ public class Item {
     }
 
     public void setAvailability(int availability) throws InputValidationException {
-        if(availability!=1 && availability!=0) {
+        if((availability!=68) && (availability!=86) && (availability!=85)) {
             throw new InputValidationException();
         }else{
             this.availability=availability;
@@ -121,10 +122,12 @@ public class Item {
     }
 
     public String toString(){
-        String buffer="Name:"+ getName()+" ID: "+getId()+" Section: "+ getSection()+" ";
+        String buffer="Name:"+ getName()+"\n ID: "+getId()+"\n Section: "+ getSection()+"\n ";
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
-            buffer+="Ingr:"+entry.getKey()+" Amount:"+entry.getValue()+"/ ";
+            buffer+="\nIngr:"+entry.getKey()+" Amount:"+entry.getValue()+"/ ";
         }
         return buffer;
     }
+
+
 }

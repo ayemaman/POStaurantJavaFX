@@ -15,7 +15,9 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDao implements UserDatabase{
 
@@ -45,9 +47,9 @@ public class UserDao implements UserDatabase{
 
     private final String retrieveUserOrders="SELECT *\n" +
             "FROM orders\n" +
-            "NATURAL JOIN order_has_item\n" +
+            "NATURAL JOIN order_has_items\n" +
             "NATURAL JOIN items\n" +
-            "NATURAL JOIN item_has_ingredient\n" +
+            "NATURAL JOIN item_has_ingredients\n" +
             "NATURAL JOIN ingredients\n" +
             "WHERE dub_id=? AND status='OPEN'\n" +
             "ORDER BY table_no";
@@ -105,7 +107,7 @@ public class UserDao implements UserDatabase{
 
     private final String getMenuSQL="SELECT *\n" +
             "FROM items\n" +
-            "NATURAL JOIN item_has_ingredient\n" +
+            "NATURAL JOIN item_has_ingredients\n" +
             "NATURAL JOIN ingredients\n"+
             "ORDER BY i_id";
     @Override
@@ -113,14 +115,14 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.query(getMenuSQL,new ItemMapper());
     }
 
-    private final String getEmptyItemSQL="SELECT * FROM items\n" +
-            "NATURAL JOIN item_has_ingredient\n" +
+    private final String getItemSQL="SELECT * FROM items\n" +
+            "NATURAL JOIN item_has_ingredients\n" +
             "NATURAL JOIN ingredients\n"+
             "WHERE i_id=?";
 
     @Override
     public List<Item> getItem(String itemID) {
-        return jdbcTemplate.query(getEmptyItemSQL,new ItemMapper(), itemID);
+        return jdbcTemplate.query(getItemSQL,new ItemMapper(), itemID);
     }
 
     private final String getAllIngredientsSQL="SELECT * FROM ingredients ORDER BY ingr_name";
@@ -136,6 +138,19 @@ public class UserDao implements UserDatabase{
     public Ingredient getIngredient(String id){
         return jdbcTemplate.queryForObject(getIngredientSQL,new IngredientMapper(),id);
     }
+
+
+    private final String saveItemSQL="INSERT INTO items VALUES(?,?,?,?,?)";
+    private final String insertIngredients="INSERT INTO item_has_ingredients VALUES (?,?,?)";
+    @Override
+    public List<Item> saveNewItem(Item item) {
+        jdbcTemplate.update(saveItemSQL, item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection());
+        for(Map.Entry<Ingredient, Integer> entry:item.getRecipe().entrySet()) {
+            jdbcTemplate.update(insertIngredients,item.getId(), entry.getKey(),entry.getValue());
+        }
+        return getItem(item.getId());
+    }
+
 
 
     private static final class UserMapper implements RowMapper<User>{
@@ -172,23 +187,23 @@ public class UserDao implements UserDatabase{
             order.setTableNo(rs.getDouble("table_no"));
             order.setStatus(rs.getString("status"));
 
+            Ingredient ingredient=new Ingredient();
+            ingredient.setId(rs.getString("ingr_id"));
+            ingredient.setName(rs.getString("ingr_name"));
+            ingredient.setAmount(rs.getInt("ingr_amount"));
+            Integer quantity=rs.getInt("ingr_quantity");
+            HashMap<Ingredient, Integer> map=new HashMap<>();
+            map.put(ingredient,quantity);
+
             Item item=new Item();
             try {
-                item.setId(rs.getString("i_id"));
-                item.setName(rs.getString("i_name"));
-                item.setPrice(rs.getDouble("i_price"));
+                item=new Item(rs.getString("i_name"),rs.getDouble("i_price"), rs.getString("i_type"),rs.getString("i_section"),rs.getInt("i_availability"),map);
                 item.setKitchen_status(rs.getString("kitchen_status"));
             }catch (InputValidationException e){
                 e.printStackTrace();
             }
 
-            Ingredient ingredient=new Ingredient();
-            Integer quantity=rs.getInt("ingr_quantity");
-            ingredient.setId(rs.getString("ingr_id"));
-            ingredient.setName(rs.getString("ingr_name"));
-            ingredient.setAmount(rs.getInt("ingr_amount"));
 
-            item.addIngredient(ingredient,quantity);
             order.addItem(item);
             return order;
         }
@@ -198,23 +213,21 @@ public class UserDao implements UserDatabase{
         @Override
         public Item mapRow(ResultSet rs, int i) throws SQLException{
             Item item=new Item();
-            try {
-                item.setId(rs.getString("i_id"));
-                item.setName(rs.getString("i_name"));
-                item.setPrice(rs.getDouble("i_price"));
-                item.setSection(rs.getString("i_section"));
+            try{
+                Ingredient ingredient=new Ingredient();
+                ingredient.setId(rs.getString("ingr_id"));
+                ingredient.setName(rs.getString("ingr_name"));
+                ingredient.setAmount(rs.getInt("ingr_amount"));
+                Integer quantity=rs.getInt("ingr_quantity");
+                HashMap<Ingredient, Integer> map=new HashMap<>();
+                map.put(ingredient, quantity);
+
+                item=new Item(rs.getString("i_name"),rs.getDouble("i_price"), rs.getString("i_type"),rs.getString("i_section"),rs.getInt("i_availability"),map);
+
+
             }catch (InputValidationException e){
                 e.printStackTrace();
             }
-
-            Ingredient ingredient=new Ingredient();
-            Integer quantity=rs.getInt("ingr_quantity");
-            ingredient.setId(rs.getString("ingr_id"));
-            ingredient.setName(rs.getString("ingr_name"));
-            ingredient.setAmount(rs.getInt("ingr_amount"));
-
-
-            item.addIngredient(ingredient,quantity);
             return item;
         }
     }

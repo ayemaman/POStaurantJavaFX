@@ -78,7 +78,7 @@ public class UserService {
             }
             return sorted;
         }catch (Exception ex1){
-            System.out.println("error retrieving user orders"+ ex1);
+            ex1.printStackTrace();
             return null;
         }
     }

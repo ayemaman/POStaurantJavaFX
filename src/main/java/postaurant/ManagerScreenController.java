@@ -70,11 +70,7 @@ public class ManagerScreenController {
             try{
                 FXMLLoader loader=fxmLoaderService.getLoader(menuForm.getURL());
                 Parent parent=loader.load();
-                MenuScreenController menuScreenController=loader.getController();
-                List<Tab> list=buttonCreationService.createSectionTabs();
-                menuScreenController.setSectionTabList(list);
-                menuScreenController.setItemButtonList(buttonCreationService.createItemButtonsForSection(list.get(0).getText()));
-                menuScreenController.setSectionTabs();
+                //MenuScreenController menuScreenController=loader.getController();
                 Scene scene= new Scene(parent);
                 scene.getStylesheets().add(""+css.getURL());
                 Stage stage= (Stage)((Node) e.getSource()).getScene().getWindow();

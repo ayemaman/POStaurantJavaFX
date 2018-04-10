@@ -97,7 +97,7 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
-        menuService.getItem("cheeseburger200");
+        System.out.println(menuService.getItem("CHEESEBURGER6.9"));
         doTime();
     }
 

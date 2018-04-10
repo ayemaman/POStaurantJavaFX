@@ -26,7 +26,7 @@
                      <HBox.margin>
                         <Insets left="10.0" right="30.0" />
                      </HBox.margin></Button>
-                  <Button fx:id="menuScreenButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="75.0" prefWidth="130.0" text="MENU SCREEN">
+                  <Button fx:id="exitButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="75.0" prefWidth="130.0" text="MENU SCREEN">
                      <HBox.margin>
                         <Insets right="30.0" />
                      </HBox.margin>

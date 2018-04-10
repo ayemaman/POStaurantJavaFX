@@ -17,6 +17,8 @@ import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
+import postaurant.database.UserDao;
+import postaurant.database.UserDatabase;
 import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
@@ -63,8 +65,17 @@ public class MenuScreenController {
         this.buttonCreationService=buttonCreationService;
     }
     public void initialize(){
+        setup();
 
+    }
 
+    public void setup(){
+        List<Tab> list=buttonCreationService.createSectionTabs();
+        if(!list.isEmpty()) {
+            setSectionTabList(list);
+            setItemButtonList(buttonCreationService.createItemButtonsForSection(list.get(0).getText()));
+            setSectionTabs();
+        }
     }
 
     public List<Button> getItemButtonList() {
@@ -82,6 +93,8 @@ public class MenuScreenController {
     public void setSectionTabList(List<Tab> sectionTabList) {
         this.sectionTabList = sectionTabList;
     }
+
+
 
     public void setSectionTabs(){
         for(Tab t: sectionTabList) {

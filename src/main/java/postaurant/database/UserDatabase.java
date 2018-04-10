@@ -21,6 +21,7 @@ public interface UserDatabase {
     List<Item> getItem(String itemID);
     List<Ingredient> getAllIngredients();
     Ingredient getIngredient(String id);
+    List<Item> saveNewItem(Item item);
 
 }
 

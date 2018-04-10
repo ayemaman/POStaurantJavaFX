@@ -14,15 +14,16 @@ import postaurant.service.UserService;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ConfirmationSaveController {
-    private boolean saved =false;
+public class ConfirmationUserDeleteController {
+    private boolean deleted=false;
     private User user;
 
     private UserService userService;
-    private static Label confirmationLabel=new Label("Successfully saved");
+    private static Label confirmationLabel=new Label("Successfully deleted");
 
     @FXML
     private Label userLabel;
+
     @FXML
     private Button yesButton;
     @FXML
@@ -32,40 +33,39 @@ public class ConfirmationSaveController {
     @FXML
     private VBox topConfirmationBox;
 
-    private ConfirmationSaveController(UserService userService){
+    private ConfirmationUserDeleteController(UserService userService){
         this.userService=userService;
         confirmationLabel.setTextFill(Paint.valueOf("#ffbf00"));
     }
 
     public void setUser(User user){
         this.user=user;
-        userLabel.setText(user.getFirstName()+" "+user.getLastName()+" "+user.getPosition());
+        userLabel.setText(user.toString());
     }
-
-    public boolean wasSaved(){
-        return saved;
+    public boolean wasDeleted(){
+        return deleted;
     }
 
     public void initialize(){
         yesButton.setOnAction(event -> {
-            user=userService.saveNewUser(user);
+            userService.blockUser(user);
             for( int i=0;i<bottomConfirmationBox.getChildren().size();){
                 bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
             }
             topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+            System.out.println("adding label");
             bottomConfirmationBox.getChildren().add(confirmationLabel);
             Button button=new Button("OK");
-
             button.setOnAction(e->button.getScene().getWindow().hide());
-            userLabel.setText("NEW USER ID: "+user.getUserID());
             bottomConfirmationBox.getChildren().add(button);
-            saved=true;
+           deleted=true;
         });
 
         noButton.setOnAction(event -> {
-            saved=false;
+            deleted=false;
             noButton.getScene().getWindow().hide();
         });
 
     }
+
 }
