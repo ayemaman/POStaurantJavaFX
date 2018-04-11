@@ -1,5 +1,9 @@
 package postaurant.model;
 
+
+import java.util.Comparator;
+import java.util.function.ToIntFunction;
+
 public class Ingredient {
     private String id;
     private String name;
@@ -47,7 +51,11 @@ public class Ingredient {
         this.allergy = allergy;
     }
 
-    public String toString(){
+    public String toString() {
         return getName();
     }
 }
+
+
+
+

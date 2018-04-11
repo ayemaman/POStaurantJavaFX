@@ -108,10 +108,9 @@ public class Item {
                 }
             }
             if(exists){
-                System.out.println("exists");
+
                 recipe.put(buffer,recipe.get(buffer)+amount);
             }else{
-                System.out.println("no exist");
                 recipe.put(ingredient,amount);
             }
 

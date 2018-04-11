@@ -148,8 +148,10 @@ public class UserDao implements UserDatabase{
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 jdbcTemplate.update(insertIngredients, item.getId(), entry.getKey().getId(), entry.getValue());
             }
+            return getItem(item.getId());
+        }else {
+            return null;
         }
-        return getItem(item.getId());
     }
 
 

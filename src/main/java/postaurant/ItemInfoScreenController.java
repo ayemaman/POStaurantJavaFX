@@ -31,7 +31,7 @@ import postaurant.service.MenuService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -127,6 +127,7 @@ public class ItemInfoScreenController {
            }
         });
 
+
         exitButton.setOnAction(e->{
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
@@ -141,125 +142,8 @@ public class ItemInfoScreenController {
             }
         });
 
-        saveButton.setOnAction(e-> {
-            try {
-                int avail;
-                if (availabilityButton.getId().equals("AvailabilityONButton")) {
-                    avail = 86;
-                } else {
-                    avail = 68;
-                }
+        saveButton.setOnAction(this::saveButtonAction);
 
-                Item item = new Item();
-                try {
-                    item.setName(name.getValue());
-                } catch (InputValidationException eName) {
-                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
-                    Parent parent = loader.load();
-                    ItemWrongInputController itemWrongInputController = loader.getController();
-                    itemWrongInputController.setErrorLabelText("name");
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-                }
-                try {
-                    item.setPrice(Double.parseDouble(price.getValue()));
-                } catch (Exception ePrice) {
-                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
-                    Parent parent = loader.load();
-                    ItemWrongInputController itemWrongInputController = loader.getController();
-                    itemWrongInputController.setErrorLabelText("price");
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-
-                }
-                try {
-                    item.setType(type.get());
-                } catch (InputValidationException eType) {
-                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
-                    Parent parent = loader.load();
-                    ItemWrongInputController itemWrongInputController = loader.getController();
-                    itemWrongInputController.setErrorLabelText("type");
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-
-
-                }
-                try {
-                    item.setSection(section.getValue());
-                } catch (InputValidationException eSection) {
-                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
-                    Parent parent = loader.load();
-                    ItemWrongInputController itemWrongInputController = loader.getController();
-                    itemWrongInputController.setErrorLabelText("section");
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-
-
-                }
-                try {
-                    item.setAvailability(avail);
-                } catch (InputValidationException eAvailability) {
-                    FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
-                    Parent parent = loader.load();
-                    ItemWrongInputController itemWrongInputController = loader.getController();
-                    itemWrongInputController.setErrorLabelText("availability");
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-
-                }
-
-                    for(Ingredient ingr: ingredientsList){
-                        item.addIngredient(ingr,1);
-                    }
-
-                if ((item.getName()!=null) && (item.getPrice()!=null) && (item.getType()!=null)&&(item.getSection()!=null)){
-                    FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
-                    Parent parent = loader.load();
-                    ConfirmationItemSaveController confirmationItemSaveController = loader.getController();
-                    item.setId();
-                    for(Map.Entry<Ingredient, Integer> entry:item.getRecipe().entrySet()) {
-                        System.out.println(entry.getKey()+""+entry.getValue());
-                    }
-                    confirmationItemSaveController.setup(item);
-                    Scene scene = new Scene(parent);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.showAndWait();
-                    if(confirmationItemSaveController.isSaved()){
-                        loader=fxmLoaderService.getLoader(menuScreenForm.getURL());
-                        parent=loader.load();
-                        scene=new Scene(parent);
-                        Stage stage1=(Stage)saveButton.getScene().getWindow();
-                        stage1.setScene(scene);
-                        stage1.show();
-
-                                /*
-                                  FXMLLoader loader=fxmLoaderService.getLoader(menuForm.getURL());
-                Parent parent=loader.load();
-                Scene scene= new Scene(parent);
-                scene.getStylesheets().add(""+css.getURL());
-                Stage stage= (Stage)((Node) e.getSource()).getScene().getWindow();
-                stage.setScene(scene);
-                stage.show();
-                                 */
-                    }
-                }
-            }catch (IOException ioE) {
-                ioE.printStackTrace();
-            }
-
-
-                });
         currentTextField=nameField;
         nameField.setOnMouseClicked(e->this.currentTextField=nameField);
         priceField.setOnMouseClicked(e->this.currentTextField=priceField);
@@ -278,7 +162,7 @@ public class ItemInfoScreenController {
         addOnActionToIngredientButtons();
         setIngredientButtons(this.page,this.ingredientGrid, 12,true,ingredientButtonList);
         setItem(item);
-        if(item.getAvailability()==1){
+        if(item.getAvailability()==86){
             availabilityButton.getStyleClass().clear();
             availabilityButton.getStyleClass().add("AvailabilityOFFButton");
         }else{
@@ -289,9 +173,12 @@ public class ItemInfoScreenController {
         recipeColumn.setMinWidth(200);
         recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         ingredientTable.setItems(ingredientsList);
+        ingredientTable.getSortOrder().add(recipeColumn);
         ingredientTable.setPlaceholder(new Label("Add ingredients"));
 
     }
+
+
 
     public void setItem(Item item) {
         this.item = item;
@@ -318,7 +205,12 @@ public class ItemInfoScreenController {
         for(Button b:ingredientButtonList){
             b.setOnAction(e->{
                 Ingredient ingredient=menuService.getIngredient(b.getText().substring(0,b.getText().indexOf("\n")));
-                ingredientTable.getItems().add(ingredient);
+                ingredientsList.add(ingredient);
+                Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
+                FXCollections.sort(ingredientsList,ingredientNameComparator);
+                for(int i=0;i<ingredientsList.size();i++){
+                    System.out.println(ingredientsList.get(i));
+                }
             });
         }
     }
@@ -453,5 +345,107 @@ public class ItemInfoScreenController {
     }
 
 
+    private void saveButtonAction(ActionEvent e) {
+        try {
+            int avail;
+            if (availabilityButton.getId().equals("AvailabilityONButton")) {
+                avail = 86;
+            } else {
+                avail = 68;
+            }
 
+            Item item = new Item();
+            try {
+                item.setName(name.getValue());
+            } catch (InputValidationException eName) {
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("name");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+            }
+            try {
+                item.setPrice(Double.parseDouble(price.getValue()));
+            } catch (Exception ePrice) {
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("price");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+
+            }
+            try {
+                item.setType(type.get());
+            } catch (InputValidationException eType) {
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("type");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+
+
+            }
+            try {
+                item.setSection(section.getValue());
+            } catch (InputValidationException eSection) {
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("section");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+
+
+            }
+            try {
+                item.setAvailability(avail);
+            } catch (InputValidationException eAvailability) {
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("availability");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+
+            }
+            for (Ingredient ingr : ingredientsList) {
+                item.addIngredient(ingr, 1);
+            }
+
+            if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null)) {
+                item.setId();
+                FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
+                Parent parent = loader.load();
+                ConfirmationItemSaveController confirmationItemSaveController = loader.getController();
+                confirmationItemSaveController.setup(item);
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+                if (confirmationItemSaveController.isSaved()) {
+                    loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
+                    parent = loader.load();
+                    scene = new Scene(parent);
+                    Stage stage1 = (Stage)((Node) e.getSource()).getScene().getWindow();
+                    stage1.setScene(scene);
+                    stage1.show();
+                }
+            }
+        } catch (IOException ioE) {
+            ioE.printStackTrace();
+        }
+    }
 }

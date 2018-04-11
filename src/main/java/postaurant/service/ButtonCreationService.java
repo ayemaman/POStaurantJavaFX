@@ -137,7 +137,6 @@ public class ButtonCreationService {
         ArrayList<Tab> tabs=new ArrayList<>();
         Map<String, List<Item>> sectionsWithItems= menuService.getSectionsWithItems();
         for (Map.Entry<String, List<Item> > entry : sectionsWithItems.entrySet()){
-
             GridPane gridPane=new GridPane();
             gridPane.setAlignment(Pos.CENTER);
             for (int i = 0; i < 4; i++) {

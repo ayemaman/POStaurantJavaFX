@@ -20,8 +20,7 @@ public class MenuService {
     public Map<String, List<Item>> getSectionsWithItems(){
         Map<String, List<Item>> map=new HashMap<>();
         List<Item> fullItemList=userDatabase.getMenu();
-        int itemInt=0;
-        while(itemInt<fullItemList.size()-1) {
+        for(int itemInt=0;itemInt<fullItemList.size()-1;)
             if (fullItemList.get(itemInt).getId().equals(fullItemList.get(itemInt + 1).getId())){
                 Map.Entry<Ingredient,Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
                 fullItemList.get(itemInt).addIngredient(entry.getKey(),entry.getValue());
@@ -30,7 +29,6 @@ public class MenuService {
             else{
                 itemInt++;
             }
-        }
 
         for(Item item:fullItemList){
             if(map.containsKey(item.getSection())){
