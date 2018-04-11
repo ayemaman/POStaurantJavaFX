@@ -1,5 +1,7 @@
 package postaurant;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -45,10 +47,10 @@ public class ItemInfoScreenController {
     private ObservableList<Ingredient> ingredientsList;
 
     private boolean lowercase=true;
-    private StringProperty name = new SimpleStringProperty("");
-    private StringProperty price = new SimpleStringProperty("");
-    private StringProperty type = new SimpleStringProperty("");
-    private StringProperty section = new SimpleStringProperty("");
+    private StringProperty name;
+    private StringProperty price;
+    private StringProperty type;
+    private StringProperty section;
 
 
 
@@ -107,6 +109,10 @@ public class ItemInfoScreenController {
     }
 
     public void initialize() {
+        name=new SimpleStringProperty("");
+        price=new SimpleStringProperty("0.00");
+        type=new SimpleStringProperty("");
+        section=new SimpleStringProperty("");
         nameField.textProperty().bind(name);
         priceField.textProperty().bind(price);
         typeField.textProperty().bind(type);
@@ -153,41 +159,50 @@ public class ItemInfoScreenController {
     }
 
     public void setup(Item item){
-        name.setValue(item.getName());
-        price.setValue(""+item.getPrice());
-        type.setValue(item.getType());
-        section.setValue(item.getSection());
+        if(item!=null) {
+            name.setValue(item.getName());
+            price.setValue("" + item.getPrice());
+            type.setValue(item.getType());
+            section.setValue(item.getSection());
+        }
         setKeyboard(lowercase);
         this.page=0;
         addOnActionToIngredientButtons();
         setIngredientButtons(this.page,this.ingredientGrid, 12,true,ingredientButtonList);
         setItem(item);
-        if(item.getAvailability()==86){
+        try{
             availabilityButton.getStyleClass().clear();
-            availabilityButton.getStyleClass().add("AvailabilityOFFButton");
-        }else{
+            if (item.getAvailability() == 86) {
+                availabilityButton.getStyleClass().add("AvailabilityOFFButton");
+            } else {
+                availabilityButton.getStyleClass().add("AvailabilityONButton");
+            }
+        }catch (NullPointerException nE) {
             availabilityButton.getStyleClass().clear();
             availabilityButton.getStyleClass().add("AvailabilityONButton");
-
         }
-        recipeColumn.setMinWidth(200);
-        recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        ingredientTable.setItems(ingredientsList);
-        ingredientTable.getSortOrder().add(recipeColumn);
-        ingredientTable.setPlaceholder(new Label("Add ingredients"));
-
-    }
+            recipeColumn.setMinWidth(200);
+            recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+            ingredientTable.setItems(ingredientsList);
+            ingredientTable.getSortOrder().add(recipeColumn);
+            ingredientTable.setPlaceholder(new Label("Add ingredients"));
+        }
 
 
 
     public void setItem(Item item) {
         this.item = item;
         ingredientsList = FXCollections.observableArrayList();
-        for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                ingredientsList.add(entry.getKey());
+        if (item != null) {
+            for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    ingredientsList.add(entry.getKey());
+                }
             }
+        }else {
+            this.item = new Item();
         }
+
     }
 
 
@@ -205,6 +220,7 @@ public class ItemInfoScreenController {
         for(Button b:ingredientButtonList){
             b.setOnAction(e->{
                 Ingredient ingredient=menuService.getIngredient(b.getText().substring(0,b.getText().indexOf("\n")));
+                System.out.println(ingredient);
                 ingredientsList.add(ingredient);
                 Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
                 FXCollections.sort(ingredientsList,ingredientNameComparator);
@@ -258,19 +274,21 @@ public class ItemInfoScreenController {
         }
         if (stringProperty != null) {
             Button button = (Button) event.getSource();
-            switch (button.getText()) {
-                case "":
+            switch (button.getId()) {
+                case "capsKey":
                     setKeyboard(!lowercase);
                     break;
-                case "<--":
+                case "backspaceKey":
                     if(!stringProperty.getValue().equals("")) {
                         stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
                     }
                     break;
-                case "DELETE":
+                case "deleteKey":
                     stringProperty.set("");
                     break;
-
+                case "spacebarKey":
+                    stringProperty.set(stringProperty.getValue()+" ");
+                    break;
                 default:
                     stringProperty.set(stringProperty.getValue() + button.getText());
                     break;
@@ -424,8 +442,17 @@ public class ItemInfoScreenController {
             for (Ingredient ingr : ingredientsList) {
                 item.addIngredient(ingr, 1);
             }
-
-            if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null)) {
+            if((item.getRecipe().isEmpty())){
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("recipe");
+                Scene scene = new Scene(parent);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.showAndWait();
+            }
+            if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())) {
                 item.setId();
                 FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
                 Parent parent = loader.load();

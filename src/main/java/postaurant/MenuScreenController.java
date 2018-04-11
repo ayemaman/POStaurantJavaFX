@@ -57,7 +57,8 @@ public class MenuScreenController {
     @FXML
     private TabPane sectionTabPane;
     @FXML
-    private Button testButton;
+    private Button newItemButton;
+
 
     public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService){
         this.menuService=menuService;
@@ -66,6 +67,23 @@ public class MenuScreenController {
     }
     public void initialize(){
         setup();
+
+        newItemButton.setOnAction(event->{
+            try {
+                FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
+                Parent parent=loader.load();
+                ItemInfoScreenController itemInfoScreenController=loader.getController();
+                itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
+                itemInfoScreenController.setup(null);
+                Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
 
     }
 

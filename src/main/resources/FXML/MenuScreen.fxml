@@ -20,7 +20,7 @@
    <left>
       <VBox alignment="CENTER" prefHeight="600.0" prefWidth="185.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="testButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="NEW ITEM">
+            <Button fx:id="newItemButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="NEW ITEM">
                <font>
                   <Font size="18.0" />
                </font>

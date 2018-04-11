@@ -72,6 +72,7 @@ public class ButtonCreationService {
             button.setText(list.get(i));
             button.setMinWidth(buttonWidth);
             button.setMnemonicParsing(false);
+            button.setId("numberKey");
             keyboardButtonList.add(button);
         }
         if (lowercase) {
@@ -80,6 +81,7 @@ public class ButtonCreationService {
                 button.setMinWidth(buttonWidth);
                 button.setMnemonicParsing(false);
                 if (list.get(i).equals("")) {
+                    button.setId("capsKey");
                     ImageView caps = new ImageView();
                     caps.setFitHeight(20);
                     caps.setFitWidth(30);
@@ -91,7 +93,12 @@ public class ButtonCreationService {
                         e.printStackTrace();
                     }
                 }
+                else if(list.get(i).equals("<--")){
+                    button.setId("backspaceKey");
+                    button.setText(list.get(i));
+                }
                 else{
+                    button.setId("lowerCharKey");
                     button.setText(list.get(i));
                 }
                 keyboardButtonList.add(button);
@@ -103,6 +110,7 @@ public class ButtonCreationService {
                 button.setMinWidth(buttonWidth);
                 button.setMnemonicParsing(false);
                 if (list.get(i).equals("")) {
+                    button.setId("capsKey");
                     ImageView caps = new ImageView();
                     caps.setFitHeight(20);
                     caps.setFitWidth(30);
@@ -113,7 +121,12 @@ public class ButtonCreationService {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else {
+                }else if(list.get(i).equals("<--")){
+                    button.setId("backspaceKey");
+                    button.setText(list.get(i));
+                }
+                else {
+                    button.setId("upperCharKey");
                     button.setText(list.get(i));
                 }
                 keyboardButtonList.add(button);
@@ -122,12 +135,14 @@ public class ButtonCreationService {
         Button delete=new Button("DELETE");
         delete.setMinHeight(height);
         delete.setMinWidth(buttonWidth);
+        delete.setId("deleteKey");
         keyboardButtonList.add(delete);
 
         Button spacebar=new Button();
         spacebar.setMinWidth(spacebarWidth);
         spacebar.setMinHeight(height);
         spacebar.setMnemonicParsing(false);
+        spacebar.setId("spacebarKey");
         keyboardButtonList.add(spacebar);
 
         return keyboardButtonList;

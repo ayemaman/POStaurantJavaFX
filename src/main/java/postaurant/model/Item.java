@@ -2,6 +2,7 @@ package postaurant.model;
 
 import postaurant.exception.InputValidationException;
 
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class Item {
     private String kitchen_status;
 
     public Item(){
-        recipe=new HashMap<Ingredient,Integer>();
+        recipe=new HashMap<>();
 
     }
     public Item (String name, Double price, String type, String section, int availability, HashMap<Ingredient,Integer> recipe)throws InputValidationException{
@@ -42,8 +43,9 @@ public class Item {
     }
 
     public void setName(String name) throws InputValidationException {
-        if(name.matches("(\\p{ASCII}){2,30}")){
-        this.name = name.toUpperCase();
+        if(name.matches("(\\p{ASCII}){2,30}")) {
+            String noSpace= name.replaceAll(" ", "");
+            this.name = noSpace.toUpperCase();
         }else{
             throw new InputValidationException();
         }
@@ -140,11 +142,11 @@ public class Item {
     }
 
     public String toString(){
-        String buffer="Name:"+ getName()+"\n ID: "+getId()+"\n Section: "+ getSection()+"\n ";
+        StringBuilder buffer= new StringBuilder("Name:" + getName() + "\n ID: " + getId() + "\n Section: " + getSection() + "\n ");
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
-            buffer+="\nIngr:"+entry.getKey()+" Amount:"+entry.getValue()+"/ ";
+            buffer.append("\nIngr:").append(entry.getKey()).append(" Amount:").append(entry.getValue()).append("/ ");
         }
-        return buffer;
+        return buffer.toString();
     }
 
 
