@@ -70,7 +70,6 @@ public class ManagerScreenController {
             try{
                 FXMLLoader loader=fxmLoaderService.getLoader(menuForm.getURL());
                 Parent parent=loader.load();
-                //MenuScreenController menuScreenController=loader.getController();
                 Scene scene= new Scene(parent);
                 scene.getStylesheets().add(""+css.getURL());
                 Stage stage= (Stage)((Node) e.getSource()).getScene().getWindow();

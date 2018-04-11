@@ -140,13 +140,14 @@ public class UserDao implements UserDatabase{
     }
 
 
-    private final String saveItemSQL="INSERT INTO items VALUES(?,?,?,?,?)";
+    private final String saveItemSQL="INSERT INTO items VALUES(?,?,?,?,?,?)";
     private final String insertIngredients="INSERT INTO item_has_ingredients VALUES (?,?,?)";
     @Override
     public List<Item> saveNewItem(Item item) {
-        jdbcTemplate.update(saveItemSQL, item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection());
-        for(Map.Entry<Ingredient, Integer> entry:item.getRecipe().entrySet()) {
-            jdbcTemplate.update(insertIngredients,item.getId(), entry.getKey(),entry.getValue());
+        if(jdbcTemplate.update(saveItemSQL, item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(),item.getAvailability())==1) {
+            for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
+                jdbcTemplate.update(insertIngredients, item.getId(), entry.getKey().getId(), entry.getValue());
+            }
         }
         return getItem(item.getId());
     }

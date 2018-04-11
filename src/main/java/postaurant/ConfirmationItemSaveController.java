@@ -16,6 +16,11 @@ import postaurant.service.MenuService;
 public class ConfirmationItemSaveController {
 
     private boolean saved=false;
+
+    public boolean isSaved() {
+        return saved;
+    }
+
     private Item item;
 
     private final MenuService menuService;
@@ -40,20 +45,34 @@ public class ConfirmationItemSaveController {
     }
     public void initialize(){
         yesButton.setOnAction(e->{
-            //item=menuService.saveItem(item);
-            for(int i=0;i<bottomConfirmationBox.getChildren().size();){
-                bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
+
+            item=menuService.saveNewItem(item);
+            if(item!=null) {
+                for (int i = 0; i < bottomConfirmationBox.getChildren().size(); ) {
+                    bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
+                }
+                topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+                topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+                bottomConfirmationBox.getChildren().add(confirmationLabel);
+                Button button = new Button("OK");
+                button.setOnAction(event -> button.getScene().getWindow().hide());
+                itemLabel.setText("NEW ITEM ID: " + item.getId());
+                bottomConfirmationBox.getChildren().add(button);
+                saved = true;
+            }else{
+                for (int i = 0; i < bottomConfirmationBox.getChildren().size(); ) {
+                    bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
+                }
+                topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+                topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+                confirmationLabel.setText("Item with this id already exists in database.\nCheck input, and change name or amount to save.");
+                topConfirmationBox.getChildren().add(confirmationLabel);
+                Button button = new Button("OK");
+                button.setOnAction(event -> button.getScene().getWindow().hide());
+                bottomConfirmationBox.getChildren().add(button);
+                saved =false;
             }
-            topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
-            bottomConfirmationBox.getChildren().add(confirmationLabel);
-            Button button=new Button("OK");
-
-            button.setOnAction(event->button.getScene().getWindow().hide());
-            itemLabel.setText("NEW ITEM ID: "+item.getId());
-            bottomConfirmationBox.getChildren().add(button);
-            saved=true;
-
-            saved=true;
+            ;
         });
 
         noButton.setOnAction(e->{

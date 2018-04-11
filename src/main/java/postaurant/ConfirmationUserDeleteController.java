@@ -53,7 +53,6 @@ public class ConfirmationUserDeleteController {
                 bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
             }
             topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
-            System.out.println("adding label");
             bottomConfirmationBox.getChildren().add(confirmationLabel);
             Button button=new Button("OK");
             button.setOnAction(e->button.getScene().getWindow().hide());

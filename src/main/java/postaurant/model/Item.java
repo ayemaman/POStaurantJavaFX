@@ -8,7 +8,7 @@ import java.util.Map;
 public class Item {
     private String id;
     private String name;
-    private double price;
+    private Double price;
     private String type;
     private String section;
     private Map<Ingredient,Integer> recipe;
@@ -49,12 +49,12 @@ public class Item {
         }
     }
 
-    public double getPrice(){
+    public Double getPrice(){
         return price;
     }
 
-    public void setPrice(double price) throws InputValidationException {
-        if(price>0) {
+    public void setPrice(Double price) throws InputValidationException {
+        if(price!=null) {
             this.price = price;
         }else{
             throw new InputValidationException();
@@ -98,7 +98,26 @@ public class Item {
     }
 
     public void addIngredient(Ingredient ingredient, Integer amount){
-        getRecipe().put(ingredient,amount);
+        if(!getRecipe().isEmpty()) {
+            boolean exists=false;
+            Ingredient buffer=new Ingredient();
+            for (Map.Entry<Ingredient, Integer> entry : getRecipe().entrySet()) {
+                if (entry.getKey().getId().equals(ingredient.getId())) {
+                    exists=true;
+                    buffer=entry.getKey();
+                }
+            }
+            if(exists){
+                System.out.println("exists");
+                recipe.put(buffer,recipe.get(buffer)+amount);
+            }else{
+                System.out.println("no exist");
+                recipe.put(ingredient,amount);
+            }
+
+        }else{
+            recipe.put(ingredient, amount);
+        }
     }
 
     public int getAvailability() {

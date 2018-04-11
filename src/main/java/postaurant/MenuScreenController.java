@@ -132,7 +132,7 @@ public class MenuScreenController {
     }
     private boolean isNextPage() {
         try {
-            System.out.println(itemButtonList.get((this.page * 16)));
+            itemButtonList.get((this.page * 16));
         } catch (IndexOutOfBoundsException e) {
             return false;
         }

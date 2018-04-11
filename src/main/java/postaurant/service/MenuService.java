@@ -46,18 +46,20 @@ public class MenuService {
 
     public Item getItem(String itemID){
         List<Item> list=userDatabase.getItem(itemID);
-        for(Item i:list){
-            System.out.println(i);
-            for(Map.Entry<Ingredient, Integer> entry: i.getRecipe().entrySet()) {
-                list.get(0).addIngredient(entry.getKey(), entry.getValue());
+        Item item=new Item();
+        if(!list.isEmpty()){
+            for (Item i : list) {
+                for (Map.Entry<Ingredient, Integer> entry : i.getRecipe().entrySet()) {
+                    list.get(0).addIngredient(entry.getKey(), entry.getValue());
+                }
+                item=list.get(0);
             }
+            return item;
+        }
+        else{
+            return null;
         }
 
-        Item item=new Item();
-        if(!list.isEmpty()) {
-            item = list.get(0);
-        }
-        return item;
     }
 
     public List<Ingredient> getAllIngredients(){
@@ -68,11 +70,13 @@ public class MenuService {
         return userDatabase.getIngredient(id);
     }
 
-    /*public Item saveNewItem(Item item){
-        if(getItem(item.getId()==null))
-
+    public Item saveNewItem(Item item){
+        if(getItem(item.getId())==null){
+            userDatabase.saveNewItem(item);
+            return getItem(item.getId());
+        }else{
+            return null;
         }
-        return getItem(item.getId());
+
     }
-*/
 }
