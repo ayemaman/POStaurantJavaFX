@@ -1,9 +1,8 @@
 package postaurant;
-
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -45,6 +44,8 @@ public class ItemInfoScreenController {
     private ArrayList<Button> ingredientButtonList;
     private Item item;
     private ObservableList<Ingredient> ingredientsList;
+    private ObservableList<String> sectionsList;
+    private ObservableList<String> typeList;
 
     private boolean lowercase=true;
     private StringProperty name;
@@ -68,15 +69,15 @@ public class ItemInfoScreenController {
     private Resource confirmationSaveForm;
 
 
-    private TextField currentTextField;
+    private Node currentTextField;
     @FXML
     private TextField  nameField;
     @FXML
     private TextField priceField;
     @FXML
-    private TextField typeField;
+    private ComboBox<String> sectionComboBox;
     @FXML
-    private TextField sectionField;
+    private ComboBox<String> typeComboBox;
 
     @FXML
     private Button saveButton;
@@ -109,14 +110,20 @@ public class ItemInfoScreenController {
     }
 
     public void initialize() {
+
         name=new SimpleStringProperty("");
         price=new SimpleStringProperty("0.00");
         type=new SimpleStringProperty("");
         section=new SimpleStringProperty("");
-        nameField.textProperty().bind(name);
-        priceField.textProperty().bind(price);
-        typeField.textProperty().bind(type);
-        sectionField.textProperty().bind(section);
+
+        sectionsList=FXCollections.observableArrayList();
+        sectionsList.addAll(menuService.getSections());
+        sectionComboBox.setItems(sectionsList);
+
+        typeList=FXCollections.observableArrayList();
+        typeList.addAll(menuService.getTypes());
+        typeComboBox.setItems(typeList);
+
 
         removeButton.setOnAction(e -> {
             ObservableList<Ingredient> selected = ingredientTable.getSelectionModel().getSelectedItems();
@@ -149,13 +156,28 @@ public class ItemInfoScreenController {
         });
 
         saveButton.setOnAction(this::saveButtonAction);
-
+        nameField.textProperty().bind(name);
+        priceField.textProperty().bind(price);
+        typeComboBox.valueProperty().bind(type);
+        sectionComboBox.valueProperty().bind(section);
         currentTextField=nameField;
         nameField.setOnMouseClicked(e->this.currentTextField=nameField);
         priceField.setOnMouseClicked(e->this.currentTextField=priceField);
-        typeField.setOnMouseClicked(e->this.currentTextField=typeField);
-        sectionField.setOnMouseClicked(e->this.currentTextField=sectionField);
 
+        typeComboBox.setOnMouseClicked(e-> this.currentTextField=typeComboBox);
+        //listen for changes to the typeComboBox selection and update the displayed section StringProperty accordingly.
+        typeComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString )->{
+            if(newString!=null){
+                type.setValue(typeComboBox.getSelectionModel().getSelectedItem());
+            }
+        });
+        sectionComboBox.setOnMouseClicked(e->this.currentTextField = sectionComboBox);
+        //listen for changes to the sectionComboBox selection and update the displayed section StringProperty accordingly.
+        sectionComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString) -> {
+            if (newString != null) {
+                section.setValue(sectionComboBox.getSelectionModel().getSelectedItem());
+            }
+        });
     }
 
     public void setup(Item item){
@@ -194,6 +216,7 @@ public class ItemInfoScreenController {
         this.item = item;
         ingredientsList = FXCollections.observableArrayList();
         if (item != null) {
+            System.out.print(item.getSection());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 for (int i = 0; i < entry.getValue(); i++) {
                     ingredientsList.add(entry.getKey());
@@ -202,6 +225,7 @@ public class ItemInfoScreenController {
         }else {
             this.item = new Item();
         }
+
 
     }
 
@@ -267,9 +291,9 @@ public class ItemInfoScreenController {
             stringProperty = name;
         } else if (currentTextField.equals(priceField)) {
             stringProperty = price;
-        } else if(currentTextField.equals(typeField)){
+        } else if(currentTextField.equals(typeComboBox)){
             stringProperty=type;
-        } else if (currentTextField.equals(sectionField)) {
+        } else if (currentTextField.equals(sectionComboBox)) {
             stringProperty=section;
         }
         if (stringProperty != null) {

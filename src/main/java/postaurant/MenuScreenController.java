@@ -117,34 +117,35 @@ public class MenuScreenController {
     public void setSectionTabs(){
         for(Tab t: sectionTabList) {
             t.setOnSelectionChanged(event-> {
-                        AnchorPane anchorPane = (AnchorPane) t.getContent();
-                        GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                        setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText()));
-                        this.page=0;
-                        setItemButtonsForSection(gridPane, true);
+                AnchorPane anchorPane = (AnchorPane) t.getContent();
+                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText()));
+                this.page = 0;
+                setItemButtonsForSection(gridPane, true);
+                for (Button b : itemButtonList) {
+                    b.setOnAction(event1 -> {
+                        try {
+                            FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
+                            Parent parent = loader.load();
+                            ItemInfoScreenController itemInfoScreenController = loader.getController();
+                            itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
+                            itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0, b.getText().indexOf("\n"))));
+                            Scene scene = new Scene(parent);
+                            scene.getStylesheets().add(css.getURL().toExternalForm());
+                            Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();
+                            stage.setScene(scene);
+                            stage.show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     });
+                }
+            });
             sectionTabPane.getTabs().add(t);
         }
         AnchorPane anchorPane=(AnchorPane)sectionTabPane.getTabs().get(0).getContent();
         GridPane gridPane =(GridPane)anchorPane.getChildren().get(0);
-        for(Button b: itemButtonList){
-            b.setOnAction(event -> {
-                try {
-                    FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
-                    Parent parent=loader.load();
-                    ItemInfoScreenController itemInfoScreenController=loader.getController();
-                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngridientButtons());
-                    itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0,b.getText().indexOf("\n"))));
-                    Scene scene = new Scene(parent);
-                    scene.getStylesheets().add(css.getURL().toExternalForm());
-                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    stage.setScene(scene);
-                    stage.show();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            });
-        }
+
         setItemButtonsForSection(gridPane, true);
 
     }

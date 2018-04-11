@@ -77,4 +77,12 @@ public class MenuService {
         }
 
     }
+
+    public List<String> getSections(){
+        return userDatabase.getSections();
+    }
+
+    public List<String> getTypes(){
+        return userDatabase.getTypes();
+    }
 }
