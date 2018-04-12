@@ -36,7 +36,8 @@ public class MenuScreenController {
     private List<Button> itemButtonList;
     private List<Button> ingredientButtonList;
     private List<Tab> sectionTabList;
-    private int page;
+    private static int pageIngredients = 0;
+    private static int pageItems = 0;
 
 
     private final MenuService menuService;
@@ -64,52 +65,48 @@ public class MenuScreenController {
     private Button upButton;
 
 
-    public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService){
-        this.menuService=menuService;
-        this.fxmLoaderService=fxmLoaderService;
-        this.buttonCreationService=buttonCreationService;
+    public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService) {
+        this.menuService = menuService;
+        this.fxmLoaderService = fxmLoaderService;
+        this.buttonCreationService = buttonCreationService;
     }
-    public void initialize(){
-        List<Tab> list=buttonCreationService.createSectionTabs();
-        if(!list.isEmpty()) {
-            setSectionTabList(list);
-            setItemButtonList(buttonCreationService.createItemButtonsForSection(list.get(0).getText()));
-            setSectionTabs();
-            setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(false));
-            System.out.println(this.page);
-            setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
-        }
+
+    public void initialize() {
+        setup();
 
 
-        upButton.setOnAction(e->{
-            if(largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
+        upButton.setOnAction(e -> {
+            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
                 Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonsForSection(gridPane, false);
-            }else {
-                setIngredientButtons(ingredientGrid,16,false,ingredientButtonList);
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonsForSection(gridPane, 16, false, itemButtonList, currentTab);
+            } else {
+                setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
             }
 
 
         });
 
-        downButton.setOnAction(e->{
-            if(largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
-            Tab currentTab=sectionTabPane.getSelectionModel().getSelectedItem();
-            AnchorPane anchorPane=(AnchorPane)currentTab.getContent();
-            GridPane gridPane=(GridPane) anchorPane.getChildren().get(0);
-            setItemButtonsForSection(gridPane, true);
-            }else {
-                setIngredientButtons(ingredientGrid,16,false,ingredientButtonList);
+        downButton.setOnAction(e -> {
+
+            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
+                Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
+                AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
+                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonsForSection(gridPane, 16, true, itemButtonList, currentTab);
+            } else {
+                setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
             }
         });
 
-        newItemButton.setOnAction(event->{
+        newItemButton.setOnAction(event -> {
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
-                Parent parent=loader.load();
-                ItemInfoScreenController itemInfoScreenController=loader.getController();
+                Parent parent = loader.load();
+                ItemInfoScreenController itemInfoScreenController = loader.getController();
                 itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
                 itemInfoScreenController.setup(null);
                 Scene scene = new Scene(parent);
@@ -117,12 +114,35 @@ public class MenuScreenController {
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
 
+    }
+
+    public void setup() {
+        //creating section tabs
+        setSectionTabs();
+        for (Button b : itemButtonList) {
+            b.setOnAction(event1 -> {
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
+                    Parent parent = loader.load();
+                    ItemInfoScreenController itemInfoScreenController = loader.getController();
+                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
+                    itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0, b.getText().indexOf("\n"))));
+                    Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toExternalForm());
+                    Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
 
     }
 
@@ -132,11 +152,29 @@ public class MenuScreenController {
     }
 
     public void setItemButtonList(List<Button> itemButtonList) {
+        for (Button b : itemButtonList) {
+            b.setOnAction(event1 -> {
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
+                    Parent parent = loader.load();
+                    ItemInfoScreenController itemInfoScreenController = loader.getController();
+                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
+                    itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0, b.getText().indexOf("\n"))));
+                    Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toExternalForm());
+                    Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
         this.itemButtonList = itemButtonList;
     }
 
-    public void setIngredientButtonList(List<Button> ingredientButtonList){
-        this.ingredientButtonList=ingredientButtonList;
+    public void setIngredientButtonList(List<Button> ingredientButtonList) {
+        this.ingredientButtonList = ingredientButtonList;
     }
 
     public List<Tab> getSectionTabList() {
@@ -148,140 +186,52 @@ public class MenuScreenController {
     }
 
 
+    public void setSectionTabs() {
+        List<Tab> list = buttonCreationService.createSectionTabs();
+        if (!list.isEmpty()) {
+            setSectionTabList(list);
+            for (Tab t : sectionTabList) {
+                t.setOnSelectionChanged(event -> {
+                    pageItems = 0;
+                    AnchorPane anchorPane = (AnchorPane) t.getContent();
+                    GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
+                    setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText()));
+                    setItemButtonsForSection(gridPane, 16, true, itemButtonList, t);
+                });
+                sectionTabPane.getTabs().add(t);
+            }
 
-    public void setSectionTabs(){
-        for(Tab t: sectionTabList) {
-            t.setOnSelectionChanged(event-> {
-                AnchorPane anchorPane = (AnchorPane) t.getContent();
-                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText()));
-                this.page = 0;
-                setItemButtonsForSection(gridPane, true);
-                for (Button b : itemButtonList) {
-                    b.setOnAction(event1 -> {
-                        try {
-                            FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
-                            Parent parent = loader.load();
-                            ItemInfoScreenController itemInfoScreenController = loader.getController();
-                            itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
-                            itemInfoScreenController.setup(menuService.getItem(b.getText().substring(0, b.getText().indexOf("\n"))));
-                            Scene scene = new Scene(parent);
-                            scene.getStylesheets().add(css.getURL().toExternalForm());
-                            Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();
-                            stage.setScene(scene);
-                            stage.show();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            });
-            sectionTabPane.getTabs().add(t);
+
         }
-        AnchorPane anchorPane=(AnchorPane)sectionTabPane.getTabs().get(0).getContent();
-        GridPane gridPane =(GridPane)anchorPane.getChildren().get(0);
-
-        setItemButtonsForSection(gridPane, true);
-
     }
 
-    private boolean isNextPageIngredients(int size){
-        try{
-            ingredientButtonList.get((this.page * size));
-        }catch (IndexOutOfBoundsException e){
-            return false;
-        }
-        return true;
-    }
-    private boolean isNextPageItems() {
+    private boolean isNextPage(int page, List<Button> list, int size) {
         try {
-            itemButtonList.get((this.page * 16));
+            if (page > 0) {
+                list.get((page * size));
+            } else {
+                list.get((size));
+            }
         } catch (IndexOutOfBoundsException e) {
             return false;
         }
         return true;
-
     }
-    //Integer page,GridPane gridPane, Integer size, boolean forward, List<Button> list
-/*
-    public void setIngredientButtons(Integer page,GridPane gridPane, Integer size, boolean forward, List<Button> list){
-        int start;
-        int x=0;
-        int y=0;
-        if(forward){
-            if (page==0){
-                start = 0;
-            }else{
-                start=page*size;
-            }
-            if(isNextPage()) {
-                for (int i = 0; i < gridPane.getChildren().size(); ) {
-                    gridPane.getChildren().remove(gridPane.getChildren().get(i));
-                }
 
-                if (list.size() - start > size - 1) {
-                    for (int i = start; i < (start + size); i++) {
-                        gridPane.add(list.get(i), x, y);
-                        gridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
-                        if (x == 2) {
-                            x = 0;
-                            y++;
-                        } else {
-                            x++;
-                        }
-                    }
-                } else {
-                    for (int i = start; i < list.size(); i++) {
-                        gridPane.add(list.get(i), x, y);
-                        gridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
-                        if (x == 2) {
-                            x = 0;
-                            y++;
-                        } else {
-                            x++;
-                        }
-                    }
-                }
-                page++;
-            }
-        }else{
-            if(page>1){
-                if(page==2){
-                    start = 0;
-                }
-                else{
-                    start = (page-2)*size;
-                }
-                for(int i=start; i<(start+size);i++){
-                    gridPane.add(list.get(i),x,y);
-                    gridPane.setMargin(list.get(i), new Insets(2,2,2,2));
-                    if(x==2){
-                        x=0;
-                        y++;
-                    }else{
-                        x++;
-                    }
-                }
-                page--;
-            }
 
-        }
-
-    }
-     */
     public void setIngredientButtons(GridPane gridPane, Integer size, boolean forward, List<Button> list) {
         int start;
         int x = 0;
         int y = 0;
         gridPane.setAlignment(Pos.CENTER);
         if (forward) {
-            System.out.println("Is forward");
-            if (this.page == 1) {
-                start=0;
-            }else {
-                start = this.page * size;
+
+            if (pageIngredients == 1) {
+                start = 0;
+            } else {
+                start = pageIngredients * size;
             }
-            if (isNextPageIngredients(size)) {
+            if (isNextPage(pageIngredients, list, size)) {
                 for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
@@ -297,35 +247,33 @@ public class MenuScreenController {
                         }
                     }
                 }
-                this.page++;
+                pageIngredients++;
             } else {
-                for (int i = 0; i < gridPane.getChildren().size();) {
-                    System.out.println(gridPane.getChildren());
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
+
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
-                    System.out.println(gridPane.getChildren());
+
                 }
-                System.out.println(list.size());
-                System.out.println(start);
                 for (int i = start; i < list.size(); i++) {
-                        System.out.println(" or here");
-                        gridPane.add(list.get(i), x, y);
+
+                    gridPane.add(list.get(i), x, y);
                     GridPane.setMargin(list.get(i), new Insets(2, 2, 10, 2));
-                        if (x == 3) {
-                            x = 0;
-                            y++;
-                        } else {
-                            x++;
-                        }
+                    if (x == 3) {
+                        x = 0;
+                        y++;
+                    } else {
+                        x++;
                     }
                 }
-                this.page++;
-        }
-        else {
-            if (this.page > 1) {
-                if (this.page == 2) {
+                pageIngredients++;
+            }
+
+        } else {
+            if (pageIngredients > 1) {
+                if (pageIngredients == 2) {
                     start = 0;
                 } else {
-                    start = (this.page - 2) * size;
+                    start = (pageIngredients - 2) * size;
                 }
                 for (int i = start; i < (start + size); i++) {
                     gridPane.add(list.get(i), x, y);
@@ -337,7 +285,7 @@ public class MenuScreenController {
                         x++;
                     }
                 }
-                this.page--;
+                pageIngredients--;
             }
 
         }
@@ -345,26 +293,27 @@ public class MenuScreenController {
     }
 
 
-
-    public void setItemButtonsForSection(GridPane gridPane, boolean forward){
+    public void setItemButtonsForSection(GridPane gridPane, Integer size, boolean forward, List<Button> list, Tab tab) {
         int start;
-        int x=0;
-        int y=0;
+        int x = 0;
+        int y = 0;
 
-        if(forward) {
-            if (this.page == 0) {
+        if (forward) {
+            if (pageItems == 0) {
                 start = 0;
             } else {
-                start = this.page * 16;
+                start = pageItems * size;
             }
-            if (isNextPageItems()) {
+            //if all buttons don't fit in gridPane
+            if (isNextPage(pageItems, list, size)) {
                 for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
-                if (itemButtonList.size() - start > 15) {
-                    for (int i = start; i < (start + 16); i++) {
-                        gridPane.add(itemButtonList.get(i), x, y);
-                        GridPane.setMargin(itemButtonList.get(i), new Insets(2, 2, 2, 2));
+                if (start == 0) {
+
+                    for (int i = start; i < size; i++) {
+                        gridPane.add(list.get(i), x, y);
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
                         if (x == 3) {
                             x = 0;
                             y++;
@@ -372,30 +321,77 @@ public class MenuScreenController {
                             x++;
                         }
                     }
-                } else {
-                    for (int i = start; i < itemButtonList.size(); i++) {
-                        gridPane.add(itemButtonList.get(i), x, y);
-                        GridPane.setMargin(itemButtonList.get(i), new Insets(2, 2, 2, 2));
-                        if (x == 3) {
-                            x = 0;
-                            y++;
-                        } else {
-                            x++;
+
+                    pageItems++;
+                }
+                else {
+                    if (isNextPage(pageItems + 1, list, size)) {
+
+                        for (int i = start; i < start + size; i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 3) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
                         }
+                        pageItems++;
+                    } else {
+
+                        for (int i = start; i < list.size(); i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 3) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
+                        }
+                        pageItems++;
                     }
                 }
-                page++;
+
+                //if all buttons fit in GridPane
+            } else {
+
+                if(start==0) {
+                    for (int i = 0; i < gridPane.getChildren().size(); ) {
+                        gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                    }
+                    for (int i = start; i < list.size(); i++) {
+
+
+                        gridPane.add(list.get(i), x, y);
+
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                        if (x == 3) {
+                            x = 0;
+                            y++;
+                        } else {
+                            x++;
+                        }
+                    }
+
+                    pageItems++;
+                }
+
             }
-        }else{
-            if(this.page>1) {
-                if (this.page == 2) {
+        } else {
+            if (pageItems > 1) {
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
+                    gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                }
+                if (pageItems == 2) {
                     start = 0;
                 } else {
-                    start = (this.page - 2) * 16;
+                    start = (pageItems - 2) * size;
                 }
                 for (int i = start; i < (start + 16); i++) {
-                    gridPane.add(itemButtonList.get(i), x, y);
-                    GridPane.setMargin(itemButtonList.get(i), new Insets(2, 2, 2, 2));
+                    gridPane.add(list.get(i), x, y);
+                    GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
                     if (x == 3) {
                         x = 0;
                         y++;
@@ -403,7 +399,7 @@ public class MenuScreenController {
                         x++;
                     }
                 }
-                page--;
+                pageItems--;
             }
 
         }
