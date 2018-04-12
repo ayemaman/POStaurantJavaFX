@@ -195,14 +195,19 @@ public class ButtonCreationService {
         return buttons;
     }
 
-    public ArrayList<Button> createIngridientButtons(){
+    public ArrayList<Button> createIngredientButtonsSmall(boolean small){
         ArrayList<Button> buttons=new ArrayList<>();
         List<Ingredient> list=menuService.getAllIngredients();
         for(Ingredient i:list){
             Button button=new Button(i.getId() + "\n" + i.getName()+ "\n" + i.getAmount());
-            button.setMinWidth(73);
-            button.setMinHeight(82.5);
-            button.setStyle("-fx-font-size:10px");
+            if(small) {
+                button.setMinWidth(73);
+                button.setMinHeight(82.5);
+                button.setStyle("-fx-font-size:10px");
+            }else{
+                button.setMinHeight(120);
+                button.setMinWidth(100);
+            }
             button.setMnemonicParsing(false);
             button.setId("IngredientButton");
             buttons.add(button);

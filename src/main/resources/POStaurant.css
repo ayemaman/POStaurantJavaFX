@@ -53,9 +53,12 @@ ToggleButton{
     -fx-background-color:green;
 }
 
-.AvailabilityONButton{
+.Availability68{
 -fx-background-color:green;
 }
+.Availability85{
+-fx-background-color:orange;
+}
 
-.AvailabilityOFFButton{
+.Availability86{
 -fx-background-color:red;}

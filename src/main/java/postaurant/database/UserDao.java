@@ -160,11 +160,6 @@ public class UserDao implements UserDatabase{
         return jdbcTemplate.queryForList(getSectionsSQL, String.class);
     }
 
-    private final String getTypesSQL="SELECT DISTINCT i_type from items";
-    @Override
-    public List<String> getTypes() {
-        return jdbcTemplate.queryForList(getTypesSQL,String.class);
-    }
 
 
     private static final class UserMapper implements RowMapper<User>{

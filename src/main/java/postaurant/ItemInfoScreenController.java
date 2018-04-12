@@ -16,7 +16,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -67,6 +69,8 @@ public class ItemInfoScreenController {
     private Resource menuScreenForm;
     @Value("/FXML/ConfirmationItemSave.fxml")
     private Resource confirmationSaveForm;
+    @Value("/POStaurant.css")
+    private Resource css;
 
 
     private Node currentTextField;
@@ -121,9 +125,10 @@ public class ItemInfoScreenController {
         sectionComboBox.setItems(sectionsList);
 
         typeList=FXCollections.observableArrayList();
-        typeList.addAll(menuService.getTypes());
+        typeList.addAll("FOOD","DRINK");
         typeComboBox.setItems(typeList);
 
+        saveButton.setOnAction(this::saveButtonAction);
 
         removeButton.setOnAction(e -> {
             ObservableList<Ingredient> selected = ingredientTable.getSelectionModel().getSelectedItems();
@@ -131,12 +136,15 @@ public class ItemInfoScreenController {
         });
 
         availabilityButton.setOnAction(e->{
-           if(availabilityButton.getStyleClass().get(0).equals("AvailabilityONButton")){
+           if(availabilityButton.getStyleClass().get(0).equals("Availability68")){
                availabilityButton.getStyleClass().clear();
-               availabilityButton.getStyleClass().add("AvailabilityOFFButton");
+               availabilityButton.getStyleClass().add("Availability85");
+           }else if(availabilityButton.getStyleClass().get(0).equals("Availability85")){
+               availabilityButton.getStyleClass().clear();
+               availabilityButton.getStyleClass().add("Availability86");
            }else{
                availabilityButton.getStyleClass().clear();
-               availabilityButton.getStyleClass().add("AvailabilityONButton");
+               availabilityButton.getStyleClass().add("Availability68");
            }
         });
 
@@ -146,6 +154,7 @@ public class ItemInfoScreenController {
                 FXMLLoader loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
                 Parent parent=loader.load();
                 Scene scene=new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage=(Stage)((Node) e.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
@@ -155,7 +164,7 @@ public class ItemInfoScreenController {
             }
         });
 
-        saveButton.setOnAction(this::saveButtonAction);
+
         nameField.textProperty().bind(name);
         priceField.textProperty().bind(price);
         typeComboBox.valueProperty().bind(type);
@@ -164,7 +173,6 @@ public class ItemInfoScreenController {
         nameField.setOnMouseClicked(e->this.currentTextField=nameField);
         priceField.setOnMouseClicked(e->this.currentTextField=priceField);
 
-        typeComboBox.setOnMouseClicked(e-> this.currentTextField=typeComboBox);
         //listen for changes to the typeComboBox selection and update the displayed section StringProperty accordingly.
         typeComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString )->{
             if(newString!=null){
@@ -195,13 +203,15 @@ public class ItemInfoScreenController {
         try{
             availabilityButton.getStyleClass().clear();
             if (item.getAvailability() == 86) {
-                availabilityButton.getStyleClass().add("AvailabilityOFFButton");
-            } else {
-                availabilityButton.getStyleClass().add("AvailabilityONButton");
+                availabilityButton.getStyleClass().add("Availability86");
+            } else if(item.getAvailability() == 85) {
+                availabilityButton.getStyleClass().add("Availability85");
+            }else{
+                availabilityButton.getStyleClass().add("Availability68");
             }
         }catch (NullPointerException nE) {
             availabilityButton.getStyleClass().clear();
-            availabilityButton.getStyleClass().add("AvailabilityONButton");
+            availabilityButton.getStyleClass().add("Availability68");
         }
             recipeColumn.setMinWidth(200);
             recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -390,9 +400,11 @@ public class ItemInfoScreenController {
     private void saveButtonAction(ActionEvent e) {
         try {
             int avail;
-            if (availabilityButton.getId().equals("AvailabilityONButton")) {
+            if (availabilityButton.getId().equals("Availability86")) {
                 avail = 86;
-            } else {
+            } else if(availabilityButton.getId().equals("Availability85")){
+                avail = 85;
+            }else{
                 avail = 68;
             }
 
@@ -405,8 +417,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("name");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
             }
             try {
@@ -417,8 +432,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("price");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
 
             }
@@ -430,8 +448,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("type");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
 
 
@@ -444,8 +465,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("section");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
 
 
@@ -458,8 +482,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("availability");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
 
             }
@@ -472,8 +499,11 @@ public class ItemInfoScreenController {
                 ItemWrongInputController itemWrongInputController = loader.getController();
                 itemWrongInputController.setErrorLabelText("recipe");
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
             }
             if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())) {
@@ -483,15 +513,21 @@ public class ItemInfoScreenController {
                 ConfirmationItemSaveController confirmationItemSaveController = loader.getController();
                 confirmationItemSaveController.setup(item);
                 Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
                 if (confirmationItemSaveController.isSaved()) {
                     loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
                     parent = loader.load();
                     scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage1 = (Stage)((Node) e.getSource()).getScene().getWindow();
                     stage1.setScene(scene);
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
                     stage1.show();
                 }
             }

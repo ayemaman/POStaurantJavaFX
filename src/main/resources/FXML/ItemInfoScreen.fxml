@@ -76,7 +76,7 @@
                                  <HBox.margin>
                                     <Insets right="10.0" />
                                  </HBox.margin></Label>
-                              <ComboBox fx:id="typeComboBox" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
+                              <ComboBox fx:id="typeComboBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
@@ -101,7 +101,7 @@
                               </Button>
                               <TableView fx:id="ingredientTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="200.0">
                                 <columns>
-                                  <TableColumn fx:id="recipeColumn" prefWidth="199.0" text="Recipe" />
+                                  <TableColumn fx:id="recipeColumn" prefWidth="198.0" text="Recipe" />
                                 </columns>
                               </TableView>
                            </children>
