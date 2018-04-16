@@ -5,9 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
+import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,62 +30,76 @@ public class UserService {
         try {
             return userDatabase.getUser(userId);
         } catch (Exception ex) {
-            logger.error("error retrieving user" , ex);
+            logger.error("error retrieving user", ex);
             return null;
         }
     }
 
-    public List<Order> getUserOrders(User user){
-        try{
-            int orderInt=0;
-            int itemInt=0;
-            List<Order> sorted= userDatabase.retrieveUserOrders(user);
-            for (Order o:sorted){
-                System.out.println(o);
-            }
-            System.out.println("--------------");
+    public List<Order> getUserOrders(User user) {
+        try {
+            List<Order> sorted = userDatabase.retrieveUserOrders(user);
+            System.out.println(sorted.isEmpty());
+            if (!sorted.isEmpty()){
+                Item lastItem = sorted.get(0).getOrderItems().keySet().iterator().next();
+                for (int i = 0; i < sorted.size() - 1; ) {
+                    //if order id are the same
+                    if (sorted.get(i).getId() == sorted.get(i + 1).getId()) {
+                        Map.Entry<Item, Integer> entry = sorted.get(i + 1).getOrderItems().entrySet().iterator().next();
+                        Integer qty = entry.getValue();
+                        Item item2 = entry.getKey();
 
-            while(orderInt<sorted.size()-1) {
-                if (sorted.get(orderInt).getOrderID() == sorted.get(orderInt + 1).getOrderID()) {
-                    if (sorted.get(orderInt).getOrderItems().get(itemInt).getId().equals(sorted.get(orderInt + 1).getOrderItems().get(0).getId())) {
-                        Map.Entry<Ingredient,Integer> entry = sorted.get(orderInt + 1).getOrderItems().get(0).getRecipe().entrySet().iterator().next();
-                        sorted.get(orderInt).getOrderItems().get(itemInt).addIngredient(entry.getKey(),entry.getValue());
-                        sorted.remove(orderInt + 1);
-                        System.out.println("item= "+itemInt);
-                        System.out.println("order= "+orderInt);
-                        for (Order o:sorted){
-                            System.out.println(o);
+                        //if items are the same (checking by id and date_ordered)
+                        if (lastItem.compareTo(item2) == 0) {
+                            lastItem.getRecipe().put(item2.getRecipe().keySet().iterator().next(), item2.getRecipe().values().iterator().next());
+                            sorted.remove(i + 1);
+                        } else {
+                            sorted.get(i).getOrderItems().put(item2, qty);
+                            sorted.remove(i + 1);
+                            lastItem = item2;
                         }
-                        System.out.println("--------------");
                     } else {
-                        sorted.get(orderInt).addItem(sorted.get(orderInt + 1).getOrderItems().get(0));
-                        itemInt++;
-                        sorted.remove(orderInt+1);
-                        System.out.println("item= "+itemInt);
-                        System.out.println("order= "+orderInt);
-                        for (Order o:sorted){
-                            System.out.println(o);
-                        }
-                        System.out.println("--------------");
+                        i++;
+                        lastItem = sorted.get(i).getOrderItems().keySet().iterator().next();
+                    }
+                }
+                return sorted;
+            }else{
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+            /*
+            Collections.sort(sorted, (o1, o2) -> {
+                long result = o1.getId() - o2.getId();
+                if(result==0) {
+                    return (int) result;
+                }
+
+                for(Map.Entry<Item,Integer> entry:o1.getOrderItems().entrySet()){
+                    entry.getKey().getDateOrdered()
+                }
+
+            });
+            for(int i=0;i<sorted.size()-1;) {
+                if (sorted.get(i).getId() == sorted.get(i + 1).getId()) {
+                    for (Map.Entry<Item, Integer> entry : sorted.get(i + 1).getOrderItems().entrySet()) {
+                        sorted.get(i).getOrderItems().put(entry.getKey(), entry.getValue());
                     }
                 } else {
-                    orderInt++;
-                    itemInt = 0;
-                    System.out.println("item= "+itemInt);
-                    System.out.println("order= "+orderInt);
-                    for (Order o:sorted){
-                        System.out.println(o);
-                    }
-                    System.out.println("--------------");
+                    i++;
                 }
             }
             return sorted;
-        }catch (Exception ex1){
-            ex1.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
-
+*/
     public List<User> getAllActiveUsers(){
         List<User> users=userDatabase.retrieveAllActiveUsers();
         for(User u:users){

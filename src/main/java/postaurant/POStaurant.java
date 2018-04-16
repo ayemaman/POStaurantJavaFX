@@ -16,11 +16,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
 import postaurant.database.UserDao;
+import postaurant.database.UserDatabase;
+import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -40,9 +43,6 @@ public class POStaurant extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        User user=new User();
-        user.setFirstName("lox");
         URL url=sample.getURL();
         Parent root = fxmlLoaderService.getLoader(url).load();
         primaryStage.setTitle("POStaurant");

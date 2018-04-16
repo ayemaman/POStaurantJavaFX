@@ -4,9 +4,7 @@ import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
-import postaurant.model.User;
 
-import java.sql.SQLException;
 import java.util.*;
 
 @Component
@@ -18,10 +16,11 @@ public class MenuService {
     }
 
     public Map<String, List<Item>> getSectionsWithItems(){
-        Map<String, List<Item>> map=new HashMap<>();
+        Map<String, List<Item>> map=new TreeMap<>();
         List<Item> fullItemList=userDatabase.getMenu();
+
         for(int itemInt=0;itemInt<fullItemList.size()-1;)
-            if (fullItemList.get(itemInt).getId().equals(fullItemList.get(itemInt + 1).getId())){
+            if (fullItemList.get(itemInt).getId()==(fullItemList.get(itemInt + 1).getId())){
                 Map.Entry<Ingredient,Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
                 fullItemList.get(itemInt).addIngredient(entry.getKey(),entry.getValue());
                 fullItemList.remove(itemInt + 1);
@@ -42,29 +41,31 @@ public class MenuService {
         return map;
     }
 
-    public Item getItem(String itemID){
-        List<Item> list=userDatabase.getItem(itemID);
-        Item item=new Item();
-        if(!list.isEmpty()){
-            for (Item i : list) {
-                for (Map.Entry<Ingredient, Integer> entry : i.getRecipe().entrySet()) {
-                    list.get(0).addIngredient(entry.getKey(), entry.getValue());
+    public Item getItem(long itemID) {
+        List<Item> list = userDatabase.getItemById(itemID);
+        if (!list.isEmpty()) {
+            Item item = list.get(0);
+            Date newestEntry = list.get(0).getDateCreated();
+            for (int i = 1; i < list.size(); ) {
+                if (list.get(i).getDateCreated() == newestEntry) {
+                    Map.Entry<Ingredient, Integer> entry = list.get(0).getRecipe().entrySet().iterator().next();
+                    item.addIngredient(entry.getKey(), entry.getValue());
+                    list.remove(i);
+                } else {
+                    i++;
                 }
-                item=list.get(0);
             }
             return item;
-        }
-        else{
+        } else {
             return null;
         }
-
     }
 
     public List<Ingredient> getAllIngredients(){
         return userDatabase.getAllIngredients();
     }
 
-    public Ingredient getIngredient(String id){
+    public Ingredient getIngredient(long id){
         return userDatabase.getIngredient(id);
     }
 

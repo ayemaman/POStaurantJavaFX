@@ -1,32 +1,44 @@
 package postaurant.model;
 
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import postaurant.exception.InputValidationException;
 
 import java.util.*;
 
-public class Order {
-    private double tableNo;
+public class Order implements Comparable<Order>{
+    private long id;
+    private Double tableNo;
     private Date timeOpened;
     private String status;
     private Date lastTimeChecked;
     private Date timeBumped;
     private Date timeClosed;
-    private List<Item> orderItems=new ArrayList<>();
-    private int orderID;
+    private Map<Item, Integer> orderItems;
+    //private List<Item> orderItems = new ArrayList<>();
 
-    public Order(){
+    private double total;
+
+    public Order() {
+        orderItems=new HashMap<>();
+    }
+
+    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
+        setId(orderID);
+        setTableNo(tableNo);
+        setTimeOpened(timeOpened);
+        setStatus(status);
+        setLastTimeChecked(lastTimeChecked);
+        setTimeBumped(timeBumped);
+        setOrderItems(orderItems);
     }
 
 
-    public int getOrderID() {
-        return orderID;
+    public long getId() {
+        return id;
     }
 
-    public void setOrderID(int orderID) {
-        this.orderID = orderID;
+    public void setId(long id) {
+        this.id = id;
     }
 
 
@@ -76,37 +88,88 @@ public class Order {
 
     public void setTimeClosed(Date timeClosed) {
         this.timeClosed = timeClosed;
+        setTotal();
     }
 
-    public List<Item> getOrderItems() {
-        return orderItems;
+    private void setTotal(){
+        this.total=0;
+        if(!getOrderItems().isEmpty()) {
+            for (Map.Entry<Item, Integer> entry : getOrderItems().entrySet()) {
+                this.total = total + (entry.getKey().getPrice() * entry.getValue());
+            }
+        }
     }
 
-    public void setOrderItems(List<Item> orderItems) {
-        this.orderItems = orderItems;
+
+    public Map<Item, Integer> getOrderItems(){ return this.orderItems;}
+
+
+
+    public void setOrderItems(Map<Item, Integer> orderItems) throws InputValidationException {
+        if (!orderItems.isEmpty()) {
+            this.orderItems = orderItems;
+        } else {
+            throw new InputValidationException();
+        }
+        setTotal();
     }
 
-    public void addItem(Item item){
-        getOrderItems().add(item);
+    public void addItem(Item item, Integer amount){
+        if(!getOrderItems().isEmpty()) {
+            Item buffer=null;
+            for (Map.Entry<Item, Integer> entry : getOrderItems().entrySet()) {
+                if (entry.getKey().getId()==(item.getId())) {
+                    buffer=entry.getKey();
+                }
+            }
+
+            if(buffer!=null){
+                getOrderItems().put(buffer,getOrderItems().get(buffer)+amount);
+            }else{
+                getOrderItems().put(item,amount);
+            }
+
+        }else{
+            getOrderItems().put(item, amount);
+        }
+        setTotal();
     }
+
 
     public String toString(){
-        String buffer="";
-        for(Item i: getOrderItems()){
-            buffer+=i+" ";
-            Iterator it=i.getRecipe().entrySet().iterator();
-            while(it.hasNext()){
-                Map.Entry pair=(Map.Entry)it.next();
-                Ingredient ingr=(Ingredient)pair.getKey();
-                int quantity=(Integer)pair.getValue();
-                buffer+=ingr.getName()+" Qty.: "+quantity+"/ ";
+        StringBuilder buffer= new StringBuilder("ORDER ID: " + getId());
+        for (Map.Entry<Item,Integer > entry : getOrderItems().entrySet()) {
+            buffer.append("\n ITEM: ").append(entry.getKey()).append("|||ITEM_QTY> ").append(entry.getValue()).append("|||");
+            buffer.append("\n");
+            /*
+                buffer.append("\n ITEM: ").append(entry.getKey().getName()).append(" Qty.:").append(entry.getValue()).append(" Price: ").append(entry.getKey().getPrice());
+                buffer.append(" ||| INGREDIENTS:");
+            for(Map.Entry<Ingredient,Integer> entry2:entry.getKey().getRecipe().entrySet()){
+                buffer.append(entry2.getKey()).append(" /amount: ").append(entry2.getValue()).append(" | ");
             }
-//
         }
-        return "Order ID: "+getOrderID()+" Order Items: "+ buffer;
+        */
+        }
 
+        return buffer.toString();
+    }
+
+    @Override
+    public int compareTo(Order o) {
+        return 0;
     }
 
 
-
+    public static class Comparators {
+        public static Comparator<Order> ID = new Comparator<Order>() {
+            @Override
+            public int compare(Order o1, Order o2) {
+                long first=o1.getId();
+                long second=o2.getId();
+                long result=first-second;
+                int resultInt=(int) result;
+                return resultInt;
+            }
+        };
+    }
 }

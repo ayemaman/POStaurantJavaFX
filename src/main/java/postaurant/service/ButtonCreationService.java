@@ -49,13 +49,15 @@ public class ButtonCreationService {
         ArrayList<Button> tableButtonList = new ArrayList<>();
         try {
             List<Order> tables = userService.getUserOrders(user);
-            for (Order o : tables) {
-                String text = "" + o.getTableNo();
-                Button button = new Button(text);
-                button.setPrefHeight(70.0);
-                button.setPrefWidth(95.0);
-                button.setMnemonicParsing(false);
-                tableButtonList.add(button);
+            if(tables!=null) {
+                for (Order o : tables) {
+                    String text = "" + o.getTableNo();
+                    Button button = new Button(text);
+                    button.setPrefHeight(70.0);
+                    button.setPrefWidth(95.0);
+                    button.setMnemonicParsing(false);
+                    tableButtonList.add(button);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

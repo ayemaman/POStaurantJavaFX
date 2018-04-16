@@ -253,6 +253,7 @@ public class ItemInfoScreenController {
     public void addOnActionToIngredientButtons(){
         for(Button b:ingredientButtonList){
             b.setOnAction(e->{
+                /*
                 Ingredient ingredient=menuService.getIngredient(b.getText().substring(0,b.getText().indexOf("\n")));
                 System.out.println(ingredient);
                 ingredientsList.add(ingredient);
@@ -260,7 +261,9 @@ public class ItemInfoScreenController {
                 FXCollections.sort(ingredientsList,ingredientNameComparator);
                 for(int i=0;i<ingredientsList.size();i++){
                     System.out.println(ingredientsList.get(i));
+
                 }
+                */
             });
         }
     }
@@ -408,7 +411,7 @@ public class ItemInfoScreenController {
                 avail = 68;
             }
 
-            Item item = new Item();
+           // Item item = new Item();
             try {
                 item.setName(name.getValue());
             } catch (InputValidationException eName) {
@@ -507,7 +510,7 @@ public class ItemInfoScreenController {
                 stage.showAndWait();
             }
             if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())) {
-                item.setId();
+                //item.setId();
                 FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
                 Parent parent = loader.load();
                 ConfirmationItemSaveController confirmationItemSaveController = loader.getController();
@@ -526,8 +529,6 @@ public class ItemInfoScreenController {
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage1 = (Stage)((Node) e.getSource()).getScene().getWindow();
                     stage1.setScene(scene);
-                    stage.initModality(Modality.APPLICATION_MODAL);
-                    stage.initStyle(StageStyle.UNDECORATED);
                     stage1.show();
                 }
             }

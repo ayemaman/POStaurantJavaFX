@@ -2,40 +2,55 @@ package postaurant.model;
 
 import postaurant.exception.InputValidationException;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-public class Item {
-    private String id;
+public class Item implements Comparable<Item> {
+    private long id;
     private String name;
     private Double price;
     private String type;
     private String section;
     private Map<Ingredient,Integer> recipe;
     private int availability;
-    private String kitchen_status;
+    private String kitchenStatus;
+    private Date dateCreated;
+    private Date dateOrdered;
 
     public Item(){
-        recipe=new HashMap<>();
-
     }
-    public Item (String name, Double price, String type, String section, int availability, HashMap<Ingredient,Integer> recipe)throws InputValidationException{
+
+    public Item(long id, String name, Double price, String type, String section, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
+        setId(id);
         setName(name);
         setPrice(price);
         setType(type);
         setSection(section);
         setAvailability(availability);
         setRecipe(recipe);
-        setId();
+        setDateCreated(dateCreated);
     }
 
-    public String getId() {
+
+    public Item (long id, String name, Double price, String type, String section, int availability, Map<Ingredient,Integer> recipe, String kitchenStatus, Date dateCreated, Date dateOrdered)throws InputValidationException{
+        setId(id);
+        setName(name);
+        setPrice(price);
+        setType(type);
+        setSection(section);
+        setAvailability(availability);
+        setRecipe(recipe);
+        setKitchenStatus(kitchenStatus);
+        setDateCreated(dateCreated);
+        setDateOrdered(dateOrdered);
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId() {
-        this.id=name+price;
+    public void setId(long id) {
+        this.id=id;
     }
 
     public String getName() {
@@ -91,7 +106,7 @@ public class Item {
         return recipe;
     }
 
-    public void setRecipe(HashMap<Ingredient,Integer> recipe) throws InputValidationException{
+    public void setRecipe(Map<Ingredient,Integer> recipe) throws InputValidationException{
         if(!recipe.isEmpty()) {
             this.recipe = recipe;
         }else{
@@ -101,20 +116,17 @@ public class Item {
 
     public void addIngredient(Ingredient ingredient, Integer amount){
         if(!getRecipe().isEmpty()) {
-            boolean exists=false;
-            Ingredient buffer=new Ingredient();
+            Ingredient buffer=null;
             for (Map.Entry<Ingredient, Integer> entry : getRecipe().entrySet()) {
                 if (entry.getKey().getId().equals(ingredient.getId())) {
-                    exists=true;
                     buffer=entry.getKey();
                 }
             }
-            if(exists){
-
-                recipe.put(buffer,recipe.get(buffer)+amount);
-            }else{
-                recipe.put(ingredient,amount);
-            }
+            if(buffer!=null) {
+                    recipe.put(buffer, recipe.get(buffer) + amount);
+                } else {
+                    recipe.put(ingredient, amount);
+                }
 
         }else{
             recipe.put(ingredient, amount);
@@ -133,12 +145,27 @@ public class Item {
         }
     }
 
-    public String getKitchen_status() {
-        return kitchen_status;
+    public String getKitchenStatus() {
+        return kitchenStatus;
     }
 
-    public void setKitchen_status(String kitchen_status) {
-        this.kitchen_status = kitchen_status;
+    public void setKitchenStatus(String kitchenStatus) {
+        this.kitchenStatus = kitchenStatus;
+    }
+
+    public Date getDateCreated(){
+        return this.dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated){
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateOrdered(){
+        return this.dateOrdered;
+    }
+    public void setDateOrdered(Date dateOrdered){
+        this.dateOrdered=dateOrdered;
     }
 
     public String toString(){
@@ -146,8 +173,18 @@ public class Item {
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
             buffer.append("\nIngr:").append(entry.getKey()).append(" Amount:").append(entry.getValue()).append("/ ");
         }
+        SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+        buffer.append("\nDateOrdered").append(ft.format(getDateOrdered()));
+
         return buffer.toString();
     }
 
-
+    @Override
+    public int compareTo(Item o) {
+        int idCmp=Long.compare(this.getId(),o.getId());
+        if(idCmp!=0){
+            return idCmp;
+        }
+        return this.getDateOrdered().compareTo(o.getDateOrdered());
+    }
 }

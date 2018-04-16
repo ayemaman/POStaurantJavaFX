@@ -18,9 +18,10 @@ public interface UserDatabase {
     User saveNewUser(User user);
     void blockUser(User user);
     List<Item> getMenu();
-    List<Item> getItem(String itemID);
+    List<Item> getItemById(long itemID);
+    List<Item> getItemByName(String name);
     List<Ingredient> getAllIngredients();
-    Ingredient getIngredient(String id);
+    Ingredient getIngredient(long id);
     List<Item> saveNewItem(Item item);
     List<String> getSections();
 
