@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
+import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
@@ -97,6 +98,7 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
+        menuService.getLatestSavedItemByName("DELIBURGER");
         doTime();
     }
 

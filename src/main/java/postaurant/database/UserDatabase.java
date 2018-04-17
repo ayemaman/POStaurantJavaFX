@@ -20,9 +20,11 @@ public interface UserDatabase {
     List<Item> getMenu();
     List<Item> getItemById(long itemID);
     List<Item> getItemByName(String name);
+    void changeItemAvailability(Item item, Integer integer);
     List<Ingredient> getAllIngredients();
     Ingredient getIngredient(long id);
     List<Item> saveNewItem(Item item);
+    void setNewItem(Item item);
     List<String> getSections();
 
 

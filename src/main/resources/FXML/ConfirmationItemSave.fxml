@@ -11,7 +11,9 @@
    <children>
       <VBox fx:id="topConfirmationBox" alignment="TOP_CENTER" prefHeight="425.0" prefWidth="100.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
          <children>
-            <Label text="Are you sure you want to save this item:" textFill="#eb0101" />
+            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="296.0" text="Any item that holds the same name" textFill="#eb0101" />
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="296.0" text="will be set us unavailable." textFill="#eb0101" />
+            <Label alignment="CENTER" prefHeight="37.0" prefWidth="296.0" text="Are you sure you want to save this item:" textFill="#eb0101" />
             <Region prefHeight="20.0" prefWidth="200.0" />
             <Label fx:id="itemLabel" prefHeight="350.0" prefWidth="251.0" textFill="#ffbf00" />
          </children>

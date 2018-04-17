@@ -3,7 +3,6 @@ package postaurant;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +15,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
+import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import javafx.fxml.FXML;
@@ -127,7 +127,6 @@ public class MenuScreenController {
     public void setup() {
         //creating section tabs
         setSectionTabs();
-
         setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(false));
     }
 
@@ -145,7 +144,9 @@ public class MenuScreenController {
                     Parent parent = loader.load();
                     ItemInfoScreenController itemInfoScreenController = loader.getController();
                     itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
-                    itemInfoScreenController.setup(menuService.getItem(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n")))));
+                    Item item=menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
+                    System.out.println(item.getAvailability());
+                    itemInfoScreenController.setup(item);
                     Scene scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();

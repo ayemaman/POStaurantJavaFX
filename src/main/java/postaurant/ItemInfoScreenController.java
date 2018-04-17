@@ -33,10 +33,7 @@ import postaurant.service.MenuService;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -226,7 +223,6 @@ public class ItemInfoScreenController {
         this.item = item;
         ingredientsList = FXCollections.observableArrayList();
         if (item != null) {
-            System.out.print(item.getSection());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 for (int i = 0; i < entry.getValue(); i++) {
                     ingredientsList.add(entry.getKey());
@@ -238,7 +234,6 @@ public class ItemInfoScreenController {
 
 
     }
-
 
 
     private boolean isNextPage() {
@@ -253,17 +248,10 @@ public class ItemInfoScreenController {
     public void addOnActionToIngredientButtons(){
         for(Button b:ingredientButtonList){
             b.setOnAction(e->{
-                /*
-                Ingredient ingredient=menuService.getIngredient(b.getText().substring(0,b.getText().indexOf("\n")));
-                System.out.println(ingredient);
+                Ingredient ingredient=menuService.getIngredient(Long.parseLong(b.getText().substring(0,b.getText().indexOf("\n"))));
                 ingredientsList.add(ingredient);
                 Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
                 FXCollections.sort(ingredientsList,ingredientNameComparator);
-                for(int i=0;i<ingredientsList.size();i++){
-                    System.out.println(ingredientsList.get(i));
-
-                }
-                */
             });
         }
     }
@@ -402,16 +390,7 @@ public class ItemInfoScreenController {
 
     private void saveButtonAction(ActionEvent e) {
         try {
-            int avail;
-            if (availabilityButton.getId().equals("Availability86")) {
-                avail = 86;
-            } else if(availabilityButton.getId().equals("Availability85")){
-                avail = 85;
-            }else{
-                avail = 68;
-            }
-
-           // Item item = new Item();
+            Item item = new Item();
             try {
                 item.setName(name.getValue());
             } catch (InputValidationException eName) {
@@ -478,6 +457,14 @@ public class ItemInfoScreenController {
 
             }
             try {
+                int avail;
+                if (availabilityButton.getStyleClass().get(0).equals("Availability86")) {
+                    avail = 86;
+                } else if(availabilityButton.getStyleClass().get(0).equals("Availability85")){
+                    avail = 85;
+                }else{
+                    avail = 68;
+                }
                 item.setAvailability(avail);
             } catch (InputValidationException eAvailability) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
@@ -493,6 +480,7 @@ public class ItemInfoScreenController {
                 stage.showAndWait();
 
             }
+
             for (Ingredient ingr : ingredientsList) {
                 item.addIngredient(ingr, 1);
             }
@@ -510,7 +498,6 @@ public class ItemInfoScreenController {
                 stage.showAndWait();
             }
             if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())) {
-                //item.setId();
                 FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
                 Parent parent = loader.load();
                 ConfirmationItemSaveController confirmationItemSaveController = loader.getController();

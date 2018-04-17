@@ -38,7 +38,6 @@ public class UserService {
     public List<Order> getUserOrders(User user) {
         try {
             List<Order> sorted = userDatabase.retrieveUserOrders(user);
-            System.out.println(sorted.isEmpty());
             if (!sorted.isEmpty()){
                 Item lastItem = sorted.get(0).getOrderItems().keySet().iterator().next();
                 for (int i = 0; i < sorted.size() - 1; ) {
@@ -101,11 +100,8 @@ public class UserService {
     }
 */
     public List<User> getAllActiveUsers(){
-        List<User> users=userDatabase.retrieveAllActiveUsers();
-        for(User u:users){
-            System.out.println(u);
-        }
-        return users;
+        return userDatabase.retrieveAllActiveUsers();
+
     }
 
     public User saveNewUser(User user){

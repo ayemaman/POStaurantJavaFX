@@ -15,48 +15,79 @@ public class MenuService {
         this.userDatabase=userDatabase;
     }
 
-    public Map<String, List<Item>> getSectionsWithItems(){
-        Map<String, List<Item>> map=new TreeMap<>();
-        List<Item> fullItemList=userDatabase.getMenu();
-
-        for(int itemInt=0;itemInt<fullItemList.size()-1;)
-            if (fullItemList.get(itemInt).getId()==(fullItemList.get(itemInt + 1).getId())){
-                Map.Entry<Ingredient,Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
-                fullItemList.get(itemInt).addIngredient(entry.getKey(),entry.getValue());
+    public Map<String, List<Item>> getSectionsWithItems() {
+        Map<String, List<Item>> map = new TreeMap<>();
+        List<Item> fullItemList = userDatabase.getMenu();
+        for (int itemInt = 0; itemInt < fullItemList.size() - 1; )
+            if (fullItemList.get(itemInt).getId() == (fullItemList.get(itemInt + 1).getId())) {
+                Map.Entry<Ingredient, Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
+                fullItemList.get(itemInt).addIngredient(entry.getKey(), entry.getValue());
                 fullItemList.remove(itemInt + 1);
-            }
-            else{
+            } else {
                 itemInt++;
             }
-
-        for(Item item:fullItemList){
-            if(map.containsKey(item.getSection())){
+        for (Item item : fullItemList) {
+            if (map.containsKey(item.getSection())) {
                 map.get(item.getSection()).add(item);
-            }else{
-                List<Item> recipe=new ArrayList<>();
-                recipe.add(item);
-                map.put(item.getSection(),recipe);
+            } else {
+                List<Item> itemsForSection = new ArrayList<>();
+                itemsForSection.add(item);
+                map.put(item.getSection(), itemsForSection);
+            }
+        }
+        for(Map.Entry<String, List<Item>> entry:map.entrySet()) {
+            List<Item> list = entry.getValue();
+            for (int i = 0; i < list.size()-1;i++ ) {
+                if (list.get(i).getId() == list.get(i + 1).getId()) {
+                    i++;
+                } else {
+                    for (int j = i + 1; j < list.size(); ) {
+                        if (list.get(i).getName().equals(list.get(j).getName())) {
+                            list.remove(j);
+                        } else {
+                            j++;
+                        }
+                    }
+                }
             }
         }
         return map;
     }
 
-    public Item getItem(long itemID) {
+    public Item getItemById(long itemID) {
         List<Item> list = userDatabase.getItemById(itemID);
         if (!list.isEmpty()) {
             Item item = list.get(0);
+           for(int i=0;i<list.size()-1;){
+               Map.Entry<Ingredient,Integer> entry=list.get(i+1).getRecipe().entrySet().iterator().next();
+               list.get(i).addIngredient(entry.getKey(),entry.getValue());
+               list.remove(i+1);
+           }
+            return item;
+        } else {
+            return null;
+        }
+    }
+
+    public Item getLatestSavedItemByName(String name){
+        List<Item> list= userDatabase.getItemByName(name);
+        if(!list.isEmpty()) {
+            Item item = list.get(0);
             Date newestEntry = list.get(0).getDateCreated();
             for (int i = 1; i < list.size(); ) {
-                if (list.get(i).getDateCreated() == newestEntry) {
-                    Map.Entry<Ingredient, Integer> entry = list.get(0).getRecipe().entrySet().iterator().next();
+                if (list.get(i).getDateCreated().getTime()==(newestEntry.getTime())) {
+                    Map.Entry<Ingredient, Integer> entry = list.get(i).getRecipe().entrySet().iterator().next();
                     item.addIngredient(entry.getKey(), entry.getValue());
                     list.remove(i);
                 } else {
                     i++;
                 }
             }
+            for(Map.Entry<Ingredient, Integer> entry: item.getRecipe().entrySet()) {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            }
             return item;
-        } else {
+        }else{
             return null;
         }
     }
@@ -70,13 +101,22 @@ public class MenuService {
     }
 
     public Item saveNewItem(Item item){
-        if(getItem(item.getId())==null){
-            userDatabase.saveNewItem(item);
-            return getItem(item.getId());
-        }else{
-            return null;
-        }
-
+           Item item1=getLatestSavedItemByName(item.getName());
+            if(item.equals(item1)){
+                if(item.getAvailability()==item1.getAvailability()){
+                    System.out.println("HERE");
+                    return getItemById(item1.getId());
+                }else {
+                    System.out.println("SAME ITEMS");
+                    userDatabase.changeItemAvailability(item1, item.getAvailability());
+                    return getItemById(item1.getId());
+                }
+            }else {
+                userDatabase.saveNewItem(item);
+                Item itemSaved = getLatestSavedItemByName(item.getName());
+                userDatabase.setNewItem(itemSaved);
+                return getItemById(itemSaved.getId());
+            }
     }
 
     public List<String> getSections(){

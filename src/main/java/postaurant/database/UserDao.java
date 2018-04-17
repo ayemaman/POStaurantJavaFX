@@ -56,7 +56,7 @@ public class UserDao implements UserDatabase {
         return openTableCount > 0;
     }
 
-    private final String retrieveItemsSql = "SELECT item_name FROM items WHERE item_type=?";
+    private final String retrieveItemsSql = "SELECT item_name FROM items WHERE item_type=? AND item_availability=68";
 
     @Override
     public List<String> retrieveItemsForSection(String section) {
@@ -93,7 +93,7 @@ public class UserDao implements UserDatabase {
         jdbcTemplate.update(blockUserSQL, user.getUserID());
     }
 
-    private final String getMenuSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients ORDER BY item_id";
+    private final String getMenuSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients ORDER BY item_id DESC";
 
     @Override
     public List<Item> getMenu() {
@@ -107,11 +107,16 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.query(getItemByIdSQL, new ItemMapper(), itemID);
     }
 
-
     private final String getItemByNameSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE item_name=? ORDER BY item_date_added DESC";
     @Override
     public List<Item> getItemByName(String name){
         return jdbcTemplate.query(getItemByNameSQL,new ItemMapper(),name);
+    }
+
+    private final String changeItemAvailabilitySQL="UPDATE items SET item_availability=? WHERE item_id=?";
+    @Override
+    public void changeItemAvailability(Item item, Integer integer) {
+        jdbcTemplate.update(changeItemAvailabilitySQL,integer, item.getId());
     }
 
 
@@ -130,20 +135,30 @@ public class UserDao implements UserDatabase {
     }
 
 
-    private final String saveItemSQL = "INSERT INTO items VALUES(?,?,?,?,?,?)";
+    private final String saveItemSQL = "INSERT INTO items(item_name, item_price, item_type, item_section, item_availability) VALUES(?,?,?,?,?)";
     private final String insertIngredients = "INSERT INTO item_has_ingredients VALUES (?,?,?)";
+    private final String getSavedItemSQL="SELECT * FROM items WHERE item_name=? AND ROWNUM=1 ORDER BY item_date_added DESC";
+
 
     @Override
     public List<Item> saveNewItem(Item item) {
-        if (jdbcTemplate.update(saveItemSQL, item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability()) == 1) {
+        if (jdbcTemplate.update(saveItemSQL, item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability()) == 1) {
+            Item savedItem=jdbcTemplate.queryForObject(getSavedItemSQL,new EmptyItemMapper(),item.getName());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
-                jdbcTemplate.update(insertIngredients, item.getId(), entry.getKey().getId(), entry.getValue());
+                jdbcTemplate.update(insertIngredients, savedItem.getId(), entry.getKey().getId(), entry.getValue());
             }
-            return getItemById(item.getId());
+            return getItemByName(item.getName());
         } else {
             return null;
         }
     }
+
+    private final String setNewItemSQL ="UPDATE items SET item_availability=86 WHERE item_name=? and item_id!=?";
+    @Override
+    public void setNewItem(Item item){
+        jdbcTemplate.update(setNewItemSQL,item.getName(),item.getId());
+    }
+
 
     private final String getSectionsSQL = "SELECT DISTINCT item_section from items";
 
@@ -209,6 +224,18 @@ public class UserDao implements UserDatabase {
 
             } catch (InputValidationException iEx1) {
                 iEx1.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    private static final class EmptyItemMapper implements RowMapper<Item>{
+        @Override
+        public Item mapRow(ResultSet rs, int i) throws SQLException {
+            try {
+                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), rs.getDate("item_date_added"));
+            } catch (InputValidationException iEx2) {
+                iEx2.printStackTrace();
             }
             return null;
         }

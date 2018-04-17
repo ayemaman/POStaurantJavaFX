@@ -18,6 +18,17 @@ public class Item implements Comparable<Item> {
     private Date dateOrdered;
 
     public Item(){
+    recipe=new TreeMap<>();
+    }
+
+    public Item(long id, String name, Double price, String type, String section, int availability, Date dateCreated) throws InputValidationException{
+        setId(id);
+        setName(name);
+        setPrice(price);
+        setType(type);
+        setSection(section);
+        setAvailability(availability);
+        setDateCreated(dateCreated);
     }
 
     public Item(long id, String name, Double price, String type, String section, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
@@ -168,15 +179,54 @@ public class Item implements Comparable<Item> {
         this.dateOrdered=dateOrdered;
     }
 
+    public String testString(){
+        StringBuilder buffer= new StringBuilder();
+        buffer.append("Name:").append(getName()).append("\n ID: ").append(getId()).append("\n Section: ").append(getSection()).append("\n TYPE: ").append(getType()).append("\n AVAIL: ").append(getAvailability());
+        for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
+            buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
+        }
+        return buffer.toString();
+    }
+
     public String toString(){
         StringBuilder buffer= new StringBuilder("Name:" + getName() + "\n ID: " + getId() + "\n Section: " + getSection() + "\n ");
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
-            buffer.append("\nIngr:").append(entry.getKey()).append(" Amount:").append(entry.getValue()).append("/ ");
+            buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
         }
         SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
-        buffer.append("\nDateOrdered").append(ft.format(getDateOrdered()));
-
+        if(this.dateOrdered!=null) {
+            buffer.append("\nDateOrdered").append(ft.format(getDateOrdered()));
+        }
         return buffer.toString();
+    }
+
+
+    public boolean equals (Item item) {
+        if (!this.name.equals(item.getName())) {
+            return false;
+        }
+        if(!this.price.equals(item.getPrice())){
+            return false;
+        }
+        if(!this.type.equals(item.getType())){
+            return false;
+        }
+        if(!this.section.equals(item.getSection())){
+            return false;
+        }
+        if(this.getRecipe().keySet().size()!=item.getRecipe().keySet().size()){
+            return false;
+        }
+        for(Map.Entry<Ingredient, Integer>entry:this.getRecipe().entrySet()){
+            if(!item.getRecipe().containsKey(entry.getKey())){
+                return false;
+            }else{
+                if(!entry.getValue().equals(item.getRecipe().get(entry.getKey()))){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
