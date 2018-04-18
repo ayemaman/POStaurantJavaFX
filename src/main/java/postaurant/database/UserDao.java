@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import postaurant.context.ItemType;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
@@ -15,25 +15,19 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UserDao implements UserDatabase {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDao() {
-        DataSource dataSource = getDataSource();
+    public UserDao(DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    private DataSource getDataSource() {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(oracle.jdbc.driver.OracleDriver.class.getName());
-        ds.setUrl("jdbc:oracle:thin:@localhost:1521:GDB01");
-        ds.setUsername("C##MANAGER");
-        ds.setPassword("entangle");
-        return ds;
-    }
+
 
     private final String retrieveUser = "SELECT * FROM dubdubs WHERE dub_id=?";
     @Override
@@ -94,11 +88,50 @@ public class UserDao implements UserDatabase {
     }
 
     private final String getMenuSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients ORDER BY item_id DESC";
-
+    private final String getMenuSQL2 = "SELECT * FROM items ORDER BY item_id DESC";
+/*
     @Override
     public List<Item> getMenu() {
         return jdbcTemplate.query(getMenuSQL, new ItemMapper());
+    }*/
+
+    @Override
+    public List<Item> getMenu() {
+
+        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        List<Item> items = jdbcTemplate.query(getMenuSQL2, new ItemMapper2());
+        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query("SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients", new ItemIngredientRowMapper());
+
+        for (ItemIngredient itemIngredient : itemIngredients) {
+            Item item = itemsMap.get(itemIngredient.itemId);
+            Ingredient ingredient = ingredients.get(itemIngredient.ingredientId);
+            item.addIngredient(ingredient, itemIngredient.amount);
+        }
+        return items;
     }
+
+
+    private static final class ItemIngredientRowMapper implements RowMapper<ItemIngredient> {
+
+        @Override
+        public ItemIngredient mapRow(ResultSet rs, int i) throws SQLException {
+            return new ItemIngredient(rs.getInt("ITEM_ID"), rs.getInt("INGREDIENT_ID"), rs.getInt("INGREDIENT_QTY"));
+        }
+    }
+
+    public static class ItemIngredient {
+        public final Integer itemId;
+        public final Integer ingredientId;
+        public final Integer amount;
+
+        public ItemIngredient(Integer itemId, Integer ingredientId, Integer amount) {
+            this.itemId = itemId;
+            this.ingredientId = ingredientId;
+            this.amount = amount;
+        }
+    }
+
 
     private final String getItemByIdSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE item_id=? ORDER BY item_id";
 
@@ -125,6 +158,11 @@ public class UserDao implements UserDatabase {
     @Override
     public List<Ingredient> getAllIngredients() {
         return jdbcTemplate.query(getAllIngredientsSQL, new IngredientMapper());
+    }
+
+
+    public Map<Integer, Ingredient> getAllIngredientsMap() {
+        return getAllIngredients().stream().collect(Collectors.toMap(ing -> ing.getId().intValue(), ing -> ing));
     }
 
     private final String getIngredientByIdSQL = "SELECT * FROM ingredients WHERE ingredient_id=?";
@@ -257,6 +295,20 @@ public class UserDao implements UserDatabase {
 
             } catch (InputValidationException iEx1) {
                 iEx1.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+
+    private static final class ItemMapper2 implements RowMapper<Item> {
+
+        @Override
+        public Item mapRow(ResultSet rs, int i) throws SQLException {
+            try {
+                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), rs.getDate("item_date_added"));
+            } catch (InputValidationException e) {
+                e.printStackTrace();
             }
             return null;
         }

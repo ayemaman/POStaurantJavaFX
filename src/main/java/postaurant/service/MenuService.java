@@ -6,6 +6,10 @@ import postaurant.model.Ingredient;
 import postaurant.model.Item;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class MenuService {
@@ -16,9 +20,9 @@ public class MenuService {
     }
 
     public Map<String, List<Item>> getSectionsWithItems() {
-        Map<String, List<Item>> map = new TreeMap<>();
-        List<Item> fullItemList = userDatabase.getMenu();
-        for (int itemInt = 0; itemInt < fullItemList.size() - 1; )
+        List<Item> fullItemList = userDatabase.getMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
+        return fullItemList.stream().collect(Collectors.groupingBy(Item::getSection));
+/*        for (int itemInt = 0; itemInt < fullItemList.size() - 1; )
             if (fullItemList.get(itemInt).getId() == (fullItemList.get(itemInt + 1).getId())) {
                 Map.Entry<Ingredient, Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
                 fullItemList.get(itemInt).addIngredient(entry.getKey(), entry.getValue());
@@ -51,7 +55,12 @@ public class MenuService {
                 }
             }
         }
-        return map;
+        return map;*/
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 
     public Item getItemById(long itemID) {

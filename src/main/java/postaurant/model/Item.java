@@ -30,17 +30,12 @@ public class Item implements Comparable<Item> {
         setSection(section);
         setAvailability(availability);
         setDateCreated(dateCreated);
+        recipe = new TreeMap<>();
     }
 
     public Item(long id, String name, Double price, String type, String section, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
-        setId(id);
-        setName(name);
-        setPrice(price);
-        setType(type);
-        setSection(section);
-        setAvailability(availability);
+        this(id, name, price, type, section, availability,dateCreated);
         setRecipe(recipe);
-        setDateCreated(dateCreated);
     }
 
 
@@ -57,7 +52,7 @@ public class Item implements Comparable<Item> {
         setDateOrdered(dateOrdered);
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -204,9 +199,10 @@ public class Item implements Comparable<Item> {
         buffer.append("\n Section: ").append(getSection());
         buffer.append("\n Type: ").append(getType());
         buffer.append("\n Availability: ").append(getAvailability()).append("\n");
-        for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
+
+       /* for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
             buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
-        }
+        }*/
         SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
         if(this.dateOrdered!=null) {
             buffer.append("\nDateOrdered").append(ft.format(getDateOrdered()));
