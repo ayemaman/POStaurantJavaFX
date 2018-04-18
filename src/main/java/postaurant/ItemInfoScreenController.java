@@ -122,7 +122,7 @@ public class ItemInfoScreenController {
         sectionComboBox.setItems(sectionsList);
 
         typeList=FXCollections.observableArrayList();
-        typeList.addAll("FOOD","DRINK");
+        typeList.addAll("FOODITEM","DRINKITEM");
         typeComboBox.setItems(typeList);
 
         saveButton.setOnAction(this::saveButtonAction);

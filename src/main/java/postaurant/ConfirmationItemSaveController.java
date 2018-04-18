@@ -53,12 +53,22 @@ public class ConfirmationItemSaveController {
                 for (int i = 0; i < bottomConfirmationBox.getChildren().size(); ) {
                     bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
                 }
-                topConfirmationBox.getChildren().removeAll();
+                for(Node n: topConfirmationBox.getChildren()){
+                    System.out.println(n);
+                }
+                int times=0;
+                while(times<3){
+                    topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
+                    times++;
+                }
+                for(Node n: topConfirmationBox.getChildren()){
+                    System.out.println(n);
+                }
                 confirmationLabel.setText("Successfully saved");
                 bottomConfirmationBox.getChildren().add(confirmationLabel);
                 Button button = new Button("OK");
                 button.setOnAction(event -> button.getScene().getWindow().hide());
-                itemLabel.setText("NEW ITEM ID: " + item.getId());
+                itemLabel.setText("ITEM ID: " + item.getId());
                 bottomConfirmationBox.getChildren().add(button);
                 saved = true;
             }else{
@@ -67,7 +77,7 @@ public class ConfirmationItemSaveController {
                 }
                 topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
                 topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
-                confirmationLabel.setText("Item with this id already exists in database.\nCheck input, and change name or amount to save.");
+                confirmationLabel.setText("Something went wrong. Please, try again.");
                 topConfirmationBox.getChildren().add(confirmationLabel);
                 Button button = new Button("OK");
                 button.setOnAction(event -> button.getScene().getWindow().hide());

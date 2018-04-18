@@ -100,23 +100,31 @@ public class MenuService {
         return userDatabase.getIngredient(id);
     }
 
-    public Item saveNewItem(Item item){
-           Item item1=getLatestSavedItemByName(item.getName());
-            if(item.equals(item1)){
-                if(item.getAvailability()==item1.getAvailability()){
-                    System.out.println("HERE");
+    public Item saveNewItem(Item item) {
+        Item item1 = getLatestSavedItemByName(item.getName());
+        if (item1 != null) {
+            if (item.equals(item1)) {
+                if (item.getAvailability() == item1.getAvailability()) {
                     return getItemById(item1.getId());
-                }else {
-                    System.out.println("SAME ITEMS");
+                }
+                else {
                     userDatabase.changeItemAvailability(item1, item.getAvailability());
                     return getItemById(item1.getId());
                 }
-            }else {
+            }
+            else {
                 userDatabase.saveNewItem(item);
                 Item itemSaved = getLatestSavedItemByName(item.getName());
                 userDatabase.setNewItem(itemSaved);
                 return getItemById(itemSaved.getId());
             }
+        }
+        else {
+            userDatabase.saveNewItem(item);
+            Item itemSaved = getLatestSavedItemByName(item.getName());
+            userDatabase.setNewItem(itemSaved);
+            return getItemById(itemSaved.getId());
+        }
     }
 
     public List<String> getSections(){

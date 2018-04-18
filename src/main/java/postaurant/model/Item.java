@@ -1,5 +1,6 @@
 package postaurant.model;
 
+import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 
 import java.text.SimpleDateFormat;
@@ -94,8 +95,14 @@ public class Item implements Comparable<Item> {
     }
 
     public void setType(String type) throws InputValidationException {
-        if (type.matches("(\\p{Alpha}){2,30}")) {
-            this.type = type.toUpperCase();
+        boolean match=false;
+        for(String s: TypeList.getItemTypes()) {
+            if (type.matches(s)) {
+                match = true;
+            }
+        }
+        if(match){
+            this.type=type;
         } else {
             throw new InputValidationException();
         }
@@ -189,7 +196,14 @@ public class Item implements Comparable<Item> {
     }
 
     public String toString(){
-        StringBuilder buffer= new StringBuilder("Name:" + getName() + "\n ID: " + getId() + "\n Section: " + getSection() + "\n ");
+        StringBuilder buffer= new StringBuilder();
+        buffer.append("Name:").append(getName());
+        if(getId()!=0) {
+            buffer.append("\n ID: ").append(getId());
+        }
+        buffer.append("\n Section: ").append(getSection());
+        buffer.append("\n Type: ").append(getType());
+        buffer.append("\n Availability: ").append(getAvailability()).append("\n");
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
             buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
         }
