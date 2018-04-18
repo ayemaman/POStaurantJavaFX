@@ -201,7 +201,7 @@ public class ButtonCreationService {
         ArrayList<Button> buttons=new ArrayList<>();
         List<Ingredient> list=menuService.getAllIngredients();
         for(Ingredient i:list){
-            Button button=new Button(i.getId() + "\n" + i.getName()+ "\n" + i.getAmount());
+            Button button=new Button(i.getId() + "\n" + i.getName()+ "\namount(g.): " + i.getAmount());
             if(small) {
                 button.setMinWidth(73);
                 button.setMinHeight(82.5);

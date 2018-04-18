@@ -22,7 +22,7 @@ public interface UserDatabase {
     List<Item> getItemByName(String name);
     void changeItemAvailability(Item item, Integer integer);
     List<Ingredient> getAllIngredients();
-    Ingredient getIngredient(long id);
+    Ingredient getIngredientById(long id);
     List<Item> saveNewItem(Item item);
     void setNewItem(Item item);
     List<String> getSections();

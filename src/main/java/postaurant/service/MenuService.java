@@ -96,8 +96,8 @@ public class MenuService {
         return userDatabase.getAllIngredients();
     }
 
-    public Ingredient getIngredient(long id){
-        return userDatabase.getIngredient(id);
+    public Ingredient getIngredientById(long id){
+        return userDatabase.getIngredientById(id);
     }
 
     public Item saveNewItem(Item item) {

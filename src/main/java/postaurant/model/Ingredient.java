@@ -1,6 +1,9 @@
 package postaurant.model;
 
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
 import postaurant.exception.InputValidationException;
 
 import java.util.Comparator;
@@ -10,11 +13,14 @@ import java.util.function.ToIntFunction;
 public class Ingredient implements Comparable<Ingredient> {
     private long id;
     private String name;
-    private int amount;
-    private double price;
+    private Integer amount;
+    private Double price;
     private int availability;
     private String allergy;
     private Date dateCreated;
+
+    public Ingredient(){
+    }
 
     public Ingredient(long id, String name, int amount, double price, int availability, String allergy, Date dateCreated) throws InputValidationException{
         setId(id);
@@ -46,15 +52,15 @@ public class Ingredient implements Comparable<Ingredient> {
         }
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
-    public Double getPrice(Double price){
+    public Double getPrice(){
         return this.price;
     }
     public void setPrice(Double price){
@@ -87,6 +93,38 @@ public class Ingredient implements Comparable<Ingredient> {
     public String toString() {
         return getName();
     }
+
+    public String toFullString() {
+        StringBuilder buffer = new StringBuilder();
+        if (getId() != 0) {
+            buffer.append("ID: ").append(getId());
+        }
+        buffer.append("\nNAME: ").append(getName());
+        buffer.append("\nAMOUNT: ").append(getAmount());
+        buffer.append("\nPrice: ").append(getPrice());
+        buffer.append("\nAvailability: ").append(getAvailability());
+        buffer.append("\nAllergy: ").append(getAllergy());
+        return buffer.toString();
+    }
+
+    public SimpleLongProperty getIDProperty(){
+        return new SimpleLongProperty(getId());
+    }
+    public SimpleStringProperty getNameProperty(){
+        return new SimpleStringProperty(getName());
+    }
+    public SimpleStringProperty getAmountProperty(){
+        String amount=""+getAmount();
+        return new SimpleStringProperty(amount);
+    }
+    public SimpleStringProperty getPriceProperty(){
+        String price=""+getPrice();
+        return new SimpleStringProperty(price);
+    }
+    public SimpleStringProperty getAllergyProperty(){
+        return new SimpleStringProperty(getAllergy());
+    }
+
 
     @Override
     public int compareTo(Ingredient o) {

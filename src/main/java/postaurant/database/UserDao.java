@@ -127,11 +127,11 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.query(getAllIngredientsSQL, new IngredientMapper());
     }
 
-    private final String getIngredientSQL = "SELECT * FROM ingredients WHERE ingredient_id=?";
+    private final String getIngredientByIdSQL = "SELECT * FROM ingredients WHERE ingredient_id=?";
 
     @Override
-    public Ingredient getIngredient(long id) {
-        return jdbcTemplate.queryForObject(getIngredientSQL, new IngredientMapper(), id);
+    public Ingredient getIngredientById(long id) {
+        return jdbcTemplate.queryForObject(getIngredientByIdSQL, new IngredientMapper(), id);
     }
 
 

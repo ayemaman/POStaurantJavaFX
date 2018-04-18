@@ -28,7 +28,7 @@
                   <Insets bottom="70.0" />
                </VBox.margin>
             </Button>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="NEW INGREDIENT">
+            <Button fx:id="newIngredientButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="NEW INGREDIENT">
                <font>
                   <Font size="18.0" />
                </font>

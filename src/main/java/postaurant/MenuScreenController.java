@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
+import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
@@ -62,6 +63,8 @@ public class MenuScreenController {
     private GridPane ingredientGrid;
     @FXML
     private Button newItemButton;
+    @FXML
+    private Button newIngredientButton;
     @FXML
     private Button downButton;
     @FXML
@@ -121,6 +124,22 @@ public class MenuScreenController {
             }
         });
 
+        newIngredientButton.setOnAction(event -> {
+            try{
+                FXMLLoader loader=fxmLoaderService.getLoader(ingredientInfoForm.getURL());
+                Parent parent=loader.load();
+                IngredientInfoScreenController ingredientInfoScreenController =loader.getController();
+                ingredientInfoScreenController.setup(null);
+                Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
 
     }
 
@@ -145,7 +164,6 @@ public class MenuScreenController {
                     ItemInfoScreenController itemInfoScreenController = loader.getController();
                     itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
                     Item item=menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
-                    System.out.println(item.getAvailability());
                     itemInfoScreenController.setup(item);
                     Scene scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
@@ -167,6 +185,9 @@ public class MenuScreenController {
                 try {
                     FXMLLoader loader = fxmLoaderService.getLoader(ingredientInfoForm.getURL());
                     Parent parent = loader.load();
+                    IngredientInfoScreenController ingredientInfoScreenController =loader.getController();
+                    Ingredient ingredient=menuService.getIngredientById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
+                    ingredientInfoScreenController.setup(ingredient);
                     Scene scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage = new Stage();

@@ -1,8 +1,6 @@
 package postaurant;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
+import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
@@ -122,7 +121,7 @@ public class ItemInfoScreenController {
         sectionComboBox.setItems(sectionsList);
 
         typeList=FXCollections.observableArrayList();
-        typeList.addAll("FOODITEM","DRINKITEM");
+        typeList.addAll(TypeList.getItemTypes());
         typeComboBox.setItems(typeList);
 
         saveButton.setOnAction(this::saveButtonAction);
@@ -231,8 +230,6 @@ public class ItemInfoScreenController {
         }else {
             this.item = new Item();
         }
-
-
     }
 
 
@@ -248,7 +245,7 @@ public class ItemInfoScreenController {
     public void addOnActionToIngredientButtons(){
         for(Button b:ingredientButtonList){
             b.setOnAction(e->{
-                Ingredient ingredient=menuService.getIngredient(Long.parseLong(b.getText().substring(0,b.getText().indexOf("\n"))));
+                Ingredient ingredient=menuService.getIngredientById(Long.parseLong(b.getText().substring(0,b.getText().indexOf("\n"))));
                 ingredientsList.add(ingredient);
                 Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
                 FXCollections.sort(ingredientsList,ingredientNameComparator);
@@ -420,7 +417,6 @@ public class ItemInfoScreenController {
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
-
             }
             try {
                 item.setType(type.get());
