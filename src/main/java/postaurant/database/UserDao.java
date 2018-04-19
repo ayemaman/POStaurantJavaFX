@@ -3,19 +3,11 @@ package postaurant.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import postaurant.context.ItemType;
-import postaurant.exception.InputValidationException;
-import postaurant.model.Ingredient;
-import postaurant.model.Item;
-import postaurant.model.Order;
-import postaurant.model.User;
+import postaurant.database.rowMappers.*;
+import postaurant.model.*;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UserDao implements UserDatabase {
@@ -32,7 +24,7 @@ public class UserDao implements UserDatabase {
     private final String retrieveUser = "SELECT * FROM dubdubs WHERE dub_id=?";
     @Override
     public User getUser(String userId) {
-        return jdbcTemplate.queryForObject(retrieveUser, new UserMapper(), userId);
+        return jdbcTemplate.queryForObject(retrieveUser, new UserRowMapper(), userId);
     }
 
 
@@ -68,7 +60,7 @@ public class UserDao implements UserDatabase {
 
     @Override
     public List<User> retrieveAllActiveUsers() {
-        return jdbcTemplate.query(retriveAllActiveUsers, new UserMapper());
+        return jdbcTemplate.query(retriveAllActiveUsers, new UserRowMapper());
     }
 
     private final String saveNewUserSQL = "INSERT INTO dubdubs (first_name,last_name,position) VALUES(?,?,?)";
@@ -77,7 +69,7 @@ public class UserDao implements UserDatabase {
     @Override
     public User saveNewUser(User user) {
         jdbcTemplate.update(saveNewUserSQL, user.getFirstName(), user.getLastName(), user.getPosition());
-        return jdbcTemplate.queryForObject(getLastSavedUserSQL, new UserMapper());
+        return jdbcTemplate.queryForObject(getLastSavedUserSQL, new UserRowMapper());
     }
 
     private final String blockUserSQL = "UPDATE dubdubs SET accessible=0 WHERE dub_id=?";
@@ -87,63 +79,41 @@ public class UserDao implements UserDatabase {
         jdbcTemplate.update(blockUserSQL, user.getUserID());
     }
 
-    private final String getMenuSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients ORDER BY item_id DESC";
-    private final String getMenuSQL2 = "SELECT * FROM items ORDER BY item_id DESC";
-/*
-    @Override
-    public List<Item> getMenu() {
-        return jdbcTemplate.query(getMenuSQL, new ItemMapper());
-    }*/
+
+    private final String getMenuSQL = "SELECT * FROM items WHERE custom<>1 ORDER BY item_id DESC";
+    private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients";
+
 
     @Override
     public List<Item> getMenu() {
-
         Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
-        List<Item> items = jdbcTemplate.query(getMenuSQL2, new ItemMapper2());
+        List<Item> items = jdbcTemplate.query(getMenuSQL, new EmptyItemMapper());
         Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
-        List<ItemIngredient> itemIngredients = jdbcTemplate.query("SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients", new ItemIngredientRowMapper());
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query(getItemIngredientIdsSQL, new ItemIngredientRowMapper());
 
         for (ItemIngredient itemIngredient : itemIngredients) {
-            Item item = itemsMap.get(itemIngredient.itemId);
-            Ingredient ingredient = ingredients.get(itemIngredient.ingredientId);
-            item.addIngredient(ingredient, itemIngredient.amount);
+            Item item = itemsMap.get(itemIngredient.getItemId());
+            Ingredient ingredient = ingredients.get(itemIngredient.getIngredientId());
+            item.addIngredient(ingredient, itemIngredient.getAmount());
         }
         return items;
     }
 
 
-    private static final class ItemIngredientRowMapper implements RowMapper<ItemIngredient> {
 
-        @Override
-        public ItemIngredient mapRow(ResultSet rs, int i) throws SQLException {
-            return new ItemIngredient(rs.getInt("ITEM_ID"), rs.getInt("INGREDIENT_ID"), rs.getInt("INGREDIENT_QTY"));
-        }
-    }
-
-    public static class ItemIngredient {
-        public final Integer itemId;
-        public final Integer ingredientId;
-        public final Integer amount;
-
-        public ItemIngredient(Integer itemId, Integer ingredientId, Integer amount) {
-            this.itemId = itemId;
-            this.ingredientId = ingredientId;
-            this.amount = amount;
-        }
-    }
 
 
     private final String getItemByIdSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE item_id=? ORDER BY item_id";
 
     @Override
     public List<Item> getItemById(long itemID) {
-        return jdbcTemplate.query(getItemByIdSQL, new ItemMapper(), itemID);
+        return jdbcTemplate.query(getItemByIdSQL, new ItemRowMapper(), itemID);
     }
 
     private final String getItemByNameSQL = "SELECT * FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE item_name=? ORDER BY item_date_added DESC";
     @Override
     public List<Item> getItemByName(String name){
-        return jdbcTemplate.query(getItemByNameSQL,new ItemMapper(),name);
+        return jdbcTemplate.query(getItemByNameSQL,new ItemRowMapper(),name);
     }
 
     private final String changeItemAvailabilitySQL="UPDATE items SET item_availability=? WHERE item_id=?";
@@ -205,127 +175,4 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.queryForList(getSectionsSQL, String.class);
     }
 
-
-    private static final class UserMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet rs, int i) {
-            try {
-                User user = new User();
-                user.setFirstName(rs.getString("first_name"));
-                user.setLastName(rs.getString("last_name"));
-                user.setUserID(rs.getString("dub_id"));
-                user.setPosition(rs.getString("position"));
-                int access = rs.getInt("accessible");
-                if (access == 1) {
-                    user.setAccessible(true);
-                } else {
-                    user.setAccessible(false);
-                }
-                return user;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-//todo
-
-    private static final class OrderMapper implements RowMapper<Order> {
-        @Override
-        public Order mapRow(ResultSet rs, int i) throws SQLException {
-            try {
-                Ingredient ingredient = new Ingredient(rs.getLong("ingredient_id"), rs.getString("ingredient_name"), rs.getInt("ingredient_amount"), rs.getDouble("ingredient_price"), rs.getInt("ingredient_availability"), rs.getString("ingredient_allergy"),rs.getDate("ingredient_date_created"));
-                int ingredientQuantity = rs.getInt("ingredient_qty");
-                TreeMap<Ingredient, Integer> map = new TreeMap<>();
-                map.put(ingredient, ingredientQuantity);
-                Integer itemQuantity = rs.getInt("item_qty");
-                try {
-                    Item item = new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"),map, rs.getString("item_kitchen_status"),rs.getDate("item_date_added"),rs.getDate("time_ordered"));
-                    TreeMap<Item, Integer> map2 = new TreeMap<Item,Integer>((o1, o2) -> {
-                        int idCmp = Long.compare(o1.getId(), o2.getId());
-                        if (idCmp != 0) {
-                            return idCmp;
-                        }
-                        return o1.getDateOrdered().compareTo(o2.getDateOrdered());
-                    });
-                    map2.put(item, itemQuantity);
-
-                    try {
-                        return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), rs.getDate("time_opened"), rs.getString("status"), rs.getDate("last_time_checked"), rs.getDate("time_bumped"), map2);
-
-                    } catch (InputValidationException iEx) {
-                        iEx.printStackTrace();
-                    }
-                } catch (InputValidationException iEx2) {
-                    iEx2.printStackTrace();
-                }
-
-            } catch (InputValidationException iEx1) {
-                iEx1.printStackTrace();
-            }
-            return null;
-        }
-    }
-
-    private static final class EmptyItemMapper implements RowMapper<Item>{
-        @Override
-        public Item mapRow(ResultSet rs, int i) throws SQLException {
-            try {
-                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), rs.getDate("item_date_added"));
-            } catch (InputValidationException iEx2) {
-                iEx2.printStackTrace();
-            }
-            return null;
-        }
-    }
-
-    private static final class ItemMapper implements RowMapper<Item> {
-        @Override
-        public Item mapRow(ResultSet rs, int i) throws SQLException {
-            try {
-                Ingredient ingredient = new Ingredient(rs.getLong("ingredient_id"), rs.getString("ingredient_name"), rs.getInt("ingredient_amount"), rs.getDouble("ingredient_price"), rs.getInt("ingredient_availability"), rs.getString("ingredient_allergy"), rs.getDate("ingredient_date_created"));
-                int ingredientQuantity = rs.getInt("ingredient_qty");
-                TreeMap<Ingredient, Integer> map = new TreeMap<>();
-                map.put(ingredient, ingredientQuantity);
-                try {
-                    return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), map, rs.getDate("item_date_added"));
-                } catch (InputValidationException iEx2) {
-                    iEx2.printStackTrace();
-                }
-
-            } catch (InputValidationException iEx1) {
-                iEx1.printStackTrace();
-            }
-            return null;
-        }
-    }
-
-
-    private static final class ItemMapper2 implements RowMapper<Item> {
-
-        @Override
-        public Item mapRow(ResultSet rs, int i) throws SQLException {
-            try {
-                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), rs.getDate("item_date_added"));
-            } catch (InputValidationException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-
-
-    private static final class IngredientMapper implements RowMapper<Ingredient> {
-        @Override
-        public Ingredient mapRow(ResultSet rs, int i) throws SQLException {
-            try {
-                Ingredient ingredient = new Ingredient(rs.getLong("ingredient_id"), rs.getString("ingredient_name"), rs.getInt("ingredient_amount"), rs.getDouble("ingredient_price"), rs.getInt("ingredient_availability"), rs.getString("ingredient_allergy"), rs.getDate("ingredient_date_created"));
-                return ingredient;
-            } catch (InputValidationException iEx) {
-                iEx.printStackTrace();
-            }
-            return null;
-        }
-
-    }
 }

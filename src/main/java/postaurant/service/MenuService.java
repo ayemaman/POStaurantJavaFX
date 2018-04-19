@@ -22,40 +22,6 @@ public class MenuService {
     public Map<String, List<Item>> getSectionsWithItems() {
         List<Item> fullItemList = userDatabase.getMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
         return fullItemList.stream().collect(Collectors.groupingBy(Item::getSection));
-/*        for (int itemInt = 0; itemInt < fullItemList.size() - 1; )
-            if (fullItemList.get(itemInt).getId() == (fullItemList.get(itemInt + 1).getId())) {
-                Map.Entry<Ingredient, Integer> entry = fullItemList.get(itemInt + 1).getRecipe().entrySet().iterator().next();
-                fullItemList.get(itemInt).addIngredient(entry.getKey(), entry.getValue());
-                fullItemList.remove(itemInt + 1);
-            } else {
-                itemInt++;
-            }
-        for (Item item : fullItemList) {
-            if (map.containsKey(item.getSection())) {
-                map.get(item.getSection()).add(item);
-            } else {
-                List<Item> itemsForSection = new ArrayList<>();
-                itemsForSection.add(item);
-                map.put(item.getSection(), itemsForSection);
-            }
-        }
-        for(Map.Entry<String, List<Item>> entry:map.entrySet()) {
-            List<Item> list = entry.getValue();
-            for (int i = 0; i < list.size()-1;i++ ) {
-                if (list.get(i).getId() == list.get(i + 1).getId()) {
-                    i++;
-                } else {
-                    for (int j = i + 1; j < list.size(); ) {
-                        if (list.get(i).getName().equals(list.get(j).getName())) {
-                            list.remove(j);
-                        } else {
-                            j++;
-                        }
-                    }
-                }
-            }
-        }
-        return map;*/
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
