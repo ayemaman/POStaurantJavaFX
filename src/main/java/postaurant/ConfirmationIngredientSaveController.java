@@ -35,7 +35,7 @@ public class ConfirmationIngredientSaveController {
         saved=false;
         yesButton.setOnAction(event -> {
             //todo
-           // ingredient=menuService.saveNewIngredient(ingredient);
+            ingredient=menuService.saveNewIngredient(ingredient);
         });
 
         noButton.setOnAction(event -> {

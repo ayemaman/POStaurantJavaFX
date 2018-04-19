@@ -26,6 +26,8 @@ public interface UserDatabase {
     List<Item> saveNewItem(Item item);
     void setNewItem(Item item);
     List<String> getSections();
+    Ingredient getIngredientByNameAmount(String name, Integer amount);
+    void saveNewIngredient(Ingredient ingredient);
 
 
 }

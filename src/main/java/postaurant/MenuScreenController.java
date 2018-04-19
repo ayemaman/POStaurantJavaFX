@@ -11,7 +11,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
@@ -49,6 +51,8 @@ public class MenuScreenController {
     private Resource itemInfoForm;
     @Value("/FXML/IngredientInfoScreen.fxml")
     private Resource ingredientInfoForm;
+    @Value("/FXML/ManagerScreen.fxml")
+    private Resource managerScreen;
     @Value("/POStaurant.css")
     private Resource css;
 
@@ -69,6 +73,8 @@ public class MenuScreenController {
     private Button downButton;
     @FXML
     private Button upButton;
+    @FXML
+    private Button managerScreenButton;
 
 
     public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService) {
@@ -132,6 +138,25 @@ public class MenuScreenController {
                 ingredientInfoScreenController.setup(null);
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setScene(scene);
+                stage.showAndWait();
+                if(ingredientInfoScreenController.wasSaved()){
+                    setIngredientButtons(ingredientGrid,16,true, ingredientButtonList);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        managerScreenButton.setOnAction(event -> {
+            try{
+                FXMLLoader loader=fxmLoaderService.getLoader(managerScreen.getURL());
+                Parent parent=loader.load();
+                Scene scene=new Scene(parent);
+                scene.getStylesheets().addAll(css.getURL().toExternalForm());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
@@ -191,8 +216,13 @@ public class MenuScreenController {
                     Scene scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
                     stage.setScene(scene);
-                    stage.show();
+                    stage.showAndWait();
+                    if(ingredientInfoScreenController.wasSaved()){
+                        setIngredientButtons(ingredientGrid,16,true, ingredientButtonList);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -106,4 +106,16 @@ public class MenuService {
         return userDatabase.getSections();
     }
 
+    public Ingredient saveNewIngredient(Ingredient ingredient){
+        Ingredient ingredient1=getIngredientByNameAmount(ingredient.getName(), ingredient.getAmount());
+        if(ingredient1==null){
+            userDatabase.saveNewIngredient(ingredient);
+            return getIngredientByNameAmount(ingredient.getName(),ingredient.getAmount());
+        }
+        return null;
+    }
+
+    public Ingredient getIngredientByNameAmount(String name, Integer amount){
+        return userDatabase.getIngredientByNameAmount(name,amount);
+    }
 }

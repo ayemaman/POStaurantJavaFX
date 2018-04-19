@@ -62,6 +62,7 @@ public class IngredientInfoScreenController {
     /*
 
      */
+    private boolean saved;
     private Node currentTextField;
     @FXML
     private TextField nameField;
@@ -85,14 +86,14 @@ public class IngredientInfoScreenController {
     public IngredientInfoScreenController(FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService) {
         this.buttonCreationService = buttonCreationService;
         this.fxmLoaderService = fxmLoaderService;
-
+        this.saved=false;
     }
 
 
     public void initialize() {
         name = new SimpleStringProperty("");
-        amount = new SimpleStringProperty("0g");
-        price = new SimpleStringProperty("0.00");
+        amount = new SimpleStringProperty("");
+        price = new SimpleStringProperty("");
         allergy = new SimpleStringProperty("");
 
         allergenList = FXCollections.observableArrayList();
@@ -301,6 +302,7 @@ public class IngredientInfoScreenController {
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
                 if (confirmationIngredientSaveController.isSaved()) {
+                    this.saved=true;
                     Stage stage1 = (Stage) ((Node) e.getSource()).getScene().getWindow();
                     stage1.hide();
                 }
@@ -309,6 +311,10 @@ public class IngredientInfoScreenController {
             ioE.printStackTrace();
         }
 
+    }
+
+    public boolean wasSaved(){
+        return this.saved;
     }
 }
 

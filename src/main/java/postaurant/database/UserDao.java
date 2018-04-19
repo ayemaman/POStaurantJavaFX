@@ -175,4 +175,16 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.queryForList(getSectionsSQL, String.class);
     }
 
+    private final String getIngredientByNameAmountSQL="SELECT * FROM ingredients WHERE ingredient_name=? and ingredient_amount=? ";
+    @Override
+    public Ingredient getIngredientByNameAmount(String name, Integer amount) {
+        return jdbcTemplate.queryForObject(getIngredientByNameAmountSQL, new IngredientMapper(), name, amount);
+    }
+
+    private final String saveNewIngredientSQL="INSERT INTO ingredients(ingredient_name, ingredient_amount, ingredient_price, ingredient_availability,ingredient_allergy) VALUES(?,?,?,?,?)";
+    @Override
+    public void saveNewIngredient(Ingredient ingredient) {
+        jdbcTemplate.update(saveNewIngredientSQL,ingredient.getName(),ingredient.getAmount(),ingredient.getPrice(),ingredient.getAvailability(),ingredient.getAllergy());
+    }
+
 }
