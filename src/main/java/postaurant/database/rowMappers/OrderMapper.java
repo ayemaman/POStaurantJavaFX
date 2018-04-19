@@ -13,7 +13,7 @@ import java.util.TreeMap;
 public class OrderMapper implements RowMapper<Order> {
 
     //todo
-    //readjust to make usage od ItemIngredient Class
+    //readjust to make usage od ItemIngredient Class 
     @Override
     public Order mapRow(ResultSet rs, int i) throws SQLException {
         try {
