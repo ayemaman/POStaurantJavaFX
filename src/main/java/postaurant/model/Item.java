@@ -242,9 +242,11 @@ public class Item implements Comparable<Item> {
     @Override
     public int compareTo(Item o) {
         int idCmp=Long.compare(this.getId(),o.getId());
-        if(idCmp!=0){
-            return idCmp;
+        if(idCmp==0) {
+            if (this.dateOrdered != null) {
+                return this.getDateOrdered().compareTo(o.getDateOrdered());
+            }
         }
-        return this.getDateOrdered().compareTo(o.getDateOrdered());
+        return idCmp;
     }
 }

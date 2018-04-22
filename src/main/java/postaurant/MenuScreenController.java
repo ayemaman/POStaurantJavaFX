@@ -46,7 +46,8 @@ public class MenuScreenController {
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
-
+    @Value("FXML/MenuScreen.fxml")
+    private Resource menuScreen;
     @Value("/FXML/ItemInfoScreen.fxml")
     private Resource itemInfoForm;
     @Value("/FXML/IngredientInfoScreen.fxml")
@@ -86,6 +87,8 @@ public class MenuScreenController {
     public void initialize() {
         setup();
         ingredientTab.setOnSelectionChanged(e->{
+            pageItems=0;
+            pageIngredients=0;
             setIngredientButtons(ingredientGrid,16,true, ingredientButtonList);
         });
         upButton.setOnAction(e -> {
@@ -93,7 +96,7 @@ public class MenuScreenController {
                 Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
                 setItemButtonsForSection(gridPane, 16, false, itemButtonList, currentTab);
             } else {
                 setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
@@ -106,7 +109,7 @@ public class MenuScreenController {
                 Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
                 setItemButtonsForSection(gridPane, 16, true, itemButtonList, currentTab);
             } else {
                 setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
@@ -118,7 +121,7 @@ public class MenuScreenController {
                 FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
                 Parent parent = loader.load();
                 ItemInfoScreenController itemInfoScreenController = loader.getController();
-                itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
+                itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(true));
                 itemInfoScreenController.setup(null);
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
@@ -144,7 +147,18 @@ public class MenuScreenController {
                 stage.setScene(scene);
                 stage.showAndWait();
                 if(ingredientInfoScreenController.wasSaved()){
-                    setIngredientButtons(ingredientGrid,16,true, ingredientButtonList);
+                    if(ingredientInfoScreenController.wasSaved()){
+                        FXMLLoader loader1=fxmLoaderService.getLoader(menuScreen.getURL());
+                        Parent parent1=loader1.load();
+                        MenuScreenController menuScreenController=loader1.getController();
+                        menuScreenController.largeTabPane.getSelectionModel().select(1);
+                        Scene scene1= new Scene(parent1);
+                        scene1.getStylesheets().add(""+css.getURL());
+                        Stage stage1= (Stage)((Node) event.getSource()).getScene().getWindow();
+                        stage1.setScene(scene1);
+                        stage1.show();
+                        stage.hide();
+                    }
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -170,8 +184,9 @@ public class MenuScreenController {
 
     public void setup() {
         //creating section tabs
-        setSectionTabs();
-        setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(false));
+            setSectionTabs();
+            setIngredientButtonList(buttonCreationService.createIngredientButtons(false));
+
     }
 
 
@@ -182,12 +197,11 @@ public class MenuScreenController {
     public void setItemButtonList(List<Button> itemButtonList) {
         for (Button b : itemButtonList) {
             b.setOnAction(event1 -> {
-
                 try {
                     FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
                     Parent parent = loader.load();
                     ItemInfoScreenController itemInfoScreenController = loader.getController();
-                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtonsSmall(true));
+                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(true));
                     Item item=menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     itemInfoScreenController.setup(item);
                     Scene scene = new Scene(parent);
@@ -221,7 +235,16 @@ public class MenuScreenController {
                     stage.setScene(scene);
                     stage.showAndWait();
                     if(ingredientInfoScreenController.wasSaved()){
-                        setIngredientButtons(ingredientGrid,16,true, ingredientButtonList);
+                        FXMLLoader loader1=fxmLoaderService.getLoader(menuScreen.getURL());
+                        Parent parent1=loader1.load();
+                        MenuScreenController menuScreenController=loader1.getController();
+                        menuScreenController.largeTabPane.getSelectionModel().select(1);
+                        Scene scene1= new Scene(parent1);
+                        scene1.getStylesheets().add(""+css.getURL());
+                        Stage stage1= (Stage)((Node) event1.getSource()).getScene().getWindow();
+                        stage1.setScene(scene1);
+                        stage1.show();
+                        stage.hide();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -247,15 +270,14 @@ public class MenuScreenController {
             for (Tab t : sectionTabList) {
                 t.setOnSelectionChanged(event -> {
                     pageItems = 0;
+                    pageIngredients=0;
                     AnchorPane anchorPane = (AnchorPane) t.getContent();
                     GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                    setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText()));
+                    setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText(),true));
                     setItemButtonsForSection(gridPane, 16, true, itemButtonList, t);
                 });
                 sectionTabPane.getTabs().add(t);
             }
-
-
         }
     }
 
@@ -303,7 +325,7 @@ public class MenuScreenController {
                     }
                     pageIngredients++;
                 } else {
-                    if (isNextPage(pageItems + 1, list, size)) {
+                    if (isNextPage(pageIngredients + 1, list, size)) {
                         for (int i = start; i < start + size; i++) {
                             gridPane.add(list.get(i), x, y);
                             GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
@@ -353,16 +375,16 @@ public class MenuScreenController {
 
             }
         } else {
-            if (pageItems > 1) {
+            if (pageIngredients > 1) {
                 for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
-                if (pageItems == 2) {
+                if (pageIngredients == 2) {
                     start = 0;
                 } else {
-                    start = (pageItems - 2) * size;
+                    start = (pageIngredients - 2) * size;
                 }
-                for (int i = start; i < (start + 16); i++) {
+                for (int i = start; i < (start + size); i++) {
                     gridPane.add(list.get(i), x, y);
                     GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
                     if (x == 3) {

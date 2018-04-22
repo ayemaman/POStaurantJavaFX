@@ -53,17 +53,13 @@ public class ConfirmationItemSaveController {
                 for (int i = 0; i < bottomConfirmationBox.getChildren().size(); ) {
                     bottomConfirmationBox.getChildren().remove(bottomConfirmationBox.getChildren().get(i));
                 }
-                for(Node n: topConfirmationBox.getChildren()){
-                    System.out.println(n);
-                }
+
                 int times=0;
                 while(times<3){
                     topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
                     times++;
                 }
-                for(Node n: topConfirmationBox.getChildren()){
-                    System.out.println(n);
-                }
+
                 confirmationLabel.setText("Successfully saved");
                 bottomConfirmationBox.getChildren().add(confirmationLabel);
                 Button button = new Button("OK");

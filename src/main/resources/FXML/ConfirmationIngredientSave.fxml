@@ -14,7 +14,7 @@
          <children>
             <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="296.0" text="Are you sure you want to save this ingredeint:" textFill="#eb0101" />
             <Region prefHeight="20.0" prefWidth="200.0" />
-            <Label fx:id="itemLabel" prefHeight="350.0" prefWidth="251.0" textFill="#ffbf00">
+            <Label fx:id="ingredientLabel" prefHeight="350.0" prefWidth="251.0" textFill="#ffbf00">
                <font>
                   <Font size="18.0" />
                </font></Label>

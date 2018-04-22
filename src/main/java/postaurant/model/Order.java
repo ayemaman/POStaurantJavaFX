@@ -6,7 +6,7 @@ import postaurant.exception.InputValidationException;
 import java.util.*;
 
 public class Order implements Comparable<Order>{
-    private long id;
+    private Long id;
     private Double tableNo;
     private Date timeOpened;
     private String status;
@@ -22,22 +22,27 @@ public class Order implements Comparable<Order>{
         orderItems=new HashMap<>();
     }
 
-    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
+    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped){
+        this();
         setId(orderID);
         setTableNo(tableNo);
         setTimeOpened(timeOpened);
         setStatus(status);
         setLastTimeChecked(lastTimeChecked);
         setTimeBumped(timeBumped);
+    }
+
+    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
+        this(orderID,tableNo,timeOpened,status,lastTimeChecked,timeBumped);
         setOrderItems(orderItems);
     }
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

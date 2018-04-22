@@ -45,18 +45,16 @@ public class ItemInfoScreenController {
     private ObservableList<String> sectionsList;
     private ObservableList<String> typeList;
 
-    private boolean lowercase=true;
+    private boolean lowercase = true;
     private StringProperty name;
     private StringProperty price;
     private StringProperty type;
     private StringProperty section;
 
 
-
     private final ButtonCreationService buttonCreationService;
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
-
 
 
     @Value("/FXML/ItemWrongInputWindow.fxml")
@@ -71,7 +69,7 @@ public class ItemInfoScreenController {
 
     private Node currentTextField;
     @FXML
-    private TextField  nameField;
+    private TextField nameField;
     @FXML
     private TextField priceField;
     @FXML
@@ -97,12 +95,16 @@ public class ItemInfoScreenController {
     private TableColumn<Ingredient, String> recipeColumn;
     @FXML
     private HBox spacebarHBox;
+    @FXML
+    private Button upButton;
+    @FXML
+    private Button downButton;
 
 
-    public ItemInfoScreenController(ButtonCreationService buttonCreationService, FXMLoaderService fxmLoaderService, MenuService menuService){
-        this.buttonCreationService=buttonCreationService;
-        this.fxmLoaderService=fxmLoaderService;
-        this.menuService=menuService;
+    public ItemInfoScreenController(ButtonCreationService buttonCreationService, FXMLoaderService fxmLoaderService, MenuService menuService) {
+        this.buttonCreationService = buttonCreationService;
+        this.fxmLoaderService = fxmLoaderService;
+        this.menuService = menuService;
     }
 
     public void setIngredientButtonList(ArrayList<Button> ingredientButtonList) {
@@ -111,16 +113,16 @@ public class ItemInfoScreenController {
 
     public void initialize() {
 
-        name=new SimpleStringProperty("");
-        price=new SimpleStringProperty("0.00");
-        type=new SimpleStringProperty("");
-        section=new SimpleStringProperty("");
+        name = new SimpleStringProperty("");
+        price = new SimpleStringProperty("0.00");
+        type = new SimpleStringProperty("");
+        section = new SimpleStringProperty("");
 
-        sectionsList=FXCollections.observableArrayList();
+        sectionsList = FXCollections.observableArrayList();
         sectionsList.addAll(menuService.getSections());
         sectionComboBox.setItems(sectionsList);
 
-        typeList=FXCollections.observableArrayList();
+        typeList = FXCollections.observableArrayList();
         typeList.addAll(TypeList.getItemTypes());
         typeComboBox.setItems(typeList);
 
@@ -131,30 +133,30 @@ public class ItemInfoScreenController {
             selected.forEach(ingredientsList::remove);
         });
 
-        availabilityButton.setOnAction(e->{
-           if(availabilityButton.getStyleClass().get(0).equals("Availability68")){
-               availabilityButton.getStyleClass().clear();
-               availabilityButton.getStyleClass().add("Availability85");
-           }else if(availabilityButton.getStyleClass().get(0).equals("Availability85")){
-               availabilityButton.getStyleClass().clear();
-               availabilityButton.getStyleClass().add("Availability86");
-           }else{
-               availabilityButton.getStyleClass().clear();
-               availabilityButton.getStyleClass().add("Availability68");
-           }
+        availabilityButton.setOnAction(e -> {
+            if (availabilityButton.getStyleClass().get(0).equals("Availability68")) {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability85");
+            } else if (availabilityButton.getStyleClass().get(0).equals("Availability85")) {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability86");
+            } else {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability68");
+            }
         });
 
 
-        exitButton.setOnAction(e->{
+        exitButton.setOnAction(e -> {
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
-                Parent parent=loader.load();
-                Scene scene=new Scene(parent);
+                Parent parent = loader.load();
+                Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
-                Stage stage=(Stage)((Node) e.getSource()).getScene().getWindow();
+                Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
-            }catch (IOException ioE){
+            } catch (IOException ioE) {
                 ioE.printStackTrace();
 
             }
@@ -165,58 +167,122 @@ public class ItemInfoScreenController {
         priceField.textProperty().bind(price);
         typeComboBox.valueProperty().bind(type);
         sectionComboBox.valueProperty().bind(section);
-        currentTextField=nameField;
-        nameField.setOnMouseClicked(e->this.currentTextField=nameField);
-        priceField.setOnMouseClicked(e->this.currentTextField=priceField);
+        currentTextField = nameField;
+        nameField.setOnMouseClicked(e -> this.currentTextField = nameField);
+        priceField.setOnMouseClicked(e -> this.currentTextField = priceField);
 
         //listen for changes to the typeComboBox selection and update the displayed section StringProperty accordingly.
-        typeComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString )->{
-            if(newString!=null){
+        typeComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString) -> {
+            if (newString != null) {
                 type.setValue(typeComboBox.getSelectionModel().getSelectedItem());
             }
         });
-        sectionComboBox.setOnMouseClicked(e->this.currentTextField = sectionComboBox);
+        sectionComboBox.setOnMouseClicked(e -> this.currentTextField = sectionComboBox);
         //listen for changes to the sectionComboBox selection and update the displayed section StringProperty accordingly.
         sectionComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString) -> {
             if (newString != null) {
                 section.setValue(sectionComboBox.getSelectionModel().getSelectedItem());
             }
         });
+
+        upButton.setOnAction(e -> {
+            System.out.println(this.page);
+
+            setIngredientButtons(this.ingredientGrid, 12, false, ingredientButtonList);
+
+        });
+
+        downButton.setOnAction(e -> {
+            setIngredientButtons(this.ingredientGrid, 12, true, ingredientButtonList);
+        });
+
+        /*
+         upButton.setOnAction(e -> {
+            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
+                Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
+                AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
+                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonsForSection(gridPane, 16, false, itemButtonList, currentTab);
+            } else {
+                setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
+            }
+        });
+
+        downButton.setOnAction(e -> {
+
+            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
+                Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
+                AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
+                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
+                setItemButtonsForSection(gridPane, 16, true, itemButtonList, currentTab);
+            } else {
+                setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
+            }
+        });
+
+         */
     }
 
-    public void setup(Item item){
-        if(item!=null) {
+    public void setup(Item item) {
+        if (item != null) {
             name.setValue(item.getName());
             price.setValue("" + item.getPrice());
             type.setValue(item.getType());
             section.setValue(item.getSection());
         }
         setKeyboard(lowercase);
-        this.page=0;
+        this.page = 0;
         addOnActionToIngredientButtons();
-        setIngredientButtons(this.page,this.ingredientGrid, 12,true,ingredientButtonList);
+        setIngredientButtons(this.ingredientGrid, 12, true, ingredientButtonList);
         setItem(item);
-        try{
+        try {
             availabilityButton.getStyleClass().clear();
             if (item.getAvailability() == 86) {
                 availabilityButton.getStyleClass().add("Availability86");
-            } else if(item.getAvailability() == 85) {
+            } else if (item.getAvailability() == 85) {
                 availabilityButton.getStyleClass().add("Availability85");
-            }else{
+            } else {
                 availabilityButton.getStyleClass().add("Availability68");
             }
-        }catch (NullPointerException nE) {
+        } catch (NullPointerException nE) {
             availabilityButton.getStyleClass().clear();
             availabilityButton.getStyleClass().add("Availability68");
         }
-            recipeColumn.setMinWidth(200);
-            recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-            ingredientTable.setItems(ingredientsList);
-            ingredientTable.getSortOrder().add(recipeColumn);
-            ingredientTable.setPlaceholder(new Label("Add ingredients"));
+        recipeColumn.setMinWidth(200);
+        recipeColumn.setCellFactory(param -> new AvailabilityFormatCell());
+        recipeColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        ingredientTable.setItems(ingredientsList);
+
+        ingredientTable.getSortOrder().add(recipeColumn);
+        ingredientTable.setPlaceholder(new Label("Add ingredients"));
+
+    }
+
+    private class AvailabilityFormatCell extends TableCell<Ingredient, String> {
+        public AvailabilityFormatCell() {
         }
-
-
+        @Override
+        protected void updateItem(String string, boolean empty) {
+            super.updateItem(string, empty);
+            setText(string == null ? "" : string);
+            if (string != null) {
+                for (Ingredient i : ingredientsList) {
+                    if (string.equals(i.getName())) {
+                        if (i.getAvailability() == 86) {
+                            setStyle("-fx-background-color:red");
+                        } else if (i.getAvailability() == 85) {
+                            setStyle("-fx-background-color:orange");
+                        }
+                    }
+                }
+            } else {
+                setStyle("");
+            }
+        }
+    }
 
     public void setItem(Item item) {
         this.item = item;
@@ -227,45 +293,49 @@ public class ItemInfoScreenController {
                     ingredientsList.add(entry.getKey());
                 }
             }
-        }else {
+        } else {
             this.item = new Item();
         }
     }
 
-
-    private boolean isNextPage() {
+    private boolean isNextPage(int page, List<Button> list, int size) {
         try {
-            ingredientButtonList.get((this.page * 12));
+            if (page > 0) {
+                list.get((page * size));
+            } else {
+                list.get((size));
+            }
         } catch (IndexOutOfBoundsException e) {
             return false;
         }
         return true;
     }
 
-    public void addOnActionToIngredientButtons(){
-        for(Button b:ingredientButtonList){
-            b.setOnAction(e->{
-                Ingredient ingredient=menuService.getIngredientById(Long.parseLong(b.getText().substring(0,b.getText().indexOf("\n"))));
+
+    public void addOnActionToIngredientButtons() {
+        for (Button b : ingredientButtonList) {
+            b.setOnAction(e -> {
+                Ingredient ingredient = menuService.getIngredientById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                 ingredientsList.add(ingredient);
                 Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
-                FXCollections.sort(ingredientsList,ingredientNameComparator);
+                FXCollections.sort(ingredientsList, ingredientNameComparator);
             });
         }
     }
 
-    private void setKeyboard(boolean lowercase){
-        int x=0;
-        int y=0;
-        for(int i=0; i< (keyboardGrid.getChildren().size());){
+    private void setKeyboard(boolean lowercase) {
+        int x = 0;
+        int y = 0;
+        for (int i = 0; i < (keyboardGrid.getChildren().size()); ) {
             keyboardGrid.getChildren().remove(keyboardGrid.getChildren().get(i));
         }
-        for(int i=0;i<spacebarHBox.getChildren().size();){
+        for (int i = 0; i < spacebarHBox.getChildren().size(); ) {
             spacebarHBox.getChildren().remove(spacebarHBox.getChildren().get(i));
         }
 
-        ArrayList<Button> buttonList=buttonCreationService.createKeyboardButtons(lowercase,78,700,30);
+        ArrayList<Button> buttonList = buttonCreationService.createKeyboardButtons(lowercase, 78, 700, 30);
 
-        for(int i=0; i<buttonList.size()-2;i++) {
+        for (int i = 0; i < buttonList.size() - 2; i++) {
             buttonList.get(i).setOnAction(this::onKeyboardPress);
             this.lowercase = lowercase;
             keyboardGrid.add(buttonList.get(i), x, y);
@@ -280,7 +350,7 @@ public class ItemInfoScreenController {
         buttonList.get(41).setOnAction(this::onKeyboardPress);
         spacebarHBox.getChildren().add(buttonList.get(40));
         spacebarHBox.getChildren().add(buttonList.get(41));
-        spacebarHBox.setMargin(buttonList.get(40),new Insets(0,11,0,0));
+        spacebarHBox.setMargin(buttonList.get(40), new Insets(0, 11, 0, 0));
     }
 
     public void onKeyboardPress(ActionEvent event) {
@@ -289,10 +359,10 @@ public class ItemInfoScreenController {
             stringProperty = name;
         } else if (currentTextField.equals(priceField)) {
             stringProperty = price;
-        } else if(currentTextField.equals(typeComboBox)){
-            stringProperty=type;
+        } else if (currentTextField.equals(typeComboBox)) {
+            stringProperty = type;
         } else if (currentTextField.equals(sectionComboBox)) {
-            stringProperty=section;
+            stringProperty = section;
         }
         if (stringProperty != null) {
             Button button = (Button) event.getSource();
@@ -301,7 +371,7 @@ public class ItemInfoScreenController {
                     setKeyboard(!lowercase);
                     break;
                 case "backspaceKey":
-                    if(!stringProperty.getValue().equals("")) {
+                    if (!stringProperty.getValue().equals("")) {
                         stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
                     }
                     break;
@@ -309,7 +379,7 @@ public class ItemInfoScreenController {
                     stringProperty.set("");
                     break;
                 case "spacebarKey":
-                    stringProperty.set(stringProperty.getValue()+" ");
+                    stringProperty.set(stringProperty.getValue() + " ");
                     break;
                 default:
                     stringProperty.set(stringProperty.getValue() + button.getText());
@@ -321,68 +391,112 @@ public class ItemInfoScreenController {
     }
 
 
-    public void setIngredientButtons(Integer page,GridPane gridPane, Integer size, boolean forward, List<Button> list){
+
+    public void setIngredientButtons(GridPane gridPane, Integer size, boolean forward, List<Button> list) {
         int start;
-        int x=0;
-        int y=0;
-        if(forward){
-            if (page==0){
+        int x = 0;
+        int y = 0;
+        if (forward) {
+
+            if (this.page == 0) {
                 start = 0;
-            }else{
-                start=page*size;
+            } else {
+                start = this.page * size;
             }
-            if(isNextPage()){
-                for(int i=0; i<gridPane.getChildren().size();){
+            //if all buttons don't fit in gridPane
+            if (isNextPage(this.page, list, size)) {
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
+                if (start == 0) {
+                    for (int i = start; i < size; i++) {
+                        gridPane.add(list.get(i), x, y);
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 10, 2));
+                        if (x == 2) {
+                            x = 0;
+                            y++;
+                        } else {
+                            x++;
+                        }
+
+                    }
+                    this.page++;
+                } else {
+                    if (isNextPage(this.page + 1, list, size)) {
+                        for (int i = start; i < start + size; i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 2) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
+                        }
+                        this.page++;
+                    } else {
+                        for (int i = start; i < list.size(); i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 2) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
+                        }
+                        this.page++;
+                    }
+                }
+            } else {
+                if (start == 0) {
+                    for (int i = 0; i < gridPane.getChildren().size(); ) {
+                        gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                    }
+                    for (int i = start; i < list.size(); i++) {
+
+
+                        gridPane.add(list.get(i), x, y);
+
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                        if (x == 2) {
+                            x = 0;
+                            y++;
+                        } else {
+                            x++;
+                        }
+                    }
+
+                    this.page++;
+                }
+
             }
-            if(list.size()-start >size-1){
-                for(int i=start; i< (start + size);i++){
-                    gridPane.add(list.get(i),x, y);
-                    gridPane.setMargin(list.get(i), new Insets(2,2,2,2));
-                    if(x==2) {
+        } else {
+            if (this.page > 1) {
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
+                    gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                }
+                if (this.page == 2) {
+                    start = 0;
+                } else {
+                    start = (this.page - 2) * size;
+                }
+                for (int i = start; i < (start + size); i++) {
+                    gridPane.add(list.get(i), x, y);
+                    GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                    if (x == 2) {
                         x = 0;
                         y++;
-                    }else{
+                    } else {
                         x++;
                     }
                 }
-            }else{
-                for(int i = start; i<list.size();i++){
-                    gridPane.add(list.get(i), x, y);
-                    gridPane.setMargin(list.get(i), new Insets(2,2,2,2));
-                    if(x==2){
-                        x=0;
-                        y++;
-                    }else{
-                        x++;
-                    }
-                }
+                this.page--;
             }
-            page++;
-        }else{
-            if(page>1){
-                if(page==2){
-                    start = 0;
-                }
-                else{
-                    start = (page-2)*size;
-                }
-                for(int i=start; i<(start+size);i++){
-                    gridPane.add(list.get(i),x,y);
-                    gridPane.setMargin(list.get(i), new Insets(2,2,2,2));
-                    if(x==2){
-                        x=0;
-                        y++;
-                    }else{
-                        x++;
-                    }
-                }
-            }
-            page--;
-        }
 
+        }
     }
+
 
 
     private void saveButtonAction(ActionEvent e) {
@@ -456,9 +570,9 @@ public class ItemInfoScreenController {
                 int avail;
                 if (availabilityButton.getStyleClass().get(0).equals("Availability86")) {
                     avail = 86;
-                } else if(availabilityButton.getStyleClass().get(0).equals("Availability85")){
+                } else if (availabilityButton.getStyleClass().get(0).equals("Availability85")) {
                     avail = 85;
-                }else{
+                } else {
                     avail = 68;
                 }
                 item.setAvailability(avail);
@@ -480,7 +594,7 @@ public class ItemInfoScreenController {
             for (Ingredient ingr : ingredientsList) {
                 item.addIngredient(ingr, 1);
             }
-            if((item.getRecipe().isEmpty())){
+            if ((item.getRecipe().isEmpty())) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
                 ItemWrongInputController itemWrongInputController = loader.getController();
@@ -510,7 +624,7 @@ public class ItemInfoScreenController {
                     parent = loader.load();
                     scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
-                    Stage stage1 = (Stage)((Node) e.getSource()).getScene().getWindow();
+                    Stage stage1 = (Stage) ((Node) e.getSource()).getScene().getWindow();
                     stage1.setScene(scene);
                     stage1.show();
                 }
@@ -519,4 +633,54 @@ public class ItemInfoScreenController {
             ioE.printStackTrace();
         }
     }
+
+
+
 }
+
+    /*
+    public class FormattedTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+
+        public FormattedTableCellFactory() {
+        }
+
+        @Override
+        public TableCell<S, T> call(TableColumn<S, T> p) {
+            TableCell<S, T> cell = new TableCell<S, T>() {
+                @Override
+                protected void updateItem(Object item, boolean empty) {
+                    // CSS Styles
+                    int available=68;
+                    int almostGone=85;
+                    int unavailable=86;
+
+                    String cssStyle = "";
+                    Ingredient ingredient = null;
+                    if( getTableRow() != null ) {
+                        ingredient = (Ingredient) getTableRow().getItem();
+
+                        if (ingredient.getAvailability() == unavailable) {
+                            setStyle("-fx-background-color:red");
+                        } else if (ingredient.getAvailability() == almostGone) {
+                            setStyle("-fx-background-color:orange");
+                        }
+                    }
+
+                    //Set the CSS style on the cell and set the cell's text.
+                    getStyleClass().add(cssStyle);
+                    if( item != null ) {
+                        setText( item.toString()  );
+                    } else {
+                        setText( "" );
+                    }
+                }
+            };
+            return cell;
+        }
+    }
+
+
+}
+
+
+*/

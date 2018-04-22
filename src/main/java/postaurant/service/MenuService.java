@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
+import postaurant.model.Order;
+import postaurant.model.User;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,10 +21,22 @@ public class MenuService {
         this.userDatabase=userDatabase;
     }
 
+
     public Map<String, List<Item>> getSectionsWithItems() {
         List<Item> fullItemList = userDatabase.getMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
         return fullItemList.stream().collect(Collectors.groupingBy(Item::getSection));
     }
+
+    public Map<String, List<Item>> getFoodSectionsWithItems(){
+        List<Item> foodItemList = userDatabase.getFoodMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
+        return foodItemList.stream().collect(Collectors.groupingBy(Item::getSection));
+    }
+
+    public Map<String, List<Item>> getDrinkSectionsWithItems(){
+        List<Item> foodItemList = userDatabase.getDrinkMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
+        return foodItemList.stream().collect(Collectors.groupingBy(Item::getSection));
+    }
+
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
@@ -58,9 +72,7 @@ public class MenuService {
                     i++;
                 }
             }
-            for(Map.Entry<Ingredient, Integer> entry: item.getRecipe().entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
+
             return item;
         }else{
             return null;
@@ -107,15 +119,22 @@ public class MenuService {
     }
 
     public Ingredient saveNewIngredient(Ingredient ingredient){
-        Ingredient ingredient1=getIngredientByNameAmount(ingredient.getName(), ingredient.getAmount());
-        if(ingredient1==null){
+        Ingredient ingredient1=getIngredientByNameAmountPrice(ingredient.getName(), ingredient.getAmount(), ingredient.getPrice());
+        if(ingredient1!=null) {
+            if (ingredient.getAvailability() != ingredient1.getAvailability()) {
+                userDatabase.changeIngredientAvailability(ingredient1,ingredient.getAvailability());
+            }
+            if(!ingredient.getAllergy().equals(ingredient1.getAllergy())){
+                userDatabase.changeIngredientAllergy(ingredient1, ingredient.getAllergy());
+            }
+            return getIngredientById(ingredient1.getId());
+        }else{
             userDatabase.saveNewIngredient(ingredient);
-            return getIngredientByNameAmount(ingredient.getName(),ingredient.getAmount());
+            return getIngredientByNameAmountPrice(ingredient.getName(),ingredient.getAmount(), ingredient.getPrice());
         }
-        return null;
     }
 
-    public Ingredient getIngredientByNameAmount(String name, Integer amount){
-        return userDatabase.getIngredientByNameAmount(name,amount);
+    public Ingredient getIngredientByNameAmountPrice(String name, Integer amount, Double price){
+        return userDatabase.getIngredientByNameAmountPrice(name,amount,price);
     }
 }

@@ -34,7 +34,11 @@ public class UserService {
             return null;
         }
     }
+    public List<Order> getUserOrders(User user){
+        return userDatabase.getUserOrders(user);
+    }
 
+    /*
     public List<Order> getUserOrders(User user) {
         try {
             List<Order> sorted = userDatabase.retrieveUserOrders(user);
@@ -70,7 +74,7 @@ public class UserService {
             return null;
         }
     }
-
+*/
             /*
             Collections.sort(sorted, (o1, o2) -> {
                 long result = o1.getId() - o2.getId();

@@ -23,8 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
-import postaurant.model.Item;
-import postaurant.model.Order;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
@@ -34,7 +32,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
+
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DubScreenController {
@@ -49,7 +47,7 @@ public class DubScreenController {
     @Value("/FXML/POStaurant.fxml")
     private Resource mainScreenForm;
 
-    @Value("/FXML/TableWindow.fxml")
+    @Value("/FXML/OrderWindow.fxml")
     private Resource tableWindowForm;
 
     @Value("/FXML/CreateOrder.fxml")
@@ -98,7 +96,6 @@ public class DubScreenController {
 
     @FXML
     private void handleTimeButton() {
-        menuService.getLatestSavedItemByName("DELIBURGER");
         doTime();
     }
 
@@ -140,8 +137,8 @@ public class DubScreenController {
             if (tableNum != -1) {
                 loader = loaderService.getLoader(tableWindowForm.getURL());
                 Parent parent = loader.load();
-                TableWindowController tableWindowController = loader.getController();
-                tableWindowController.setTableNo(tableNum);
+                OrderWindowController orderWindowController = loader.getController();
+                orderWindowController.setTableNo(tableNum);
                 scene = new Scene(parent);
                 scene.getStylesheets().add("POStaurant.css");
                 stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

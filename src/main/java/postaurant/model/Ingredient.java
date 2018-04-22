@@ -46,7 +46,8 @@ public class Ingredient implements Comparable<Ingredient> {
 
     public void setName(String name) throws InputValidationException {
         if(name.matches("(\\p{ASCII}){2,30}")) {
-            this.name = name;
+            this.name = name.toUpperCase();
+
         }else{
             throw new InputValidationException();
         }

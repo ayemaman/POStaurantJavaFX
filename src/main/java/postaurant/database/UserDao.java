@@ -2,6 +2,7 @@ package postaurant.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import postaurant.database.rowMappers.*;
 import postaurant.model.*;
@@ -27,12 +28,65 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.queryForObject(retrieveUser, new UserRowMapper(), userId);
     }
 
-
-    private final String retrieveUserOrders = "SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE dub_id=? AND status<>'CLOSED' ORDER BY table_no, time_ordered";
+    private final String getOrderSQL="select * from orders WHERE order_id=?";
+    private final String getOrderItemSQL="select * from order_has_items WHERE order_id=?";
+    private final String retriveOrder = "SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE order_id=? AND status<>'CLOSED' ORDER BY table_no, time_ordered";
     @Override
-    public List<Order> retrieveUserOrders(User user) {
-        return jdbcTemplate.query(retrieveUserOrders, new OrderMapper(), user.getUserID());
+    public Order getOrderById(Long orderId){
+        Map<Integer,Item> items=getAllItemsMap();
+        Order order=jdbcTemplate.queryForObject(getOrderSQL,new EmptyOrderMapper(),orderId);
+
+        List<OrderItem> orderItems=jdbcTemplate.query(getOrderItemSQL, new OrderItemRowMapper(), orderId);
+
+        for(OrderItem orderItem:orderItems){
+            Item item=items.get(orderItem.getItemId());
+            order.addItem(item,orderItem.getAmount());
+        }
+        return order;
     }
+
+
+    /*
+
+    private final String getMenuSQL = "SELECT * FROM items WHERE custom<>1 ORDER BY item_id DESC";
+    private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients";
+
+    @Override
+    public List<Item> getMenu() {
+        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        List<Item> items = jdbcTemplate.query(getMenuSQL, new EmptyItemMapper());
+        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query(getItemIngredientIdsSQL, new ItemIngredientRowMapper());
+
+        for (ItemIngredient itemIngredient : itemIngredients) {
+            Item item = itemsMap.get(itemIngredient.getItemId());
+            Ingredient ingredient = ingredients.get(itemIngredient.getIngredientId());
+            item.addIngredient(ingredient, itemIngredient.getAmount());
+        }
+        return items;
+    }
+     */
+    private final String getUserOrdersSQL="SELECT * FROM orders WHERE dub_id=? AND status<>'CLOSED' ORDER BY table_no";
+    private final String getOrderItemIdsSQL="SELECT order_id, item_id, item_qty FROM orders NATURAL JOIN order_has_items NATURAL JOIN items WHERE dub_id=? AND status<>'CLOSED'";
+
+
+    @Override
+    public List<Order> getUserOrders(User user){
+        Map<Integer,Item> items=getAllItemsMap();
+        List<Order> orders=jdbcTemplate.query(getUserOrdersSQL,new EmptyOrderMapper(), user.getUserID());
+        Map<Integer, Order> orderMap = orders.stream().collect(Collectors.toMap(or->or.getId().intValue(), or->or ));
+
+        List<OrderItem> orderItems=jdbcTemplate.query(getOrderItemIdsSQL, new OrderItemRowMapper(), user.getUserID());
+
+        for(OrderItem orderItem: orderItems){
+            Order order= orderMap.get(orderItem.getOrderId());
+            Item item= items.get(orderItem.getItemId());
+            order.addItem(item, orderItem.getAmount());
+        }
+        return orders;
+    }
+
 
 
     private final String openTableExists = "SELECT count(*) FROM orders WHERE status='OPEN' AND table_no=?";
@@ -42,7 +96,7 @@ public class UserDao implements UserDatabase {
         return openTableCount > 0;
     }
 
-    private final String retrieveItemsSql = "SELECT item_name FROM items WHERE item_type=? AND item_availability=68";
+    private final String retrieveItemsSql = "SELECT item_name FROM items WHERE item_section=? AND item_availability=68";
 
     @Override
     public List<String> retrieveItemsForSection(String section) {
@@ -74,6 +128,7 @@ public class UserDao implements UserDatabase {
 
     private final String blockUserSQL = "UPDATE dubdubs SET accessible=0 WHERE dub_id=?";
 
+
     @Override
     public void blockUser(User user) {
         jdbcTemplate.update(blockUserSQL, user.getUserID());
@@ -82,7 +137,6 @@ public class UserDao implements UserDatabase {
 
     private final String getMenuSQL = "SELECT * FROM items WHERE custom<>1 ORDER BY item_id DESC";
     private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients";
-
 
     @Override
     public List<Item> getMenu() {
@@ -100,6 +154,42 @@ public class UserDao implements UserDatabase {
     }
 
 
+    private final String getDrinkMenuSQL="SELECT * FROM items WHERE custom<>1 AND item_type='DRINKITEM' ORDER BY item_id DESC";
+    private final String getDrinkIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items  NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom<>1 AND item_type='DRINKITEM'";
+    @Override
+    public List<Item> getDrinkMenu() {
+        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        List<Item> items = jdbcTemplate.query(getDrinkMenuSQL, new EmptyItemMapper());
+        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query(getDrinkIngredientIdsSQL, new ItemIngredientRowMapper());
+        if(!items.isEmpty() && !itemIngredients.isEmpty()) {
+            for (ItemIngredient itemIngredient : itemIngredients) {
+                Item item = itemsMap.get(itemIngredient.getItemId());
+                Ingredient ingredient = ingredients.get(itemIngredient.getIngredientId());
+                item.addIngredient(ingredient, itemIngredient.getAmount());
+            }
+        }
+        return items;
+    }
+
+    private final String getFoodMenuSQL="SELECT * FROM items WHERE custom<>1 AND item_type='FOODITEM' ORDER BY item_id DESC";
+    private final String getFoodIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom<>1 AND item_type='FOODITEM' ";
+
+    @Override
+    public List<Item> getFoodMenu() {
+        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        List<Item> items = jdbcTemplate.query(getFoodMenuSQL, new EmptyItemMapper());
+        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query(getFoodIngredientIdsSQL, new ItemIngredientRowMapper());
+        if(!items.isEmpty() && !itemIngredients.isEmpty()) {
+            for (ItemIngredient itemIngredient : itemIngredients) {
+                Item item = itemsMap.get(itemIngredient.getItemId());
+                Ingredient ingredient = ingredients.get(itemIngredient.getIngredientId());
+                item.addIngredient(ingredient, itemIngredient.getAmount());
+            }
+        }
+        return items;
+    }
 
 
 
@@ -122,6 +212,16 @@ public class UserDao implements UserDatabase {
         jdbcTemplate.update(changeItemAvailabilitySQL,integer, item.getId());
     }
 
+
+    private final String getAllItemsSQL="SELECT * FROM items ORDER BY item_name";
+    @Override
+    public List<Item> getAllItems(){
+        return jdbcTemplate.query(getAllItemsSQL, new EmptyItemMapper());
+    }
+
+    public Map<Integer,Item> getAllItemsMap(){
+        return getAllItems().stream().collect(Collectors.toMap(item->item.getId().intValue(),item->item));
+    }
 
     private final String getAllIngredientsSQL = "SELECT * FROM ingredients ORDER BY ingredient_name";
 
@@ -175,10 +275,29 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.queryForList(getSectionsSQL, String.class);
     }
 
-    private final String getIngredientByNameAmountSQL="SELECT * FROM ingredients WHERE ingredient_name=? and ingredient_amount=? ";
+    private final String getIngredientByNameAmountPriceSQL="SELECT * FROM ingredients WHERE ingredient_name=? and ingredient_amount=? AND ingredient_price=? ";
     @Override
-    public Ingredient getIngredientByNameAmount(String name, Integer amount) {
-        return jdbcTemplate.queryForObject(getIngredientByNameAmountSQL, new IngredientMapper(), name, amount);
+    public Ingredient getIngredientByNameAmountPrice(String name, Integer amount, Double price) {
+        try {
+            return jdbcTemplate.queryForObject(getIngredientByNameAmountPriceSQL, new IngredientMapper(), name, amount, price);
+        }catch (EmptyResultDataAccessException ERDAe){
+            return null;
+        }
+
+    }
+
+
+    private final String changeIngredientAvailabilitySQL="UPDATE ingredients SET ingredient_availability=? WHERE ingredient_id=?";
+
+    @Override
+    public void changeIngredientAvailability(Ingredient ingredient, Integer integer) {
+        jdbcTemplate.update(changeIngredientAvailabilitySQL, integer,ingredient.getId());
+    }
+
+    private final String changeIngredientAllergySQL="UPDATE ingredients SET ingredient_allergy=? WHERE ingredient_id=?";
+    @Override
+    public void changeIngredientAllergy(Ingredient ingredient, String allergy) {
+        jdbcTemplate.update(changeIngredientAllergySQL,allergy,ingredient.getId());
     }
 
     private final String saveNewIngredientSQL="INSERT INTO ingredients(ingredient_name, ingredient_amount, ingredient_price, ingredient_availability,ingredient_allergy) VALUES(?,?,?,?,?)";

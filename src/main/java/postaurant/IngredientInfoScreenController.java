@@ -121,6 +121,19 @@ public class IngredientInfoScreenController {
                 allergy.setValue(allergyChoiceBox.getSelectionModel().getSelectedItem());
             }
         });
+
+        availabilityButton.setOnAction(e -> {
+            if (availabilityButton.getStyleClass().get(0).equals("Availability68")) {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability85");
+            } else if (availabilityButton.getStyleClass().get(0).equals("Availability85")) {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability86");
+            } else {
+                availabilityButton.getStyleClass().clear();
+                availabilityButton.getStyleClass().add("Availability68");
+            }
+        });
     }
 
     public void setup(Ingredient ingredient) {
@@ -305,6 +318,7 @@ public class IngredientInfoScreenController {
                     this.saved=true;
                     Stage stage1 = (Stage) ((Node) e.getSource()).getScene().getWindow();
                     stage1.hide();
+
                 }
             }
         } catch (IOException ioE) {
