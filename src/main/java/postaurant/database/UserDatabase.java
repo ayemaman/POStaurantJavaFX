@@ -24,10 +24,12 @@ public interface UserDatabase {
     List<Item> getAllItems();
     List<Item> getItemById(long itemID);
     List<Item> getItemByName(String name);
+    List<Item> getCustomItemsByName(String name);
     void changeItemAvailability(Item item, Integer integer);
     List<Ingredient> getAllIngredients();
     Ingredient getIngredientById(long id);
     List<Item> saveNewItem(Item item);
+    void saveNewCustomItem(Item item);
     void setNewItem(Item item);
     List<String> getSections();
     Ingredient getIngredientByNameAmountPrice(String name, Integer amount, Double price);

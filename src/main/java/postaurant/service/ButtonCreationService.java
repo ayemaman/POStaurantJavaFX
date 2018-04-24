@@ -27,9 +27,7 @@ import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ButtonCreationService {
@@ -67,7 +65,7 @@ public class ButtonCreationService {
                             FXMLLoader loader = fxmLoaderService.getLoader(orderWindow.getURL());
                             Parent parent = loader.load();
                             OrderWindowController orderWindowController = loader.getController();
-                            //orderWindowController.setTableNo(tableNum);
+                            orderWindowController.setOrderId(o.getId());
                             Scene scene = new Scene(parent);
                             scene.getStylesheets().add("POStaurant.css");
                             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -231,14 +229,14 @@ public class ButtonCreationService {
                 button.setMinHeight(120);
                 button.setMinWidth(100);
                 button.setMnemonicParsing(false);
-                button.setId("itemButtonLarge");
+
             }
             else{
                 button = new Button(i.getId()+"\n" +i.getName());
                 button.setMinHeight(59.0);
                 button.setMinWidth(92.0);
                 button.setMnemonicParsing(false);
-                button.setId("itemButtonSmall");
+
             }
             //checking ingredients availability
             int avail=68;
@@ -255,16 +253,19 @@ public class ButtonCreationService {
                 if(!large){
                     button.setStyle("-fx-background-color:red; " +
                                     "-fx-font-size:10px;");
+                    button.setId("86");
                 }
             }else if(avail==85){
                 button.setStyle("-fx-background-color:orange");
                 if(!large){
                     button.setStyle("-fx-background-color:orange; " +
                                     "-fx-font-size:10px;");
+                    button.setId("85");
                 }
             }else {
                 if (!large) {
                     button.setStyle("-fx-font-size:10px;");
+                    button.setId("68");
                 }
             }
 
@@ -274,16 +275,19 @@ public class ButtonCreationService {
                 if(!large){
                     button.setStyle("-fx-background-color:red; " +
                                     "-fx-font-size:10px;");
+                    button.setId("86");
                 }
             }else if(i.getAvailability()==85) {
                 button.setStyle("-fx-background-color:orange");
                 if(!large){
                     button.setStyle("-fx-background-color:orange; " +
                                     "-fx-font-size:10px;");
+                    button.setId("85");
                 }
             }else{
                 if (!large) {
                     button.setStyle("-fx-font-size:10px;");
+                    button.setId("68");
                 }
             }
 
@@ -292,21 +296,68 @@ public class ButtonCreationService {
         return buttons;
     }
 
-    public ArrayList<Button> createIngredientButtons(boolean small) {
+    //if(i.getName().substring(0,1).equals("A") || i.getName().substring(0,1).equals("B") || i.getName().substring(0,1).equals("C") )
+
+    public Map<String, List<Button>> createIngredientButtonsForSections(int version){
+        Map<String, List<Ingredient>> map=menuService.getAZSectionsWithIngredients();
+        Map<String, List<Button>> map2=new HashMap<>();
+        for(Map.Entry<String, List<Ingredient>> entry: map.entrySet()){
+            map2.put(entry.getKey(),new ArrayList<>());
+        }
+
+        for(Map.Entry<String, List<Ingredient>> entry: map.entrySet()){
+            for(Ingredient i:entry.getValue()){
+                Button button = new Button();
+                if (version==1) {
+                    button.setText(+i.getId() + "\n" + i.getName() + "\namount(g.):\n " + i.getAmount());
+                    button.setMinWidth(73);
+                    button.setMinHeight(82.5);
+                    button.setStyle("-fx-font-size:9px");
+                } else if(version==2){
+                    button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount()+"g\nprice: "+i.getPrice()+"£");
+                    button.setMinWidth(100);
+                    button.setMinHeight(120);
+                    button.setStyle("-fx-font-size:10px");
+                }else if(version==3){
+                    button.setText(i.getId() + "\n" + i.getName() +"\nAmount: "+ i.getAmount()+"g\nPrice: "+i.getPrice()+"£");
+                    button.setMinWidth(140);
+                    button.setMinHeight(110);
+                }
+
+                if(i.getAvailability()==86){
+                    button.setStyle("-fx-background-color:red");
+                }else if(i.getAvailability()==85){
+                    button.setStyle("-fx-background-color:orange");
+                }
+                button.setMnemonicParsing(false);
+                button.setId("IngredientButton");
+                map2.get(entry.getKey()).add(button);
+            }
+
+        }
+        return map2;
+    }
+
+    public ArrayList<Button> createIngredientButtons(int version) {
         ArrayList<Button> buttons = new ArrayList<>();
         List<Ingredient> list = menuService.getAllIngredients();
+
         for (Ingredient i : list) {
             Button button = new Button();
-            if (small) {
+            if (version==1) {
                 button.setText(+i.getId() + "\n" + i.getName() + "\namount(g.):\n " + i.getAmount());
                 button.setMinWidth(73);
                 button.setMinHeight(82.5);
                 button.setStyle("-fx-font-size:9px");
-            } else {
+            } else if(version==2){
                 button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount()+"g\nprice: "+i.getPrice()+"£");
-                button.setMinHeight(120);
                 button.setMinWidth(100);
-                button.setStyle("-fx-font-size:12px");
+                button.setMinHeight(120);
+                button.setStyle("-fx-font-size:10px");
+            }else if(version==3){
+                button.setText(i.getId() + "\n" + i.getName() +"\nAmount: "+ i.getAmount()+"g\nPrice: "+i.getPrice()+"£");
+                button.setMinWidth(140);
+                button.setMinHeight(110);
             }
 
             if(i.getAvailability()==86){

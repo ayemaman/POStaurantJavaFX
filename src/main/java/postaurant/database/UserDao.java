@@ -136,7 +136,7 @@ public class UserDao implements UserDatabase {
 
 
     private final String getMenuSQL = "SELECT * FROM items WHERE custom<>1 ORDER BY item_id DESC";
-    private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients";
+    private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom<>1";
 
     @Override
     public List<Item> getMenu() {
@@ -243,6 +243,7 @@ public class UserDao implements UserDatabase {
     }
 
 
+
     private final String saveItemSQL = "INSERT INTO items(item_name, item_price, item_type, item_section, item_availability) VALUES(?,?,?,?,?)";
     private final String insertIngredients = "INSERT INTO item_has_ingredients VALUES (?,?,?)";
     private final String getSavedItemSQL="SELECT * FROM items WHERE item_name=? AND ROWNUM=1 ORDER BY item_date_added DESC";
@@ -260,11 +261,40 @@ public class UserDao implements UserDatabase {
             return null;
         }
     }
-
     private final String setNewItemSQL ="UPDATE items SET item_availability=86 WHERE item_name=? and item_id!=?";
     @Override
     public void setNewItem(Item item){
         jdbcTemplate.update(setNewItemSQL,item.getName(),item.getId());
+    }
+
+    private final String saveCustomItemSQL ="INSERT INTO items(item_name, item_price, item_type, item_section, item_availability, custom) VALUES(?,?,?,?,?,1)";
+    @Override
+    public void saveNewCustomItem(Item item){
+        if(jdbcTemplate.update(saveCustomItemSQL,item.getName(),item.getPrice(),item.getType(),item.getSection(),item.getAvailability())==1){
+            Item savedItem=jdbcTemplate.queryForObject(getSavedItemSQL,new EmptyItemMapper(),item.getName());
+            for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
+                jdbcTemplate.update(insertIngredients, savedItem.getId(), entry.getKey().getId(), entry.getValue());
+            }
+        }
+    }
+
+
+    private final String getCustomItem="SELECT * FROM items WHERE item_name=?";
+    private final String getCustomItemIngredientIDsSQL="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom=1 AND item_name=?";
+    @Override
+    public List<Item> getCustomItemsByName(String name){
+        Map<Integer,Ingredient> ingredients=getAllIngredientsMap();
+        List<Item> items=jdbcTemplate.query(getCustomItem,new EmptyItemMapper(), name);
+        if(!items.isEmpty()) {
+        Map<Integer,Item> itemsMap=items.stream().collect(Collectors.toMap(it-> it.getId().intValue(),it->it));
+        List<ItemIngredient> itemIngredients = jdbcTemplate.query(getCustomItemIngredientIDsSQL, new ItemIngredientRowMapper(),name);
+            for (ItemIngredient itemIngredient : itemIngredients) {
+                Item item = itemsMap.get(itemIngredient.getItemId());
+                Ingredient ingredient = ingredients.get(itemIngredient.getIngredientId());
+                item.addIngredient(ingredient, itemIngredient.getAmount());
+            }
+        }
+        return items;
     }
 
 

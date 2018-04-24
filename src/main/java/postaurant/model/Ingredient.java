@@ -52,6 +52,9 @@ public class Ingredient implements Comparable<Ingredient> {
             throw new InputValidationException();
         }
     }
+    public char getFirstLetter(){
+        return this.name.charAt(0);
+    }
 
     public Integer getAmount() {
         return amount;

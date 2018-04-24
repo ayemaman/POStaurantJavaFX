@@ -1,5 +1,6 @@
 package postaurant.model;
 
+import javafx.beans.property.SimpleStringProperty;
 import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 
@@ -62,6 +63,9 @@ public class Item implements Comparable<Item> {
 
     public String getName() {
         return name;
+    }
+    public SimpleStringProperty getNameProperty(){
+        return new SimpleStringProperty(getName());
     }
 
     public void setName(String name) throws InputValidationException {
@@ -180,6 +184,8 @@ public class Item implements Comparable<Item> {
     public void setDateOrdered(Date dateOrdered){
         this.dateOrdered=dateOrdered;
     }
+
+
 
     public String testString(){
         StringBuilder buffer= new StringBuilder();

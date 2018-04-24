@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.OrderWindowController">
     <top>
@@ -42,7 +43,7 @@
                </children>
             </VBox>
             <Region prefHeight="0.0" prefWidth="50.0" />
-            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" text="SEND ORDER">
+            <Button fx:id="sendButton" mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" text="SEND ORDER">
                <HBox.margin>
                   <Insets top="20.0" />
                </HBox.margin></Button>
@@ -89,7 +90,7 @@
                                         <Insets right="5.0" />
                                     </HBox.margin>
                                 </Label>
-                                <TextField />
+                                <TextField fx:id="totalTextField" />
                             </children>
                         </HBox>
                     </children>
@@ -100,7 +101,7 @@
                 <VBox prefHeight="400.0" prefWidth="100.0">
                     <children>
                         <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="PRINT CHECK" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="VOID" />
+                        <Button fx:id="voidButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="VOID" />
                         <Button fx:id="modifyButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="MODIFY" />
                         <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
                         <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
@@ -165,6 +166,20 @@
                                             </graphic></Button>
                                     </children>
                                 </VBox>
+                        <VBox prefHeight="200.0" prefWidth="50.0">
+                           <children>
+                              <Button fx:id="plusButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="+" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="minusButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="-" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </VBox>
                             </children>
                         </HBox>
                     </children></VBox>

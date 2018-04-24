@@ -121,7 +121,7 @@ public class MenuScreenController {
                 FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
                 Parent parent = loader.load();
                 ItemInfoScreenController itemInfoScreenController = loader.getController();
-                itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(true));
+                itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(1));
                 itemInfoScreenController.setup(null);
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
@@ -185,7 +185,7 @@ public class MenuScreenController {
     public void setup() {
         //creating section tabs
             setSectionTabs();
-            setIngredientButtonList(buttonCreationService.createIngredientButtons(false));
+            setIngredientButtonList(buttonCreationService.createIngredientButtons(2));
 
     }
 
@@ -201,7 +201,7 @@ public class MenuScreenController {
                     FXMLLoader loader = fxmLoaderService.getLoader(itemInfoForm.getURL());
                     Parent parent = loader.load();
                     ItemInfoScreenController itemInfoScreenController = loader.getController();
-                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(true));
+                    itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(1));
                     Item item=menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     itemInfoScreenController.setup(item);
                     Scene scene = new Scene(parent);
