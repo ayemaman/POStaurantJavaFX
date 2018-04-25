@@ -12,6 +12,6 @@ import java.sql.SQLException;
 public class OrderItemRowMapper implements RowMapper<OrderItem> {
     @Override
     public OrderItem mapRow(ResultSet rs, int i) throws SQLException {
-        return new OrderItem(rs.getInt("order_id"), rs.getInt("item_id"), rs.getInt("item_qty"));
+        return new OrderItem(rs.getInt("order_id"), rs.getInt("item_id"), rs.getInt("item_qty"),rs.getString("item_kitchen_status"),rs.getDate("time_ordered"));
     }
 }

@@ -66,6 +66,7 @@ public class ButtonCreationService {
                             Parent parent = loader.load();
                             OrderWindowController orderWindowController = loader.getController();
                             orderWindowController.setOrderId(o.getId());
+                            orderWindowController.setUser(user);
                             Scene scene = new Scene(parent);
                             scene.getStylesheets().add("POStaurant.css");
                             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();

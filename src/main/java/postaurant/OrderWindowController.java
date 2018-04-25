@@ -20,6 +20,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
+import jdk.internal.util.xml.impl.Input;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,17 +28,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.database.UserDatabase;
+import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.model.Order;
+import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
+import postaurant.service.OrderService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -45,6 +48,7 @@ public class OrderWindowController {
     private ArrayList<Button> itemButtonList;
     private ArrayList<Button> sectionButtonList;
     private Order order;
+    private User user;
     private ObservableList<Map.Entry<Item,Integer>> observableOrder = FXCollections.observableArrayList();
     private ObservableList<Map.Entry<Item, Integer>> originalOrder= FXCollections.observableArrayList();
     private SimpleDoubleProperty total=new SimpleDoubleProperty(0.00);
@@ -57,11 +61,14 @@ public class OrderWindowController {
     private final MenuService menuService;
     private final UserDatabase userDatabase;
     private final FXMLoaderService fxmLoaderService;
+    private final OrderService orderService;
 
     @Value("/FXML/AlreadySentWindow.fxml")
     private Resource alreadySentWindow;
     @Value("/FXML/ModifyitemWindow.fxml")
     private Resource modifyItemWindow;
+    @Value("/FXML/DubScreen.fxml")
+    private Resource dubScreen;
     @Value("POStaurant.css")
     private Resource css;
 
@@ -84,6 +91,8 @@ public class OrderWindowController {
     @FXML
     private Button voidButton;
     @FXML
+    private Button sendButton;
+    @FXML
     private TextField totalTextField;
     @FXML
     private TableView<Map.Entry<Item, Integer>> orderTableView;
@@ -94,18 +103,59 @@ public class OrderWindowController {
     @FXML
     private TableColumn<Map.Entry<Item, Integer>,Number> qtyColumn;
 
-    public OrderWindowController(ButtonCreationService buttonCreationService, MenuService menuService, UserDatabase userDatabase, FXMLoaderService fxmLoaderService) {
+    public OrderWindowController(ButtonCreationService buttonCreationService, MenuService menuService, UserDatabase userDatabase, FXMLoaderService fxmLoaderService,OrderService orderService) {
         this.buttonCreationService =buttonCreationService ;
         this.menuService=menuService;
         this.userDatabase=userDatabase;
         this.fxmLoaderService=fxmLoaderService;
+        this.orderService=orderService;
     }
 
     public void initialize(){
         sectionButtonList=buttonCreationService.createOrderSectionButtons(true);
         addOnActionToSectionButtons();
         setSectionButtons(sectionGrid,16,true, sectionButtonList);
+        sendButton.setOnAction(event -> {
+            if(originalOrder.equals(observableOrder)){
+                //((Button)event.getSource()).getScene().getWindow().hide();
+                orderService.setCheckedByDub(this.order,new Date());
+            }else {
+                //searching for new items
+                orderService.setCheckedByDub(this.order,new Date());
+                for (int i = 0; i < observableOrder.size(); ) {
+                    if (originalOrder.contains(observableOrder.get(i))) {
+                        observableOrder.remove(observableOrder.get(i));
+                    } else {
+                        i++;
+                    }
+                }
+                //adding together similar items
+                for(int i=0;i<observableOrder.size()-1;){
+                    System.out.println(observableOrder.get(i).getKey().equals(observableOrder.get(i+1).getKey()));
+                    if(observableOrder.get(i).getKey().equals(observableOrder.get(i+1).getKey())){
+                        observableOrder.get(i).setValue(observableOrder.get(i).getValue()+observableOrder.get(i+1).getValue());
+                        observableOrder.remove(observableOrder.get(i+1));
+                    }
+                    else{
+                        i++;
+                    }
+                }
 
+                orderService.sendOrder(this.order.getId(),observableOrder);
+                try {
+                    FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
+                    Parent parent=loader.load();
+                    DubScreenController dubScreenController=loader.getController();
+                    dubScreenController.setUser(this.user);
+                    Scene scene=new Scene(parent);
+                    Stage stage= (Stage)((Button) event.getSource()).getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                }catch (IOException ioE){
+                    ioE.printStackTrace();
+                }
+            }
+        });
 
 
         modifyButton.setOnAction(event -> {
@@ -213,6 +263,7 @@ public class OrderWindowController {
             Map.Entry<Item,Integer> entry=orderTableView.getSelectionModel().getSelectedItem();
             if(!originalOrder.contains(entry)){
                 observableOrder.remove(entry);
+                orderTableView.refresh();
                 setTotal();
             }else{
                 //todo
@@ -223,38 +274,61 @@ public class OrderWindowController {
 
 
     }
-
-    public void setOrderId(Long id){
-        this.order=userDatabase.getOrderById(id);
+    public void setUser(User user){
+        this.user=user;
+    }
+    public void setOrderId(Long id) {
+        this.order = userDatabase.getOrderById(id);
         this.observableOrder.addAll(order.getOrderItems().entrySet());
         this.originalOrder.addAll(order.getOrderItems().entrySet());
         setTotal();
 
-        totalTextField.textProperty().bindBidirectional(total,new NumberStringConverter());
+        totalTextField.textProperty().bindBidirectional(total, new NumberStringConverter());
 
 
         itemColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getKey().getName()));
-        //todo
-        /*
-        itemColumn.setCellFactory(new Callback<TableColumn<Map.Entry<Item, Integer>, String>, TableCell<Map.Entry<Item, Integer>, String>>() {
-                                      @Override
-                                      public TableCell<Map.Entry<Item, Integer>, String> call(TableColumn<Map.Entry<Item, Integer>, String> param) {
-                                          return new TableCell<Map.Entry<Item, Integer>, String>() {
-                                              @Override
-                                              protected void updateItem(String string, boolean empty) {
-                                                  super.updateItem(string, empty);
-                                                  Object object = this.getTableRow().getItem();
-                                                  System.out.println(object);
-                                                  Map.Entry<Item, Integer> entry = (Map.Entry<Item, Integer>) object;
-                                                  System.out.println("PAMPAM"+entry);
-                                              }
-                                          };
-                                      }
-                                  });
-                                  */
-            priceColumn.setCellValueFactory(data -> new ReadOnlyDoubleWrapper(data.getValue().getKey().getPrice()));
-            qtyColumn.setCellValueFactory(data -> new ReadOnlyIntegerWrapper(data.getValue().getValue()));
-            orderTableView.setItems(observableOrder);
+
+        priceColumn.setCellValueFactory(data -> new ReadOnlyDoubleWrapper(data.getValue().getKey().getPrice()));
+        qtyColumn.setCellValueFactory(data -> new ReadOnlyIntegerWrapper(data.getValue().getValue()));
+        orderTableView.setItems(observableOrder);
+        orderTableView.setRowFactory(new Callback<TableView<Map.Entry<Item, Integer>>, TableRow<Map.Entry<Item, Integer>>>() {
+            @Override
+            public TableRow<Map.Entry<Item, Integer>> call(TableView<Map.Entry<Item, Integer>> param) {
+                final TableRow<Map.Entry<Item, Integer>> row = new TableRow<Map.Entry<Item, Integer>>() {
+                    @Override
+                    protected void updateItem(Map.Entry<Item, Integer> entry, boolean empty) {
+                        super.updateItem(entry, empty);
+                        if (entry != null) {
+                            if (entry.getKey().getKitchenStatus().equals("SENT")) {
+                                this.setStyle("-fx-background-color: blue");
+                                SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+
+                            } else if(entry.getKey().getKitchenStatus().equals("SEEN")) {
+                                //if 20 minutes has passed since ordering
+                                if (new Date().getTime() - entry.getKey().getDateOrdered().getTime() > 20L * 60 * 1000) {
+                                    this.setStyle("-fx-background-color:red");
+                                }
+                                //if less then 20 minutes
+                                else{
+                                    this.setStyle("-fx-background-color:yellow");
+                                }
+
+                            } else if(entry.getKey().getKitchenStatus().equals("COOKED")) {
+                                this.setStyle("-fx-background-color:#90EE90");
+                            }else if(entry.getKey().getKitchenStatus().equals("BUMPED")){
+                                this.setStyle("-fx-background-color:green");
+                            }
+                            else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                };
+                return row;
+            }
+        });
+
+        orderTableView.getSelectionModel().selectLast();
 
     }
 
@@ -262,10 +336,7 @@ public class OrderWindowController {
         Double totalDouble=0.00;
         for(Map.Entry<Item,Integer> entry: observableOrder){
             Double price=(entry.getKey().getPrice()*entry.getValue());
-            System.out.println("PRICE: "+price);
             totalDouble+=price;
-            System.out.println("AFTER: "+total);
-            System.out.println("-----------------------------------------------------");
         }
         total.setValue(totalDouble);
     }

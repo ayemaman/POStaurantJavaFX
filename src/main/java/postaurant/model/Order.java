@@ -14,12 +14,15 @@ public class Order implements Comparable<Order>{
     private Date timeBumped;
     private Date timeClosed;
     private Map<Item, Integer> orderItems;
+
+    //private Map<Item, Map<Integer,Date> orderItems;
+
     //private List<Item> orderItems = new ArrayList<>();
 
     private double total;
 
     public Order() {
-        orderItems=new HashMap<>();
+        orderItems=new TreeMap<>();
     }
 
     public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped){
@@ -123,8 +126,9 @@ public class Order implements Comparable<Order>{
         if(!getOrderItems().isEmpty()) {
             Item buffer=null;
             for (Map.Entry<Item, Integer> entry : getOrderItems().entrySet()) {
-                if (entry.getKey().getId()==(item.getId())) {
+                if (entry.getKey().equals(item)) {
                     buffer=entry.getKey();
+                    System.out.println(buffer);
                 }
             }
 
@@ -146,14 +150,6 @@ public class Order implements Comparable<Order>{
         for (Map.Entry<Item,Integer > entry : getOrderItems().entrySet()) {
             buffer.append("\n ITEM: ").append(entry.getKey()).append("|||ITEM_QTY> ").append(entry.getValue()).append("|||");
             buffer.append("\n");
-            /*
-                buffer.append("\n ITEM: ").append(entry.getKey().getName()).append(" Qty.:").append(entry.getValue()).append(" Price: ").append(entry.getKey().getPrice());
-                buffer.append(" ||| INGREDIENTS:");
-            for(Map.Entry<Ingredient,Integer> entry2:entry.getKey().getRecipe().entrySet()){
-                buffer.append(entry2.getKey()).append(" /amount: ").append(entry2.getValue()).append(" | ");
-            }
-        }
-        */
         }
 
         return buffer.toString();

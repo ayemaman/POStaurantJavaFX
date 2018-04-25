@@ -6,13 +6,16 @@ import postaurant.model.Order;
 import postaurant.model.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface UserDatabase {
     User getUser(String userId);
     List<Order> getUserOrders(User user);
+    void addItemToOrder(Long orderId, Long itemId, Integer qty);
     Order getOrderById(Long orderId);
+    void setCheckedByDub(Order order, Date date);
     boolean openTableExists(String value);
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();

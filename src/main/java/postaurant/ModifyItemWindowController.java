@@ -31,6 +31,7 @@ public class ModifyItemWindowController {
     private int ingredientPage;
     private Item item;
 
+    private List<Ingredient> addOns=new ArrayList<>();
     private List<Button> currentButtonListSelected;
     private Map<String,List<Button>> ingredientButtonsAZ;
     private List<Ingredient> originalRecipeList;
@@ -76,7 +77,9 @@ public class ModifyItemWindowController {
         });
         removeButton.setOnAction(event -> {
             ObservableList<Ingredient> selected = recipeTableView.getSelectionModel().getSelectedItems();
+            addOns.remove(selected.get(0));
             selected.forEach(recipeList::remove);
+
         });
 
         saveButton.setOnAction(event -> {
@@ -84,8 +87,19 @@ public class ModifyItemWindowController {
                 //INSERT INTO items(item_name, item_price, item_type, item_section, item_availability)
                 Item item=new Item();
                 try {
-                    item.setName("CUSTOM_"+this.item.getName());
-                    item.setPrice(this.item.getPrice());
+                    System.out.println(this.item.getName());
+
+                    System.out.println(this.item.getName().matches("CUSTOM_(.*)"));
+                    if(!this.item.getName().matches("CUSTOM_(.*)")){
+                        item.setName("CUSTOM_" + this.item.getName());
+                    }else{
+                        item.setName(this.item.getName());
+                    }
+                    Double total=0.00;
+                    for(int i=0;i<addOns.size();i++){
+                        total=total+addOns.get(i).getPrice();
+                    }
+                    item.setPrice(this.item.getPrice()+total);
                     item.setType(this.item.getType());
                     item.setSection(this.item.getSection());
                     item.setAvailability(this.item.getAvailability());
@@ -132,6 +146,7 @@ public class ModifyItemWindowController {
                 b.setOnAction(event -> {
                     Ingredient ingredient = menuService.getIngredientById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     recipeList.add(ingredient);
+                    addOns.add(ingredient);
                     Comparator<Ingredient> ingredientNameComparator = Comparator.comparing(Ingredient::getName);
                     FXCollections.sort(recipeList, ingredientNameComparator);
                 });

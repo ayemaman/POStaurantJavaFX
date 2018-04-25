@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Item implements Comparable<Item> {
-    private long id;
+    private Long id;
     private String name;
     private Double price;
     private String type;
@@ -31,12 +31,16 @@ public class Item implements Comparable<Item> {
         setSection(section);
         setAvailability(availability);
         setDateCreated(dateCreated);
-        recipe = new TreeMap<>();
+        setKitchenStatus("");
+        this.recipe=new TreeMap<>();
+        setDateOrdered(null);
+
     }
 
     public Item(long id, String name, Double price, String type, String section, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
         this(id, name, price, type, section, availability,dateCreated);
         setRecipe(recipe);
+        setKitchenStatus("");
     }
 
 
@@ -57,7 +61,7 @@ public class Item implements Comparable<Item> {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id=id;
     }
 
@@ -221,29 +225,35 @@ public class Item implements Comparable<Item> {
         if (!this.name.equals(item.getName())) {
             return false;
         }
-        if(!this.price.equals(item.getPrice())){
+        if (!this.price.equals(item.getPrice())) {
             return false;
         }
-        if(!this.type.equals(item.getType())){
+        if (!this.type.equals(item.getType())) {
             return false;
         }
-        if(!this.section.equals(item.getSection())){
+        if (!this.section.equals(item.getSection())) {
             return false;
         }
-        if(this.getRecipe().keySet().size()!=item.getRecipe().keySet().size()){
+        if (this.getRecipe().keySet().size() != item.getRecipe().keySet().size()) {
             return false;
         }
-        for(Map.Entry<Ingredient, Integer>entry:this.getRecipe().entrySet()){
-            if(!item.getRecipe().containsKey(entry.getKey())){
+        for (Map.Entry<Ingredient, Integer> entry : this.getRecipe().entrySet()) {
+            if (!item.getRecipe().containsKey(entry.getKey())) {
                 return false;
-            }else{
-                if(!entry.getValue().equals(item.getRecipe().get(entry.getKey()))){
+            } else {
+                if (!entry.getValue().equals(item.getRecipe().get(entry.getKey()))) {
                     return false;
                 }
             }
         }
-        return true;
+
+        if (this.getDateOrdered() != null && item.getDateOrdered() != null) {
+            return this.getDateOrdered().getTime() == item.getDateOrdered().getTime();
+        } else {
+           return true;
+        }
     }
+
 
     @Override
     public int compareTo(Item o) {

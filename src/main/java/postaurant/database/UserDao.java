@@ -28,6 +28,7 @@ public class UserDao implements UserDatabase {
         return jdbcTemplate.queryForObject(retrieveUser, new UserRowMapper(), userId);
     }
 
+
     private final String getOrderSQL="select * from orders WHERE order_id=?";
     private final String getOrderItemSQL="select * from order_has_items WHERE order_id=?";
     private final String retriveOrder = "SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE order_id=? AND status<>'CLOSED' ORDER BY table_no, time_ordered";
@@ -40,11 +41,22 @@ public class UserDao implements UserDatabase {
 
         for(OrderItem orderItem:orderItems){
             Item item=items.get(orderItem.getItemId());
+            item.setKitchenStatus(orderItem.getKitchenStatus());
+            item.setDateOrdered(orderItem.getDateOrdered());
             order.addItem(item,orderItem.getAmount());
+
+        }
+        for(Map.Entry<Item,Integer> entry:order.getOrderItems().entrySet()){
+            System.out.println("1NAME:"+entry.getKey().getName()+" 1KS: "+entry.getKey().getKitchenStatus());
         }
         return order;
     }
 
+    private final String tableGotCheckedSQL="UPDATE orders SET last_time_checked=? WHERE order_id=?";
+    @Override
+    public void setCheckedByDub(Order order, Date date) {
+        jdbcTemplate.update(tableGotCheckedSQL,date,order.getId());
+    }
 
     /*
 
@@ -68,7 +80,7 @@ public class UserDao implements UserDatabase {
     }
      */
     private final String getUserOrdersSQL="SELECT * FROM orders WHERE dub_id=? AND status<>'CLOSED' ORDER BY table_no";
-    private final String getOrderItemIdsSQL="SELECT order_id, item_id, item_qty FROM orders NATURAL JOIN order_has_items NATURAL JOIN items WHERE dub_id=? AND status<>'CLOSED'";
+    private final String getOrderItemIdsSQL="SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items WHERE dub_id=? AND status<>'CLOSED'";
 
 
     @Override
@@ -87,6 +99,11 @@ public class UserDao implements UserDatabase {
         return orders;
     }
 
+    private final String addItemToOrderSQL="INSERT INTO order_has_items (order_id, item_id, item_qty) VALUES(?,?,?)";
+    @Override
+    public void addItemToOrder(Long orderId, Long itemId, Integer qty) {
+        jdbcTemplate.update(addItemToOrderSQL,orderId,itemId,qty);
+    }
 
 
     private final String openTableExists = "SELECT count(*) FROM orders WHERE status='OPEN' AND table_no=?";
