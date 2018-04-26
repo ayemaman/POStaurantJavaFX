@@ -241,7 +241,7 @@ public class MenuService {
     public Item saveNewCustomItem(Item item) {
         List<Item> previousCustomItems = getCustomItemsByName(item.getName());
         for (Item i : previousCustomItems) {
-            if (item.equals(i)) {
+            if (item.specialEquals(i)) {
                 return i;
             }
         }
@@ -256,7 +256,7 @@ public class MenuService {
     public Item saveNewItem(Item item) {
         Item item1 = getLatestSavedItemByName(item.getName());
         if (item1 != null) {
-            if (item.equals(item1)) {
+            if (item.specialEquals(item1)) {
                 if (item.getAvailability() == item1.getAvailability()) {
                     return getItemById(item1.getId());
                 }

@@ -1,10 +1,13 @@
 package postaurant.model;
 
 import javafx.beans.property.SimpleStringProperty;
+import org.springframework.cglib.core.Local;
 import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Item implements Comparable<Item> {
@@ -17,7 +20,7 @@ public class Item implements Comparable<Item> {
     private int availability;
     private String kitchenStatus;
     private Date dateCreated;
-    private Date dateOrdered;
+    private LocalDateTime dateOrdered;
 
     public Item(){
     recipe=new TreeMap<>();
@@ -44,7 +47,7 @@ public class Item implements Comparable<Item> {
     }
 
 
-    public Item (long id, String name, Double price, String type, String section, int availability, Map<Ingredient,Integer> recipe, String kitchenStatus, Date dateCreated, Date dateOrdered)throws InputValidationException{
+    public Item (long id, String name, Double price, String type, String section, int availability, Map<Ingredient,Integer> recipe, String kitchenStatus, Date dateCreated, LocalDateTime dateOrdered)throws InputValidationException{
         setId(id);
         setName(name);
         setPrice(price);
@@ -182,10 +185,10 @@ public class Item implements Comparable<Item> {
         this.dateCreated = dateCreated;
     }
 
-    public Date getDateOrdered(){
+    public LocalDateTime getDateOrdered(){
         return this.dateOrdered;
     }
-    public void setDateOrdered(Date dateOrdered){
+    public void setDateOrdered(LocalDateTime dateOrdered){
         this.dateOrdered=dateOrdered;
     }
 
@@ -213,15 +216,14 @@ public class Item implements Comparable<Item> {
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
             buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
         }
-        SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
         if(this.dateOrdered!=null) {
-            buffer.append("\nDateOrdered").append(ft.format(getDateOrdered()));
+            buffer.append("\nDateOrdered").append(getDateOrdered());
         }
         return buffer.toString();
     }
 
 
-    public boolean equals (Item item) {
+    public boolean specialEquals (Item item) {
         if (!this.name.equals(item.getName())) {
             return false;
         }
@@ -246,21 +248,21 @@ public class Item implements Comparable<Item> {
                 }
             }
         }
-
-        if (this.getDateOrdered() != null && item.getDateOrdered() != null) {
-            return this.getDateOrdered().getTime() == item.getDateOrdered().getTime();
-        } else {
-           return true;
+        if (this.dateOrdered == null ||item.getDateOrdered() == null ) {
+            return true;
         }
+
+        return (this.getDateOrdered().equals(item.getDateOrdered()));
+
     }
 
 
     @Override
     public int compareTo(Item o) {
-        int idCmp=Long.compare(this.getId(),o.getId());
+        int idCmp=Long.compare(getId(),o.getId());
         if(idCmp==0) {
             if (this.dateOrdered != null) {
-                return this.getDateOrdered().compareTo(o.getDateOrdered());
+                return getDateOrdered().compareTo(o.getDateOrdered());
             }
         }
         return idCmp;

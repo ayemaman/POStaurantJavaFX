@@ -1,5 +1,7 @@
 package postaurant.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class OrderItem {
@@ -7,9 +9,9 @@ public class OrderItem {
     private  Integer itemId;
     private  Integer amount;
     private String kitchenStatus;
-    private Date dateOrdered;
+    private LocalDateTime dateOrdered;
 
-    public OrderItem(Integer orderId, Integer itemId, Integer amount, String kitchenStatus, Date dateOrdered) {
+    public OrderItem(Integer orderId, Integer itemId, Integer amount, String kitchenStatus, LocalDateTime dateOrdered) {
         this.orderId = orderId;
         this.itemId = itemId;
         this.amount = amount;
@@ -35,5 +37,5 @@ public class OrderItem {
     public String getKitchenStatus() {
         return kitchenStatus;
     }
-    public Date getDateOrdered(){return dateOrdered;}
+    public LocalDateTime getDateOrdered(){return dateOrdered;}
 }

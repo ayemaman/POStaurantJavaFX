@@ -111,7 +111,7 @@ public class DubScreenController {
 
     private boolean isNextPage() {
         try {
-            System.out.println(tableButtonList.get((this.page * 16)));
+         tableButtonList.get((this.page * 16));
         } catch (IndexOutOfBoundsException e) {
             return false;
         }

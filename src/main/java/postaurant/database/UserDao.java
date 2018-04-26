@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import postaurant.database.rowMappers.*;
+import postaurant.exception.InputValidationException;
 import postaurant.model.*;
 
 import javax.sql.DataSource;
@@ -36,18 +37,24 @@ public class UserDao implements UserDatabase {
     public Order getOrderById(Long orderId){
         Map<Integer,Item> items=getAllItemsMap();
         Order order=jdbcTemplate.queryForObject(getOrderSQL,new EmptyOrderMapper(),orderId);
-
         List<OrderItem> orderItems=jdbcTemplate.query(getOrderItemSQL, new OrderItemRowMapper(), orderId);
 
-        for(OrderItem orderItem:orderItems){
+        for(OrderItem orderItem:orderItems) {
             Item item=items.get(orderItem.getItemId());
-            item.setKitchenStatus(orderItem.getKitchenStatus());
-            item.setDateOrdered(orderItem.getDateOrdered());
-            order.addItem(item,orderItem.getAmount());
+            try{
+                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability(), item.getDateCreated());
+                newItem.setKitchenStatus(orderItem.getKitchenStatus());
+                newItem.setDateOrdered(orderItem.getDateOrdered());
+                order.addItem(newItem,orderItem.getAmount());
+            }catch (InputValidationException iE){
+                iE.printStackTrace();
+            }
+
+
 
         }
-        for(Map.Entry<Item,Integer> entry:order.getOrderItems().entrySet()){
-            System.out.println("1NAME:"+entry.getKey().getName()+" 1KS: "+entry.getKey().getKitchenStatus());
+        for(Map.Entry<Item,Integer> entry: order.getOrderItems().entrySet()){
+            System.out.println(entry.getKey());
         }
         return order;
     }
@@ -94,7 +101,16 @@ public class UserDao implements UserDatabase {
         for(OrderItem orderItem: orderItems){
             Order order= orderMap.get(orderItem.getOrderId());
             Item item= items.get(orderItem.getItemId());
-            order.addItem(item, orderItem.getAmount());
+            try{
+                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability(), item.getDateCreated());
+                newItem.setKitchenStatus(orderItem.getKitchenStatus());
+                newItem.setDateOrdered(orderItem.getDateOrdered());
+                order.addItem(newItem, orderItem.getAmount());
+            }catch (InputValidationException iE){
+                iE.printStackTrace();
+            }
+
+
         }
         return orders;
     }

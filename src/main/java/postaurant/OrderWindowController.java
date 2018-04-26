@@ -39,6 +39,7 @@ import postaurant.service.OrderService;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -131,8 +132,7 @@ public class OrderWindowController {
                 }
                 //adding together similar items
                 for(int i=0;i<observableOrder.size()-1;){
-                    System.out.println(observableOrder.get(i).getKey().equals(observableOrder.get(i+1).getKey()));
-                    if(observableOrder.get(i).getKey().equals(observableOrder.get(i+1).getKey())){
+                    if(observableOrder.get(i).getKey().compareTo(observableOrder.get(i+1).getKey())!=0){
                         observableOrder.get(i).setValue(observableOrder.get(i).getValue()+observableOrder.get(i+1).getValue());
                         observableOrder.remove(observableOrder.get(i+1));
                     }
@@ -280,6 +280,14 @@ public class OrderWindowController {
     public void setOrderId(Long id) {
         this.order = userDatabase.getOrderById(id);
         this.observableOrder.addAll(order.getOrderItems().entrySet());
+        int count=1;
+        /*
+       for(Map.Entry entry:order.getOrderItems().entrySet()){
+           System.out.println(count);
+           System.out.println(entry.getKey() +" "+entry.getValue());
+           count++;
+       }
+       */
         this.originalOrder.addAll(order.getOrderItems().entrySet());
         setTotal();
 
@@ -305,7 +313,7 @@ public class OrderWindowController {
 
                             } else if(entry.getKey().getKitchenStatus().equals("SEEN")) {
                                 //if 20 minutes has passed since ordering
-                                if (new Date().getTime() - entry.getKey().getDateOrdered().getTime() > 20L * 60 * 1000) {
+                                if(LocalDateTime.now().isAfter(entry.getKey().getDateOrdered().plusMinutes(20))){
                                     this.setStyle("-fx-background-color:red");
                                 }
                                 //if less then 20 minutes
@@ -482,9 +490,10 @@ public class OrderWindowController {
     public void addOnActionToItemButtons(){
         for(Button b: itemButtonList){
             b.setOnAction(e->{
-                if(!b.getId().equals("86") && !b.getId().equals("85")){
+                if(!b.getId().equals("86")){
                     Item item = menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     TreeMap<Item, Integer> treeMap = new TreeMap<>();
+                    item.setDateOrdered(LocalDateTime.now());
                     treeMap.put(item, 1);
                     observableOrder.add(treeMap.entrySet().iterator().next());
                     orderTableView.getSelectionModel().selectLast();
