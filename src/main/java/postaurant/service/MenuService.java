@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
-import postaurant.model.Order;
-import postaurant.model.User;
+import postaurant.model.KitchenOrderInfo;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -252,6 +252,15 @@ public class MenuService {
     }
 
 
+    public List<KitchenOrderInfo> getAllOrderedItemsForKitchen(){
+        List<KitchenOrderInfo> items=userDatabase.getKitchenOrderInfo();
+        return items;
+    }
+
+
+
+
+
 
     public Item saveNewItem(Item item) {
         Item item1 = getLatestSavedItemByName(item.getName());
@@ -302,5 +311,13 @@ public class MenuService {
 
     public Ingredient getIngredientByNameAmountPrice(String name, Integer amount, Double price){
         return userDatabase.getIngredientByNameAmountPrice(name,amount,price);
+    }
+
+    public void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered){
+        userDatabase.setKitchenStatusToSeen(orderId, itemId, timeOrdered);
+    }
+
+    public void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered){
+        userDatabase.setKitchenStatusToReady(orderId, itemId, timeOrdered);
     }
 }

@@ -16,6 +16,7 @@ public class Item implements Comparable<Item> {
     private Double price;
     private String type;
     private String section;
+    private String station;
     private Map<Ingredient,Integer> recipe;
     private int availability;
     private String kitchenStatus;
@@ -26,32 +27,37 @@ public class Item implements Comparable<Item> {
     recipe=new TreeMap<>();
     }
 
-    public Item(long id, String name, Double price, String type, String section, int availability, Date dateCreated) throws InputValidationException{
+    public Item(long id, String name, Double price, String type, String section, String station, int availability, Date dateCreated) throws InputValidationException{
         setId(id);
         setName(name);
         setPrice(price);
         setType(type);
+        setStation(station);
         setSection(section);
         setAvailability(availability);
         setDateCreated(dateCreated);
         setKitchenStatus("");
         this.recipe=new TreeMap<>();
         setDateOrdered(null);
-
+    }
+    public Item(long id, String name, Double price, String type, String section, String station, int availability, Date dateCreated, LocalDateTime dateOrdered ) throws InputValidationException {
+        this(id,name,price,type,section,station,availability,dateCreated);
+        setDateOrdered(dateOrdered);
     }
 
-    public Item(long id, String name, Double price, String type, String section, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
-        this(id, name, price, type, section, availability,dateCreated);
+    public Item(long id, String name, Double price, String type, String section, String station, int availability, Map<Ingredient, Integer> recipe, Date dateCreated) throws InputValidationException{
+        this(id, name, price, type, section, station, availability,dateCreated);
         setRecipe(recipe);
         setKitchenStatus("");
     }
 
 
-    public Item (long id, String name, Double price, String type, String section, int availability, Map<Ingredient,Integer> recipe, String kitchenStatus, Date dateCreated, LocalDateTime dateOrdered)throws InputValidationException{
+    public Item (long id, String name, Double price, String type, String section, String station, int availability, Map<Ingredient,Integer> recipe, String kitchenStatus, Date dateCreated, LocalDateTime dateOrdered)throws InputValidationException{
         setId(id);
         setName(name);
         setPrice(price);
         setType(type);
+        setStation(station);
         setSection(section);
         setAvailability(availability);
         setRecipe(recipe);
@@ -114,6 +120,18 @@ public class Item implements Comparable<Item> {
         }
     }
 
+    public String getStation(){
+        return station;
+    }
+
+    public void setStation(String station) throws InputValidationException {
+        String buffer = station.toUpperCase();
+        if (buffer.matches("FRY") || buffer.matches("GRILL") || buffer.matches("PLATE/SAUTE") || buffer.matches("DESSERTS")||buffer.matches("BAR")) {
+            this.station = station.toUpperCase();
+        } else {
+            throw new InputValidationException();
+        }
+    }
     public String getSection() {
         return section;
     }
@@ -206,11 +224,12 @@ public class Item implements Comparable<Item> {
     public String toString(){
         StringBuilder buffer= new StringBuilder();
         buffer.append("Name:").append(getName());
-        if(getId()!=0) {
+        if(getId()!=null) {
             buffer.append("\n ID: ").append(getId());
         }
         buffer.append("\n Section: ").append(getSection());
         buffer.append("\n Type: ").append(getType());
+        buffer.append("\n Station: ").append(getStation());
         buffer.append("\n Availability: ").append(getAvailability()).append("\n");
 
         for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
@@ -234,6 +253,9 @@ public class Item implements Comparable<Item> {
             return false;
         }
         if (!this.section.equals(item.getSection())) {
+            return false;
+        }
+        if(!this.station.equals(item.getStation())){
             return false;
         }
         if (this.getRecipe().keySet().size() != item.getRecipe().keySet().size()) {

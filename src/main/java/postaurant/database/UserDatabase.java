@@ -1,10 +1,8 @@
 package postaurant.database;
 
-import postaurant.model.Ingredient;
-import postaurant.model.Item;
-import postaurant.model.Order;
-import postaurant.model.User;
+import postaurant.model.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +14,7 @@ public interface UserDatabase {
     void addItemToOrder(Long orderId, Long itemId, Integer qty);
     Order getOrderById(Long orderId);
     void setCheckedByDub(Order order, Date date);
+    List<KitchenOrderInfo> getKitchenOrderInfo();
     boolean openTableExists(String value);
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
@@ -39,6 +38,8 @@ public interface UserDatabase {
     void changeIngredientAvailability(Ingredient ingredient,Integer integer);
     void changeIngredientAllergy(Ingredient ingredient, String allergy);
     void saveNewIngredient(Ingredient ingredient);
+    void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered);
+    void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered);
 
 
 }

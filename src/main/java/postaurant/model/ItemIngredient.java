@@ -1,22 +1,22 @@
 package postaurant.model;
 
 public class ItemIngredient {
-    private  Integer itemId;
-    private  Integer ingredientId;
+    private  Long itemId;
+    private  Long ingredientId;
     private  Integer amount;
 
-    public ItemIngredient(Integer itemId, Integer ingredientId, Integer amount) {
+    public ItemIngredient(Long itemId, Long ingredientId, Integer amount) {
         this.itemId = itemId;
         this.ingredientId = ingredientId;
         this.amount = amount;
     }
 
-    public Integer getItemId() {
+    public Long getItemId() {
         return itemId;
     }
 
 
-    public Integer getIngredientId() {
+    public Long getIngredientId() {
         return ingredientId;
     }
 

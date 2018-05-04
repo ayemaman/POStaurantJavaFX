@@ -9,6 +9,6 @@ import java.sql.SQLException;
 public class ItemIngredientRowMapper implements RowMapper<ItemIngredient> {
     @Override
     public ItemIngredient mapRow(ResultSet rs, int i) throws SQLException {
-        return new ItemIngredient(rs.getInt("ITEM_ID"), rs.getInt("INGREDIENT_ID"), rs.getInt("INGREDIENT_QTY"));
+        return new ItemIngredient(rs.getLong("ITEM_ID"), rs.getLong("INGREDIENT_ID"), rs.getInt("INGREDIENT_QTY"));
     }
 }

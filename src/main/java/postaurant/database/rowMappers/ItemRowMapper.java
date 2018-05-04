@@ -18,7 +18,7 @@ public class ItemRowMapper implements RowMapper<Item> {
             TreeMap<Ingredient, Integer> map = new TreeMap<>();
             map.put(ingredient, ingredientQuantity);
             try {
-                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), map, rs.getDate("item_date_added"));
+                return new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getString("item_station"), rs.getInt("item_availability"), map, rs.getDate("item_date_added"));
             } catch (InputValidationException iEx2) {
                 iEx2.printStackTrace();
             }

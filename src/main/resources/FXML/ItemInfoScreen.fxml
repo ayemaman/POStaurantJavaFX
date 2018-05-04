@@ -52,7 +52,7 @@
                <children>
                   <VBox alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="275.0">
                      <children>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0">
                            <children>
                               <Label text="Item:">
                                  <HBox.margin>
@@ -61,7 +61,7 @@
                               <TextField fx:id="nameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0">
                            <children>
                               <Label text="Price:">
                                  <HBox.margin>
@@ -70,7 +70,7 @@
                               <TextField fx:id="priceField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0">
                            <children>
                               <Label text="Type:">
                                  <HBox.margin>
@@ -79,7 +79,17 @@
                               <ComboBox fx:id="typeComboBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Station:">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="stationComboBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="200.0">
                            <children>
                               <Label text="Section:">
                                  <HBox.margin>

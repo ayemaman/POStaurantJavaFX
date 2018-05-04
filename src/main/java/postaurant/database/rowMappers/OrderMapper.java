@@ -35,7 +35,7 @@ public class OrderMapper implements RowMapper<Order> {
       dateToConvert.getTime()).toLocalDateTime();
 }
                  */
-                Item item = new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"), rs.getInt("item_availability"), map, rs.getString("item_kitchen_status"), rs.getDate("item_date_added"), (convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_ordered"))));
+                Item item = new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"),rs.getString("item_station"), rs.getInt("item_availability"), map, rs.getString("item_kitchen_status"), rs.getDate("item_date_added"), (convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_ordered"))));
                 TreeMap<Item, Integer> map2 = new TreeMap<>((o1, o2) -> {
                     int idCmp = Long.compare(o1.getId(), o2.getId());
                     System.out.println("COMPARING: "+o1.getId()+" "+o2.getId());

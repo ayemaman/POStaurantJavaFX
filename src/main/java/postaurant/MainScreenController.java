@@ -20,6 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.Item;
+import postaurant.model.KitchenOrderInfo;
 import postaurant.model.User;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,9 @@ public class MainScreenController {
 
     @Value("/FXML/AccessBlocked.fxml")
     private Resource accessBlockedForm;
+
+    @Value("/FXML/KitchenScreen.fxml")
+    private Resource kitchenForm;
 
 
 
@@ -93,7 +97,19 @@ public class MainScreenController {
                                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                                 stage.setScene(scene);
                                 stage.show();
-                            } else {
+                            }else if(user.getPosition().equals("KITCHEN")){
+                                loader =loaderService.getLoader(kitchenForm.getURL());
+                                Parent parent = loader.load();
+                                KitchenScreenController kitchenScreenController=loader.getController();
+                                kitchenScreenController.setup();
+                                scene = new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+
+                            }
+                            else {
                                 loader = loaderService.getLoader(dubScreenForm.getURL());
                                 Parent parent = loader.load();
                                 DubScreenController dubscreen = loader.getController();

@@ -9,6 +9,7 @@ import postaurant.exception.InputValidationException;
 import postaurant.model.*;
 
 import javax.sql.DataSource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class UserDao implements UserDatabase {
 
     private final String getOrderSQL="select * from orders WHERE order_id=?";
     private final String getOrderItemSQL="select * from order_has_items WHERE order_id=?";
-    private final String retriveOrder = "SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE order_id=? AND status<>'CLOSED' ORDER BY table_no, time_ordered";
+
     @Override
     public Order getOrderById(Long orderId){
         Map<Integer,Item> items=getAllItemsMap();
@@ -42,7 +43,7 @@ public class UserDao implements UserDatabase {
         for(OrderItem orderItem:orderItems) {
             Item item=items.get(orderItem.getItemId());
             try{
-                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability(), item.getDateCreated());
+                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getStation(), item.getAvailability(), item.getDateCreated());
                 newItem.setKitchenStatus(orderItem.getKitchenStatus());
                 newItem.setDateOrdered(orderItem.getDateOrdered());
                 order.addItem(newItem,orderItem.getAmount());
@@ -53,9 +54,7 @@ public class UserDao implements UserDatabase {
 
 
         }
-        for(Map.Entry<Item,Integer> entry: order.getOrderItems().entrySet()){
-            System.out.println(entry.getKey());
-        }
+
         return order;
     }
 
@@ -102,7 +101,7 @@ public class UserDao implements UserDatabase {
             Order order= orderMap.get(orderItem.getOrderId());
             Item item= items.get(orderItem.getItemId());
             try{
-                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability(), item.getDateCreated());
+                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(),item.getStation(), item.getAvailability(), item.getDateCreated());
                 newItem.setKitchenStatus(orderItem.getKitchenStatus());
                 newItem.setDateOrdered(orderItem.getDateOrdered());
                 order.addItem(newItem, orderItem.getAmount());
@@ -168,14 +167,36 @@ public class UserDao implements UserDatabase {
     }
 
 
+
+    private final String getKitchenOrderInfoSQL ="SELECT DISTINCT order_id, table_no, item_id, item_name, time_ordered,item_qty,item_station,item_kitchen_status FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients  WHERE time_closed IS NULL AND item_kitchen_status NOT IN('BUMPED','READY') ORDER BY time_ordered";
+    private final String getItemIngredientIdsForKitchenSQL="SELECT * FROM item_has_ingredients";
+    @Override
+    public List<KitchenOrderInfo> getKitchenOrderInfo(){
+        Map<Long,Ingredient> ingredients = getAllIngredientsMap();
+         List<KitchenOrderInfo> list=jdbcTemplate.query(getKitchenOrderInfoSQL, new KitchenOrderMapper());
+         List<ItemIngredient> itemIngredients=jdbcTemplate.query(getItemIngredientIdsForKitchenSQL, new ItemIngredientRowMapper());
+
+         for(KitchenOrderInfo kitchenOrderInfo:list){
+             Item item=kitchenOrderInfo.getItem();
+             for( ItemIngredient itemIngredient: itemIngredients){
+                 if(itemIngredient.getItemId().equals(item.getId())){
+                     item.addIngredient(ingredients.get(itemIngredient.getIngredientId()),itemIngredient.getAmount());
+                 }
+             }
+         }
+         return list;
+
+    }
+    //todo
+
+
     private final String getMenuSQL = "SELECT * FROM items WHERE custom<>1 ORDER BY item_id DESC";
     private final String getItemIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom<>1";
-
     @Override
     public List<Item> getMenu() {
-        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        Map<Long, Ingredient> ingredients = getAllIngredientsMap();
         List<Item> items = jdbcTemplate.query(getMenuSQL, new EmptyItemMapper());
-        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        Map<Long, Item> itemsMap = items.stream().collect(Collectors.toMap(Item::getId, it -> it));
         List<ItemIngredient> itemIngredients = jdbcTemplate.query(getItemIngredientIdsSQL, new ItemIngredientRowMapper());
 
         for (ItemIngredient itemIngredient : itemIngredients) {
@@ -191,9 +212,9 @@ public class UserDao implements UserDatabase {
     private final String getDrinkIngredientIdsSQL ="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items  NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom<>1 AND item_type='DRINKITEM'";
     @Override
     public List<Item> getDrinkMenu() {
-        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        Map<Long, Ingredient> ingredients = getAllIngredientsMap();
         List<Item> items = jdbcTemplate.query(getDrinkMenuSQL, new EmptyItemMapper());
-        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        Map<Long, Item> itemsMap = items.stream().collect(Collectors.toMap(Item::getId, it -> it));
         List<ItemIngredient> itemIngredients = jdbcTemplate.query(getDrinkIngredientIdsSQL, new ItemIngredientRowMapper());
         if(!items.isEmpty() && !itemIngredients.isEmpty()) {
             for (ItemIngredient itemIngredient : itemIngredients) {
@@ -210,9 +231,9 @@ public class UserDao implements UserDatabase {
 
     @Override
     public List<Item> getFoodMenu() {
-        Map<Integer, Ingredient> ingredients = getAllIngredientsMap();
+        Map<Long, Ingredient> ingredients = getAllIngredientsMap();
         List<Item> items = jdbcTemplate.query(getFoodMenuSQL, new EmptyItemMapper());
-        Map<Integer, Item> itemsMap = items.stream().collect(Collectors.toMap(it -> it.getId().intValue(), it -> it));
+        Map<Long, Item> itemsMap = items.stream().collect(Collectors.toMap(Item::getId, it -> it));
         List<ItemIngredient> itemIngredients = jdbcTemplate.query(getFoodIngredientIdsSQL, new ItemIngredientRowMapper());
         if(!items.isEmpty() && !itemIngredients.isEmpty()) {
             for (ItemIngredient itemIngredient : itemIngredients) {
@@ -264,8 +285,8 @@ public class UserDao implements UserDatabase {
     }
 
 
-    public Map<Integer, Ingredient> getAllIngredientsMap() {
-        return getAllIngredients().stream().collect(Collectors.toMap(ing -> ing.getId().intValue(), ing -> ing));
+    public Map<Long, Ingredient> getAllIngredientsMap() {
+        return getAllIngredients().stream().collect(Collectors.toMap(ing -> ing.getId(), ing -> ing));
     }
 
     private final String getIngredientByIdSQL = "SELECT * FROM ingredients WHERE ingredient_id=?";
@@ -277,14 +298,14 @@ public class UserDao implements UserDatabase {
 
 
 
-    private final String saveItemSQL = "INSERT INTO items(item_name, item_price, item_type, item_section, item_availability) VALUES(?,?,?,?,?)";
+    private final String saveItemSQL = "INSERT INTO items(item_name, item_price, item_type, item_section, item_station, item_availability) VALUES(?,?,?,?,?,?)";
     private final String insertIngredients = "INSERT INTO item_has_ingredients VALUES (?,?,?)";
     private final String getSavedItemSQL="SELECT * FROM items WHERE item_name=? AND ROWNUM=1 ORDER BY item_date_added DESC";
 
 
     @Override
     public List<Item> saveNewItem(Item item) {
-        if (jdbcTemplate.update(saveItemSQL, item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getAvailability()) == 1) {
+        if (jdbcTemplate.update(saveItemSQL, item.getName(), item.getPrice(), item.getType(), item.getSection(), item.getStation(), item.getAvailability()) == 1) {
             Item savedItem=jdbcTemplate.queryForObject(getSavedItemSQL,new EmptyItemMapper(),item.getName());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 jdbcTemplate.update(insertIngredients, savedItem.getId(), entry.getKey().getId(), entry.getValue());
@@ -300,10 +321,10 @@ public class UserDao implements UserDatabase {
         jdbcTemplate.update(setNewItemSQL,item.getName(),item.getId());
     }
 
-    private final String saveCustomItemSQL ="INSERT INTO items(item_name, item_price, item_type, item_section, item_availability, custom) VALUES(?,?,?,?,?,1)";
+    private final String saveCustomItemSQL ="INSERT INTO items(item_name, item_price, item_type, item_section, item_station, item_availability, custom) VALUES(?,?,?,?,?,1)";
     @Override
     public void saveNewCustomItem(Item item){
-        if(jdbcTemplate.update(saveCustomItemSQL,item.getName(),item.getPrice(),item.getType(),item.getSection(),item.getAvailability())==1){
+        if(jdbcTemplate.update(saveCustomItemSQL,item.getName(),item.getPrice(),item.getType(),item.getSection(),item.getStation(),item.getAvailability())==1){
             Item savedItem=jdbcTemplate.queryForObject(getSavedItemSQL,new EmptyItemMapper(),item.getName());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 jdbcTemplate.update(insertIngredients, savedItem.getId(), entry.getKey().getId(), entry.getValue());
@@ -316,10 +337,10 @@ public class UserDao implements UserDatabase {
     private final String getCustomItemIngredientIDsSQL="SELECT ITEM_ID, INGREDIENT_ID, INGREDIENT_QTY FROM items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients WHERE custom=1 AND item_name=?";
     @Override
     public List<Item> getCustomItemsByName(String name){
-        Map<Integer,Ingredient> ingredients=getAllIngredientsMap();
+        Map<Long,Ingredient> ingredients=getAllIngredientsMap();
         List<Item> items=jdbcTemplate.query(getCustomItem,new EmptyItemMapper(), name);
         if(!items.isEmpty()) {
-        Map<Integer,Item> itemsMap=items.stream().collect(Collectors.toMap(it-> it.getId().intValue(),it->it));
+        Map<Long,Item> itemsMap=items.stream().collect(Collectors.toMap(it-> it.getId(),it->it));
         List<ItemIngredient> itemIngredients = jdbcTemplate.query(getCustomItemIngredientIDsSQL, new ItemIngredientRowMapper(),name);
             for (ItemIngredient itemIngredient : itemIngredients) {
                 Item item = itemsMap.get(itemIngredient.getItemId());
@@ -367,6 +388,20 @@ public class UserDao implements UserDatabase {
     @Override
     public void saveNewIngredient(Ingredient ingredient) {
         jdbcTemplate.update(saveNewIngredientSQL,ingredient.getName(),ingredient.getAmount(),ingredient.getPrice(),ingredient.getAvailability(),ingredient.getAllergy());
+    }
+
+    private final String setKitchenStatusToSeenSQL="UPDATE order_has_items SET item_kitchen_status='SEEN' WHERE order_id=? AND item_id=? AND time_ordered=?";
+    @Override
+    public void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered) {
+        jdbcTemplate.update(setKitchenStatusToSeenSQL,orderId,itemId,timeOrdered);
+    }
+
+
+
+    private final String setKitchenStatusToReadySQL="UPDATE order_has_items SET item_kitchen_status='READY' WHERE order_id=? AND item_id=? AND time_ordered=?";
+    @Override
+    public void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered) {
+    jdbcTemplate.update(setKitchenStatusToReadySQL,orderId,itemId,timeOrdered);
     }
 
 }

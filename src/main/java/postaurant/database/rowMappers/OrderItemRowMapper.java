@@ -14,8 +14,7 @@ import java.util.Date;
 public class OrderItemRowMapper implements RowMapper<OrderItem> {
     @Override
     public OrderItem mapRow(ResultSet rs, int i) throws SQLException {
-        //OrderItem orderItem =new OrderItem(rs.getInt("order_id"), rs.getInt("item_id"), rs.getInt("item_qty"),rs.getString("item_kitchen_status"),convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_ordered")));
-        //System.out.println(orderItem.getOrderId()+" "+orderItem.getItemId()+" "+orderItem.getDateOrdered()+" "+orderItem.getKitchenStatus()+" "+orderItem.getAmount());
+
 
         return new OrderItem(rs.getInt("order_id"), rs.getInt("item_id"), rs.getInt("item_qty"),rs.getString("item_kitchen_status"),convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_ordered")));
     }

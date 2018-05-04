@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 
 public class TypeList {
     private static ObservableList<String> itemTypes =FXCollections.observableArrayList();

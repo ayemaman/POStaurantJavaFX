@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
+import postaurant.context.StationList;
 import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
@@ -44,12 +45,14 @@ public class ItemInfoScreenController {
     private ObservableList<Ingredient> ingredientsList;
     private ObservableList<String> sectionsList;
     private ObservableList<String> typeList;
+    private ObservableList<String> stationList;
 
     private boolean lowercase = true;
     private StringProperty name;
     private StringProperty price;
     private StringProperty type;
     private StringProperty section;
+    private StringProperty station;
 
 
     private final ButtonCreationService buttonCreationService;
@@ -76,6 +79,8 @@ public class ItemInfoScreenController {
     private ComboBox<String> sectionComboBox;
     @FXML
     private ComboBox<String> typeComboBox;
+    @FXML
+    private ComboBox<String> stationComboBox;
 
     @FXML
     private Button saveButton;
@@ -117,6 +122,7 @@ public class ItemInfoScreenController {
         price = new SimpleStringProperty("0.00");
         type = new SimpleStringProperty("");
         section = new SimpleStringProperty("");
+        station = new SimpleStringProperty("");
 
         sectionsList = FXCollections.observableArrayList();
         sectionsList.addAll(menuService.getSections());
@@ -125,6 +131,10 @@ public class ItemInfoScreenController {
         typeList = FXCollections.observableArrayList();
         typeList.addAll(TypeList.getItemTypes());
         typeComboBox.setItems(typeList);
+
+        stationList= FXCollections.observableArrayList();
+        stationList.addAll(StationList.getStationTypes());
+        stationComboBox.setItems(stationList);
 
         saveButton.setOnAction(this::saveButtonAction);
 
@@ -166,6 +176,7 @@ public class ItemInfoScreenController {
         nameField.textProperty().bind(name);
         priceField.textProperty().bind(price);
         typeComboBox.valueProperty().bind(type);
+        stationComboBox.valueProperty().bind(station);
         sectionComboBox.valueProperty().bind(section);
         currentTextField = nameField;
         nameField.setOnMouseClicked(e -> this.currentTextField = nameField);
@@ -177,6 +188,12 @@ public class ItemInfoScreenController {
                 type.setValue(typeComboBox.getSelectionModel().getSelectedItem());
             }
         });
+        //listen for changes to the stationComboBox selection and update the displayed section StringProperty accordingly.
+        stationComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString) ->{
+            if( newString!=null){
+                station.setValue(stationComboBox.getSelectionModel().getSelectedItem());
+            }
+        });
         sectionComboBox.setOnMouseClicked(e -> this.currentTextField = sectionComboBox);
         //listen for changes to the sectionComboBox selection and update the displayed section StringProperty accordingly.
         sectionComboBox.getSelectionModel().selectedItemProperty().addListener((selected, oldString, newString) -> {
@@ -184,6 +201,7 @@ public class ItemInfoScreenController {
                 section.setValue(sectionComboBox.getSelectionModel().getSelectedItem());
             }
         });
+
 
         upButton.setOnAction(e -> {
             System.out.println(this.page);
@@ -196,33 +214,6 @@ public class ItemInfoScreenController {
             setIngredientButtons(this.ingredientGrid, 12, true, ingredientButtonList);
         });
 
-        /*
-         upButton.setOnAction(e -> {
-            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
-                Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
-                AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
-                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
-                setItemButtonsForSection(gridPane, 16, false, itemButtonList, currentTab);
-            } else {
-                setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
-            }
-        });
-
-        downButton.setOnAction(e -> {
-
-            if (largeTabPane.getSelectionModel().getSelectedItem().getText().equals("ITEMS")) {
-                Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
-                AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
-                GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText()));
-                setItemButtonsForSection(gridPane, 16, true, itemButtonList, currentTab);
-            } else {
-                setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
-            }
-        });
-
-         */
     }
 
     public void setup(Item item) {
@@ -231,6 +222,7 @@ public class ItemInfoScreenController {
             price.setValue("" + item.getPrice());
             type.setValue(item.getType());
             section.setValue(item.getSection());
+            station.setValue(item.getStation());
         }
         setKeyboard(lowercase);
         this.page = 0;
@@ -359,8 +351,7 @@ public class ItemInfoScreenController {
             stringProperty = name;
         } else if (currentTextField.equals(priceField)) {
             stringProperty = price;
-        } else if (currentTextField.equals(typeComboBox)) {
-            stringProperty = type;
+
         } else if (currentTextField.equals(sectionComboBox)) {
             stringProperty = section;
         }
@@ -547,7 +538,21 @@ public class ItemInfoScreenController {
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
 
-
+            }
+            try{
+                item.setStation(station.get());
+            }catch(InputValidationException eStation){
+                FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
+                Parent parent = loader.load();
+                ItemWrongInputController itemWrongInputController = loader.getController();
+                itemWrongInputController.setErrorLabelText("station");
+                Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toExternalForm());
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.showAndWait();
             }
             try {
                 item.setSection(section.getValue());
@@ -563,7 +568,6 @@ public class ItemInfoScreenController {
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
-
 
             }
             try {
@@ -607,7 +611,7 @@ public class ItemInfoScreenController {
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.showAndWait();
             }
-            if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())) {
+            if ((item.getName() != null) && (item.getPrice() != null) && (item.getType() != null) && (item.getSection() != null) && (!item.getRecipe().isEmpty())&& (item.getStation()!=null)) {
                 FXMLLoader loader = fxmLoaderService.getLoader(confirmationSaveForm.getURL());
                 Parent parent = loader.load();
                 ConfirmationItemSaveController confirmationItemSaveController = loader.getController();
