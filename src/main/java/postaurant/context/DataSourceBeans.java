@@ -25,8 +25,9 @@ public class DataSourceBeans {
         ds.setUsername("C##MANAGER");
         ds.setPassword("entangle");
         return ds;
+        
     }
-    
+
 /*
     @Bean
     public DataSource mySQLDataSource(){
