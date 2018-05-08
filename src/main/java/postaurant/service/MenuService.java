@@ -251,6 +251,11 @@ public class MenuService {
         return getItemById(itemSaved.getId());
     }
 
+    public List<KitchenOrderInfo> getAllOrderedItemsForQC(){
+        List<KitchenOrderInfo> items=userDatabase.getQCOrderInfo();
+        return items;
+    }
+
 
     public List<KitchenOrderInfo> getAllOrderedItemsForKitchen(){
         List<KitchenOrderInfo> items=userDatabase.getKitchenOrderInfo();

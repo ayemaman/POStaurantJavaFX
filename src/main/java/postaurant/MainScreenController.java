@@ -19,12 +19,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
+import postaurant.database.UserDatabase;
 import postaurant.model.Item;
 import postaurant.model.KitchenOrderInfo;
 import postaurant.model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 @Component
@@ -46,9 +48,16 @@ public class MainScreenController {
     @Value("/FXML/KitchenScreen.fxml")
     private Resource kitchenForm;
 
+    @Value("/FXML/QCScreen.fxml")
+    private Resource qcScreen;
+
 
 
     private final FXMLoaderService loaderService;
+
+    //todo
+    private final UserDatabase userDatabase;
+
     private User user;
 
     @FXML private Button loginButton;
@@ -58,14 +67,19 @@ public class MainScreenController {
     private final Integer startTime = 1;
     private Integer seconds = startTime;
 
-    public MainScreenController(FXMLoaderService loaderService){
+    public MainScreenController(FXMLoaderService loaderService, UserDatabase userDatabase){
         this.loaderService = loaderService;
+        this.userDatabase=userDatabase;
     }
 
     public void initialize() {
         timeButton.setOnAction(e -> {
             try {
                 doTime();
+                List list=userDatabase.getTest();
+                for(Object o:list){
+                    System.out.println((String)o);
+                }
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -108,6 +122,15 @@ public class MainScreenController {
                                 stage.setScene(scene);
                                 stage.show();
 
+                            }
+                            else if(user.getPosition().equals("FOODRUNNER")){
+                                loader =loaderService.getLoader(qcScreen.getURL());
+                                Parent parent = loader.load();
+                                scene = new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
                             }
                             else {
                                 loader = loaderService.getLoader(dubScreenForm.getURL());

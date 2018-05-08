@@ -3,9 +3,15 @@ package postaurant;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 
@@ -15,6 +21,8 @@ import postaurant.model.ItemIngredientTreeCellValues;
 import postaurant.model.KitchenOrderInfo;
 import postaurant.service.MenuService;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +43,9 @@ public class KitchenScreenController {
 
     private final FXMLoaderService fxmLoaderService;
     private final MenuService menuService;
+
+    @Value("FXML/POStaurant.fxml")
+    private Resource postaurantScreen;
 
 
 
@@ -59,11 +70,11 @@ public class KitchenScreenController {
     private TreeView<ItemIngredientTreeCellValues> dessertsTreeView;
 
     @FXML
-    private Button refreshButton;
-    @FXML
     private Button seenButton;
     @FXML
     private Button bumpButton;
+    @FXML
+    private Button exitButton;
 
 
 
@@ -76,40 +87,80 @@ public class KitchenScreenController {
 
     public void initialize(){
 
+        exitButton.setOnAction(e->{
+            try {
+                FXMLLoader loader=fxmLoaderService.getLoader(postaurantScreen.getURL());
+                Parent parent=loader.load();
+                Scene scene=new Scene(parent);
+                Stage stage=(Stage)((Node)e.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+        });
         bumpButton.setOnAction(e->{
             ObservableList<TreeItem<ItemIngredientTreeCellValues>> i= currentTreeView.getSelectionModel().getSelectedItems();
             TreeItem<ItemIngredientTreeCellValues> treeItem=i.get(0);
-            ItemIngredientTreeCellValues cellValue=treeItem.getValue();
-            menuService.setKitchenStatusToReady(cellValue.getOrderId(),cellValue.getItemId(),cellValue.getDateOrdered());
-            itemList= menuService.getAllOrderedItemsForKitchen();
-            filterItemLists();
-            setupCurrentTableView();
-            setTreeView(currentList, currentTreeView);
-            currentTreeView.refresh();
+            if(treeItem!=null) {
+                ItemIngredientTreeCellValues cellValue = treeItem.getValue();
+                menuService.setKitchenStatusToReady(cellValue.getOrderId(), cellValue.getItemId(), cellValue.getDateOrdered());
+                itemList = menuService.getAllOrderedItemsForKitchen();
+                filterItemLists();
+                Tab tab = getCurrenTab();
+                switch (tab.getText()) {
+                    case "FRY":
+                        currentList = fryList;
+                        break;
+                    case "GRILL":
+                        currentList = grillList;
+                        break;
+                    case "DESSERTS":
+                        currentList = dessertList;
+                        break;
+                    case "PLATE/SAUTE":
+                        currentList = sauteList;
+                        break;
+                }
+                setupCurrentTableView();
+                setTreeView(currentList, currentTreeView);
+                currentTreeView.refresh();
+            }
         });
 
         seenButton.setOnAction(e->{
             ObservableList<TreeItem<ItemIngredientTreeCellValues>> i= currentTreeView.getSelectionModel().getSelectedItems();
             TreeItem<ItemIngredientTreeCellValues> treeItem=i.get(0);
-            ItemIngredientTreeCellValues cellValue=treeItem.getValue();
-            menuService.setKitchenStatusToSeen(cellValue.getOrderId(),cellValue.getItemId(),cellValue.getDateOrdered());
-            itemList= menuService.getAllOrderedItemsForKitchen();
-            filterItemLists();
-            setupCurrentTableView();
-            setTreeView(currentList, currentTreeView);
-            currentTreeView.refresh();
-
-
-        });
-
-        refreshButton.setOnAction(e->{
-                itemList= menuService.getAllOrderedItemsForKitchen();
+            if(treeItem!=null) {
+                ItemIngredientTreeCellValues cellValue = treeItem.getValue();
+                menuService.setKitchenStatusToSeen(cellValue.getOrderId(), cellValue.getItemId(), cellValue.getDateOrdered());
+                itemList = menuService.getAllOrderedItemsForKitchen();
                 filterItemLists();
+                Tab tab = getCurrenTab();
+                switch (tab.getText()) {
+                    case "FRY":
+                        currentList = fryList;
+                        break;
+                    case "GRILL":
+                        currentList = grillList;
+                        break;
+                    case "DESSERTS":
+                        currentList = dessertList;
+                        break;
+                    case "PLATE/SAUTE":
+                        currentList = sauteList;
+                        break;
+                }
                 setupCurrentTableView();
                 setTreeView(currentList, currentTreeView);
                 currentTreeView.refresh();
+            }
+
 
         });
+
+
 
 
             fryTab.setOnSelectionChanged(e -> {
@@ -226,6 +277,7 @@ public class KitchenScreenController {
         return treeItem;
     }
 
-
-
+    public Tab getCurrenTab() {
+        return currenTab;
+    }
 }

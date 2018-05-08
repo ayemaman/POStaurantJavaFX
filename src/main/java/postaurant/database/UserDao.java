@@ -22,7 +22,11 @@ public class UserDao implements UserDatabase {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
+    private final String testSQL="select * from dubdubs";
+    @Override
+    public List getTest(){
+        return jdbcTemplate.queryForList(testSQL,String.class);
+    }
 
     private final String retrieveUser = "SELECT * FROM dubdubs WHERE dub_id=?";
     @Override
@@ -186,6 +190,24 @@ public class UserDao implements UserDatabase {
          }
          return list;
 
+    }
+    private final String getQCOrderInfoSQL ="SELECT DISTINCT order_id, table_no, item_id, item_name, time_ordered,item_qty,item_station,item_kitchen_status FROM orders NATURAL JOIN order_has_items NATURAL JOIN items NATURAL JOIN item_has_ingredients NATURAL JOIN ingredients  WHERE time_closed IS NULL ORDER BY time_ordered";
+
+    @Override
+    public List<KitchenOrderInfo> getQCOrderInfo() {
+        Map<Long,Ingredient> ingredients = getAllIngredientsMap();
+        List<KitchenOrderInfo> list=jdbcTemplate.query(getQCOrderInfoSQL, new KitchenOrderMapper());
+        List<ItemIngredient> itemIngredients=jdbcTemplate.query(getItemIngredientIdsForKitchenSQL, new ItemIngredientRowMapper());
+
+        for(KitchenOrderInfo kitchenOrderInfo:list){
+            Item item=kitchenOrderInfo.getItem();
+            for( ItemIngredient itemIngredient: itemIngredients){
+                if(itemIngredient.getItemId().equals(item.getId())){
+                    item.addIngredient(ingredients.get(itemIngredient.getIngredientId()),itemIngredient.getAmount());
+                }
+            }
+        }
+        return list;
     }
     //todo
 

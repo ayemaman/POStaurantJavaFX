@@ -85,7 +85,6 @@ public class MenuScreenController {
     }
 
     public void initialize() {
-        menuService.getAllOrderedItemsForKitchen();
         setup();
         ingredientTab.setOnSelectionChanged(e->{
             pageItems=0;

@@ -1,32 +1,30 @@
 package postaurant.service;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.OrderWindowController;
 import postaurant.context.FXMLoaderService;
 import postaurant.context.KeyboardList;
-import postaurant.model.Ingredient;
-import postaurant.model.Item;
-import postaurant.model.Order;
-import postaurant.model.User;
+import postaurant.context.QCNode;
+import postaurant.model.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
@@ -60,7 +58,7 @@ public class ButtonCreationService {
                     button.setPrefHeight(70.0);
                     button.setPrefWidth(95.0);
                     button.setMnemonicParsing(false);
-                    button.setOnAction(e->{
+                    button.setOnAction(e -> {
                         try {
                             FXMLLoader loader = fxmLoaderService.getLoader(orderWindow.getURL());
                             Parent parent = loader.load();
@@ -72,7 +70,7 @@ public class ButtonCreationService {
                             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                             stage.setScene(scene);
                             stage.show();
-                        }catch (Exception eX){
+                        } catch (Exception eX) {
                             eX.printStackTrace();
                         }
                     });
@@ -166,15 +164,15 @@ public class ButtonCreationService {
         return keyboardButtonList;
     }
 
-    public ArrayList<Button> createOrderSectionButtons(boolean food){
-        ArrayList<Button> sectionButtons =new ArrayList<>();
+    public ArrayList<Button> createOrderSectionButtons(boolean food) {
+        ArrayList<Button> sectionButtons = new ArrayList<>();
         Map<String, List<Item>> sectionsWithItems;
-        if(food) {
-            sectionsWithItems= menuService.getFoodSectionsWithItems();
-        }else{
+        if (food) {
+            sectionsWithItems = menuService.getFoodSectionsWithItems();
+        } else {
             sectionsWithItems = menuService.getDrinkSectionsWithItems();
         }
-        for(Map.Entry<String, List<Item>> entry:sectionsWithItems.entrySet()) {
+        for (Map.Entry<String, List<Item>> entry : sectionsWithItems.entrySet()) {
             Button button = new Button(entry.getKey());
             button.setMinHeight(50);
             button.setMinWidth(100);
@@ -184,7 +182,6 @@ public class ButtonCreationService {
         }
         return sectionButtons;
     }
-
 
 
     public ArrayList<Tab> createSectionTabs() {
@@ -225,45 +222,44 @@ public class ButtonCreationService {
         List<Item> items = sectionsWithItems.get(section);
         for (Item i : items) {
             Button button;
-            if(large) {
+            if (large) {
                 button = new Button(i.getId() + "\n" + i.getName());
                 button.setMinHeight(120);
                 button.setMinWidth(100);
                 button.setMnemonicParsing(false);
 
-            }
-            else{
-                button = new Button(i.getId()+"\n" +i.getName());
+            } else {
+                button = new Button(i.getId() + "\n" + i.getName());
                 button.setMinHeight(59.0);
                 button.setMinWidth(92.0);
                 button.setMnemonicParsing(false);
 
             }
             //checking ingredients availability
-            int avail=68;
-            for(Map.Entry<Ingredient,Integer> entry:i.getRecipe().entrySet()){
-                if(entry.getKey().getAvailability()==86){
-                    avail=86;
+            int avail = 68;
+            for (Map.Entry<Ingredient, Integer> entry : i.getRecipe().entrySet()) {
+                if (entry.getKey().getAvailability() == 86) {
+                    avail = 86;
                     break;
-                }else if(entry.getKey().getAvailability()==85){
-                    avail=85;
+                } else if (entry.getKey().getAvailability() == 85) {
+                    avail = 85;
                 }
             }
-            if(avail==86){
+            if (avail == 86) {
                 button.setStyle("-fx-background-color:red");
-                if(!large){
+                if (!large) {
                     button.setStyle("-fx-background-color:red; " +
-                                    "-fx-font-size:10px;");
+                            "-fx-font-size:10px;");
                     button.setId("86");
                 }
-            }else if(avail==85){
+            } else if (avail == 85) {
                 button.setStyle("-fx-background-color:orange");
-                if(!large){
+                if (!large) {
                     button.setStyle("-fx-background-color:orange; " +
-                                    "-fx-font-size:10px;");
+                            "-fx-font-size:10px;");
                     button.setId("85");
                 }
-            }else {
+            } else {
                 if (!large) {
                     button.setStyle("-fx-font-size:10px;");
                     button.setId("68");
@@ -271,21 +267,21 @@ public class ButtonCreationService {
             }
 
             //checking items availability
-            if((i.getAvailability()==86)) {
+            if ((i.getAvailability() == 86)) {
                 button.setStyle("-fx-background-color:red");
-                if(!large){
+                if (!large) {
                     button.setStyle("-fx-background-color:red; " +
-                                    "-fx-font-size:10px;");
+                            "-fx-font-size:10px;");
                     button.setId("86");
                 }
-            }else if(i.getAvailability()==85) {
+            } else if (i.getAvailability() == 85) {
                 button.setStyle("-fx-background-color:orange");
-                if(!large){
+                if (!large) {
                     button.setStyle("-fx-background-color:orange; " +
-                                    "-fx-font-size:10px;");
+                            "-fx-font-size:10px;");
                     button.setId("85");
                 }
-            }else{
+            } else {
                 if (!large) {
                     button.setStyle("-fx-font-size:10px;");
                     button.setId("68");
@@ -299,35 +295,35 @@ public class ButtonCreationService {
 
     //if(i.getName().substring(0,1).equals("A") || i.getName().substring(0,1).equals("B") || i.getName().substring(0,1).equals("C") )
 
-    public Map<String, List<Button>> createIngredientButtonsForSections(int version){
-        Map<String, List<Ingredient>> map=menuService.getAZSectionsWithIngredients();
-        Map<String, List<Button>> map2=new HashMap<>();
-        for(Map.Entry<String, List<Ingredient>> entry: map.entrySet()){
-            map2.put(entry.getKey(),new ArrayList<>());
+    public Map<String, List<Button>> createIngredientButtonsForSections(int version) {
+        Map<String, List<Ingredient>> map = menuService.getAZSectionsWithIngredients();
+        Map<String, List<Button>> map2 = new HashMap<>();
+        for (Map.Entry<String, List<Ingredient>> entry : map.entrySet()) {
+            map2.put(entry.getKey(), new ArrayList<>());
         }
 
-        for(Map.Entry<String, List<Ingredient>> entry: map.entrySet()){
-            for(Ingredient i:entry.getValue()){
+        for (Map.Entry<String, List<Ingredient>> entry : map.entrySet()) {
+            for (Ingredient i : entry.getValue()) {
                 Button button = new Button();
-                if (version==1) {
+                if (version == 1) {
                     button.setText(+i.getId() + "\n" + i.getName() + "\namount(g.):\n " + i.getAmount());
                     button.setMinWidth(73);
                     button.setMinHeight(82.5);
                     button.setStyle("-fx-font-size:9px");
-                } else if(version==2){
-                    button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount()+"g\nprice: "+i.getPrice()+"£");
+                } else if (version == 2) {
+                    button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount() + "g\nprice: " + i.getPrice() + "£");
                     button.setMinWidth(100);
                     button.setMinHeight(120);
                     button.setStyle("-fx-font-size:10px");
-                }else if(version==3){
-                    button.setText(i.getId() + "\n" + i.getName() +"\nAmount: "+ i.getAmount()+"g\nPrice: "+i.getPrice()+"£");
+                } else if (version == 3) {
+                    button.setText(i.getId() + "\n" + i.getName() + "\nAmount: " + i.getAmount() + "g\nPrice: " + i.getPrice() + "£");
                     button.setMinWidth(140);
                     button.setMinHeight(110);
                 }
 
-                if(i.getAvailability()==86){
+                if (i.getAvailability() == 86) {
                     button.setStyle("-fx-background-color:red");
-                }else if(i.getAvailability()==85){
+                } else if (i.getAvailability() == 85) {
                     button.setStyle("-fx-background-color:orange");
                 }
                 button.setMnemonicParsing(false);
@@ -345,25 +341,25 @@ public class ButtonCreationService {
 
         for (Ingredient i : list) {
             Button button = new Button();
-            if (version==1) {
+            if (version == 1) {
                 button.setText(+i.getId() + "\n" + i.getName() + "\namount(g.):\n " + i.getAmount());
                 button.setMinWidth(73);
                 button.setMinHeight(82.5);
                 button.setStyle("-fx-font-size:9px");
-            } else if(version==2){
-                button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount()+"g\nprice: "+i.getPrice()+"£");
+            } else if (version == 2) {
+                button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount() + "g\nprice: " + i.getPrice() + "£");
                 button.setMinWidth(100);
                 button.setMinHeight(120);
                 button.setStyle("-fx-font-size:10px");
-            }else if(version==3){
-                button.setText(i.getId() + "\n" + i.getName() +"\nAmount: "+ i.getAmount()+"g\nPrice: "+i.getPrice()+"£");
+            } else if (version == 3) {
+                button.setText(i.getId() + "\n" + i.getName() + "\nAmount: " + i.getAmount() + "g\nPrice: " + i.getPrice() + "£");
                 button.setMinWidth(140);
                 button.setMinHeight(110);
             }
 
-            if(i.getAvailability()==86){
+            if (i.getAvailability() == 86) {
                 button.setStyle("-fx-background-color:red");
-            }else if(i.getAvailability()==85){
+            } else if (i.getAvailability() == 85) {
                 button.setStyle("-fx-background-color:orange");
             }
             button.setMnemonicParsing(false);
@@ -372,7 +368,73 @@ public class ButtonCreationService {
         }
         return buttons;
     }
+    /*
+     public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String station, String status, int qty
+     private Long orderId;
+    private Double tableNo;
+    private Item item;
+    private int qty;
+     */
 
+    public ArrayList<VBox> createQCNodes() {
+        ArrayList<VBox> list = new ArrayList<>();
+        List<KitchenOrderInfo> orders = menuService.getAllOrderedItemsForQC();
+        Double currentTable = -1.0;
+        LocalDateTime currentTime = LocalDateTime.now().minusYears(1);
+        VBox currentVBox = null;
 
+        for (KitchenOrderInfo k : orders) {
+
+            if(currentTable.equals(k.getTableNo())) {
+                if (currentVBox != null) {
+                if (k.getItem().getDateOrdered().getMinute() - currentTime.getMinute() < 1) {
+                        ListView<KitchenOrderInfo> listView=(ListView<KitchenOrderInfo>) currentVBox.getChildren().get(1);
+                        ObservableList<KitchenOrderInfo> observableList = listView.getItems();
+                        observableList.add(k);
+                        System.out.println(k);
+                        listView.setItems(observableList);
+                    }
+                }
+            }else {
+                    VBox vBox = new VBox();
+                    vBox.setPrefSize(160, 200);
+                    Label label = new Label();
+                    label.setPrefSize(160, 40);
+                    label.setText("" + k.getTableNo());
+                    ListView<KitchenOrderInfo> listView = new ListView<>();
+                    listView.setPrefSize(160, 160);
+                    listView.setCellFactory(lv -> {
+                        ListCell<KitchenOrderInfo> cell = new ListCell<>();
+                        cell.itemProperty().addListener((obs, oldItem, newItem) -> {
+                            if (newItem == null) {
+                                cell.setText(null);
+                                cell.setStyle("-fx-background-color:grey");
+                            } else {
+                                cell.setText(newItem.getItem().getName() + " Qty: " + newItem.getQty());
+                                if (newItem.getItem().getKitchenStatus().equals("SEEN")) {
+                                    cell.setStyle("-fx-background-color:blue");
+                                } else if (newItem.getItem().getKitchenStatus().equals("READY")) {
+                                    cell.setStyle("-fx-background-color:green");
+
+                                }
+                            }
+                        });
+                        return cell;
+                    });
+
+                    ObservableList<KitchenOrderInfo> observableList = FXCollections.observableArrayList();
+                    observableList.add(k);
+                    listView.setItems(observableList);
+                    vBox.getChildren().add(label);
+                    vBox.getChildren().add(listView);
+                    currentTable = k.getTableNo();
+                    currentTime = k.getItem().getDateOrdered();
+                    currentVBox = vBox;
+                    list.add(vBox);
+
+                }
+            }
+        return list;
+    }
 }
 

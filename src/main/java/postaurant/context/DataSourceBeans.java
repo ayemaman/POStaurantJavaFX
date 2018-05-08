@@ -26,7 +26,18 @@ public class DataSourceBeans {
         ds.setPassword("entangle");
         return ds;
     }
-
+    
+/*
+    @Bean
+    public DataSource mySQLDataSource(){
+        DriverManagerDataSource ds= new DriverManagerDataSource();
+        ds.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
+        ds.setUrl("jdbc:mysql://hostname:port/dbname");
+        ds.setUsername();
+        ds.setPassword();
+        return ds;
+    }
+*/
 
 
 }

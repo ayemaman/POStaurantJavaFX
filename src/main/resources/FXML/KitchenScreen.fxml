@@ -59,7 +59,6 @@
                      <children>
                         <Button fx:id="seenButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="SEEN" />
                         <Region prefHeight="200.0" prefWidth="200.0" />
-                        <Button fx:id="refreshButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="REFRESH" />
                         <Button fx:id="bumpButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="BUMP" />
                      </children>
                   </HBox>
@@ -72,7 +71,7 @@
                         <Insets left="30.0" right="10.0" />
                      </VBox.margin>
                   </TextField>
-                  <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="TIME">
+                  <Button fx:id="timeButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="TIME">
                      <VBox.margin>
                         <Insets right="10.0" top="20.0" />
                      </VBox.margin>
@@ -107,7 +106,7 @@
                         <Insets right="10.0" top="30.0" />
                      </VBox.margin>
                   </Button>
-                  <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="EXIT">
+                  <Button fx:id="exitButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="80.0" prefWidth="130.0" text="EXIT">
                      <VBox.margin>
                         <Insets bottom="10.0" right="10.0" top="80.0" />
                      </VBox.margin>

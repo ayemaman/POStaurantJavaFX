@@ -15,6 +15,7 @@ public interface UserDatabase {
     Order getOrderById(Long orderId);
     void setCheckedByDub(Order order, Date date);
     List<KitchenOrderInfo> getKitchenOrderInfo();
+    List<KitchenOrderInfo> getQCOrderInfo();
     boolean openTableExists(String value);
     List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
@@ -41,6 +42,6 @@ public interface UserDatabase {
     void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered);
     void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered);
 
-
+    List getTest();
 }
 
