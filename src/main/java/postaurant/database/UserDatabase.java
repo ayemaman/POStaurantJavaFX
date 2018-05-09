@@ -42,6 +42,5 @@ public interface UserDatabase {
     void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered);
     void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered);
 
-    List getTest();
 }
 

@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.User;
+import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.List;
 public class UsersScreenController {
      private final UserService userService;
      private final FXMLoaderService fxmLoaderService;
+     private final ButtonCreationService buttonCreationService;
 
      private ArrayList<Button> userButtons;
      private int page;
@@ -49,9 +51,10 @@ public class UsersScreenController {
      @FXML private Button downButton;
 
 
-     public UsersScreenController(UserService userService, FXMLoaderService fxmLoaderService){
+     public UsersScreenController(UserService userService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService){
          this.fxmLoaderService=fxmLoaderService;
          this.userService=userService;
+         this.buttonCreationService=buttonCreationService;
      }
 
     public void initialize() {
@@ -93,7 +96,7 @@ public class UsersScreenController {
 
     private boolean isNextPage() {
         try {
-            System.out.println(userButtons.get((this.page * 16))+" checks : "+ this.page*16);
+           userButtons.get((this.page * 16));
         } catch (IndexOutOfBoundsException e) {
             return false;
         }
@@ -103,7 +106,10 @@ public class UsersScreenController {
 
     public void setUserButtons(){
          this.page=0;
-         createUserButtons();
+         userButtons=buttonCreationService.createUserButtons();
+         for(Button b:userButtons){
+             b.setOnAction(this::handleUserButtons);
+         }
          setUsers(true);
     }
 
@@ -174,31 +180,6 @@ public class UsersScreenController {
     }
 
 
-
-    public void createUserButtons() {
-        try {
-            userButtons=new ArrayList<>();
-            List<User> users = userService.getAllActiveUsers();
-            for (User u: users) {
-                String text =""+u.getUserID()+System.lineSeparator()+u.getFirstName().substring(0,1)+u.getLastName()+System.lineSeparator()+u.getPosition();
-                Button button = new Button(text);
-                button.setPrefHeight(70.0);
-                button.setPrefWidth(95.0);
-
-                button.setMnemonicParsing(false);
-                button.getStyleClass().add("UserButton");
-                if(u.getPosition().equals("DUBDUB")) {
-                    button.getStyleClass().add("DubButton");
-                }else if (u.getPosition().equals("MANAGER")){
-                    button.getStyleClass().add("ManagerButton");
-                }
-                button.setOnAction(this::handleUserButtons);
-                userButtons.add(button);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void handleUserButtons(ActionEvent event){
              try {

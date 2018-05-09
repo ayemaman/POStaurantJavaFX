@@ -1,12 +1,9 @@
 package postaurant;
 
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,9 +15,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
-import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
-import jdk.internal.util.xml.impl.Input;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -28,20 +23,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.database.UserDatabase;
-import postaurant.exception.InputValidationException;
-import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.model.Order;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import postaurant.service.OrderService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -64,6 +57,9 @@ public class OrderWindowController {
     private final FXMLoaderService fxmLoaderService;
     private final OrderService orderService;
 
+
+    @Value("/FXML/ErrorWindow.fxml")
+    private Resource errorWindow;
     @Value("/FXML/AlreadySentWindow.fxml")
     private Resource alreadySentWindow;
     @Value("/FXML/ModifyitemWindow.fxml")
@@ -117,12 +113,23 @@ public class OrderWindowController {
         addOnActionToSectionButtons();
         setSectionButtons(sectionGrid,16,true, sectionButtonList);
         sendButton.setOnAction(event -> {
+            orderService.setCheckedByDub(this.order,new Date());
             if(originalOrder.equals(observableOrder)){
-                //((Button)event.getSource()).getScene().getWindow().hide();
-                orderService.setCheckedByDub(this.order,new Date());
+                try {
+                    FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
+                    Parent parent=loader.load();
+                    DubScreenController dubScreenController=loader.getController();
+                    dubScreenController.setUser(this.user);
+                    Scene scene=new Scene(parent);
+                    Stage stage= (Stage)((Button) event.getSource()).getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }else {
                 //searching for new items
-                orderService.setCheckedByDub(this.order,new Date());
                 for (int i = 0; i < observableOrder.size(); ) {
                     if (originalOrder.contains(observableOrder.get(i))) {
                         observableOrder.remove(observableOrder.get(i));
@@ -199,8 +206,21 @@ public class OrderWindowController {
                     }
                 }
             }else{
-                //TODO
-                System.out.println("SELECT ITEM TO MODIFY");
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(errorWindow.getURL());
+                    Parent parent = loader.load();
+                    ErrorWindowController errorWindowController = loader.getController();
+                    errorWindowController.setErrorLabel("No item selected");
+                    Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toString());
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }catch (IOException ioE){
+                    ioE.printStackTrace();
+                }
             }
 
         });
@@ -229,45 +249,129 @@ public class OrderWindowController {
 
         plusButton.setOnAction(event -> {
                 Map.Entry<Item, Integer> entry = orderTableView.getSelectionModel().getSelectedItem();
-            if (!originalOrder.contains(entry)) {
-               entry.setValue(entry.getValue()+1);
-                setTotal();
-                orderTableView.refresh();
-
-            }else{
-                //todo
-                System.out.println("You can't do that");
-            }
+                if(entry!=null) {
+                    if (!originalOrder.contains(entry)) {
+                        entry.setValue(entry.getValue() + 1);
+                        setTotal();
+                        orderTableView.refresh();
+                    } else {
+                        try {
+                            FXMLLoader loader = fxmLoaderService.getLoader(alreadySentWindow.getURL());
+                            Parent parent = loader.load();
+                            Scene scene = new Scene(parent);
+                            scene.getStylesheets().add(css.getURL().toString());
+                            Stage stage = new Stage();
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.initStyle(StageStyle.UNDECORATED);
+                            stage.setScene(scene);
+                            stage.showAndWait();
+                        } catch (IOException ioE) {
+                            ioE.printStackTrace();
+                        }
+                    }
+                }else{
+                    try {
+                        FXMLLoader loader = fxmLoaderService.getLoader(errorWindow.getURL());
+                        Parent parent = loader.load();
+                        ErrorWindowController errorWindowController = loader.getController();
+                        errorWindowController.setErrorLabel("No item selected");
+                        Scene scene = new Scene(parent);
+                        scene.getStylesheets().add(css.getURL().toString());
+                        Stage stage = new Stage();
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.initStyle(StageStyle.UNDECORATED);
+                        stage.setScene(scene);
+                        stage.showAndWait();
+                    }catch (IOException ioE){
+                        ioE.printStackTrace();
+                    }
+                }
         });
 
         minusButton.setOnAction(event -> {
             Map.Entry<Item, Integer> entry = orderTableView.getSelectionModel().getSelectedItem();
-            if (!originalOrder.contains(entry)) {
-                if (entry.getValue() > 1) {
-                    entry.setValue(entry.getValue() - 1);
-                    setTotal();
-                    orderTableView.refresh();
+            if(entry!=null) {
+                if (!originalOrder.contains(entry)) {
+                    if (entry.getValue() > 1) {
+                        entry.setValue(entry.getValue() - 1);
+                        setTotal();
+                        orderTableView.refresh();
+                    } else {
+                        //todo
+                        System.out.println("You can't do that");
+                    }
+                } else {
+                    try {
+                        FXMLLoader loader = fxmLoaderService.getLoader(alreadySentWindow.getURL());
+                        Parent parent = loader.load();
+                        Scene scene = new Scene(parent);
+                        scene.getStylesheets().add(css.getURL().toString());
+                        Stage stage = new Stage();
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.initStyle(StageStyle.UNDECORATED);
+                        stage.setScene(scene);
+                        stage.showAndWait();
+                    } catch (IOException ioE) {
+                        ioE.printStackTrace();
+                    }
                 }
-
-                else {
-                    //todo
-                    System.out.println("You can't do that");
+            }else{
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(errorWindow.getURL());
+                    Parent parent = loader.load();
+                    ErrorWindowController errorWindowController = loader.getController();
+                    errorWindowController.setErrorLabel("No item selected");
+                    Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toString());
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }catch (IOException ioE){
+                    ioE.printStackTrace();
                 }
-            } else {
-                //todo
-                System.out.println("You can't do that");
             }
         });
 
         voidButton.setOnAction(event -> {
             Map.Entry<Item,Integer> entry=orderTableView.getSelectionModel().getSelectedItem();
-            if(!originalOrder.contains(entry)){
-                observableOrder.remove(entry);
-                orderTableView.refresh();
-                setTotal();
+            if(entry!=null) {
+                if (!originalOrder.contains(entry)) {
+                    observableOrder.remove(entry);
+                    orderTableView.refresh();
+                    setTotal();
+                } else {
+                    try {
+                        FXMLLoader loader = fxmLoaderService.getLoader(alreadySentWindow.getURL());
+                        Parent parent = loader.load();
+                        Scene scene = new Scene(parent);
+                        scene.getStylesheets().add(css.getURL().toString());
+                        Stage stage = new Stage();
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.initStyle(StageStyle.UNDECORATED);
+                        stage.setScene(scene);
+                        stage.showAndWait();
+                    } catch (IOException ioE) {
+                        ioE.printStackTrace();
+                    }
+                }
             }else{
-                //todo
-                System.out.println("You can't do that");
+                try {
+                    FXMLLoader loader = fxmLoaderService.getLoader(errorWindow.getURL());
+                    Parent parent = loader.load();
+                    ErrorWindowController errorWindowController = loader.getController();
+                    errorWindowController.setErrorLabel("No item selected");
+                    Scene scene = new Scene(parent);
+                    scene.getStylesheets().add(css.getURL().toString());
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                }catch (IOException ioE){
+                    ioE.printStackTrace();
+                }
             }
 
         });
@@ -280,22 +384,12 @@ public class OrderWindowController {
     public void setOrderId(Long id) {
         this.order = userDatabase.getOrderById(id);
         this.observableOrder.addAll(order.getOrderItems().entrySet());
-        int count=1;
-        /*
-       for(Map.Entry entry:order.getOrderItems().entrySet()){
-           System.out.println(count);
-           System.out.println(entry.getKey() +" "+entry.getValue());
-           count++;
-       }
-       */
         this.originalOrder.addAll(order.getOrderItems().entrySet());
         setTotal();
 
         totalTextField.textProperty().bindBidirectional(total, new NumberStringConverter());
 
-
         itemColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getKey().getName()));
-
         priceColumn.setCellValueFactory(data -> new ReadOnlyDoubleWrapper(data.getValue().getKey().getPrice()));
         qtyColumn.setCellValueFactory(data -> new ReadOnlyIntegerWrapper(data.getValue().getValue()));
         orderTableView.setItems(observableOrder);

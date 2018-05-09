@@ -1,4 +1,4 @@
-package postaurant;
+package postaurant.serviceWindowsControllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,19 +9,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ItemWrongInputController {
-
+public class ErrorWindowController {
     @FXML
     private Label errorLabel;
     @FXML
     private Button reenter;
 
     public void initialize(){
-            reenter.setOnAction(e-> reenter.getScene().getWindow().hide());
-
+        reenter.setOnAction(e-> reenter.getScene().getWindow().hide());
 
     }
-    public void setErrorLabelText(String error){
-        errorLabel.setText("Wrong "+error);
+    public void setErrorLabel(String error) {
+        errorLabel.setText(error);
     }
+
 }

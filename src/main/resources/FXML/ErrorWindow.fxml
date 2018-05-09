@@ -7,11 +7,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.WrongInputWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.serviceWindowsControllers.ErrorWindowController">
     <children>
-        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" minHeight="150.0" minWidth="300.0" prefHeight="150.0" prefWidth="300.0" spacing="10.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
+        <VBox alignment="CENTER" minHeight="150.0" minWidth="300.0" prefHeight="150.0" prefWidth="300.0" spacing="10.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
             <children>
-                <Label text="WRONG NAME/SURNAME">
+                <Label fx:id="errorLabel">
                     <VBox.margin>
                         <Insets top="50.0" />
                     </VBox.margin>

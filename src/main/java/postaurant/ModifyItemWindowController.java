@@ -1,6 +1,5 @@
 package postaurant;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,8 +8,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import jdk.internal.util.xml.impl.Input;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,9 +16,7 @@ import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)

@@ -1,7 +1,7 @@
 
 
 .DubButton{
-    -fx-background-color: radial-gradient(center 50% -40%, radius 200%, green 45%, grey 50%);
+    -fx-background-color: radial-gradient(center 50% -40%, radius 200%,grey  45%, green 50%);
     -fx-background-radius: 8,7,6;
     -fx-background-insets: 0,1,2;
     -fx-text-fill: black;
@@ -9,13 +9,27 @@
 }
 
 .ManagerButton{
--fx-background-color: radial-gradient(center 50% -40%, radius 200%, pink 45%, grey 50%);
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%,grey  45%, pink 50%);
     -fx-background-radius: 8,7,6;
     -fx-background-insets: 0,1,2;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
 }
 
+.KitchenButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, grey 45%, blue 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+.FoodRunnerButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, grey 45%, yellow 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
 .UserButton:hover{
 -fx-background-color:grey
 }

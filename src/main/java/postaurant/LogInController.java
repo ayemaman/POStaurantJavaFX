@@ -1,4 +1,5 @@
 package postaurant;
+import javafx.fxml.FXMLLoader;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.User;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.service.UserService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.net.URL;
 
@@ -33,7 +35,7 @@ public class LogInController {
     private final UserService userService;
     private final FXMLoaderService fxmlLoaderService;
 
-    @Value("/FXML/noID.fxml")
+    @Value("/FXML/ErrorWindow.fxml")
     private Resource noID;
     @Value("/POStaurant.css")
     private Resource css;
@@ -88,8 +90,10 @@ public class LogInController {
         user = userService.getUser(buffer.getValue());
         if (user == null) {
             try {
-                URL url = noID.getURL();
-                Parent root = fxmlLoaderService.getLoader(url).load();
+                FXMLLoader loader=fxmlLoaderService.getLoader(noID.getURL());
+                Parent root = loader.load();
+                ErrorWindowController errorWindowController=loader.getController();
+                errorWindowController.setErrorLabel("WRONG USER ID");
                 Scene scene = new Scene(root);
                 scene.getStylesheets().add(css.getURL().toString());
                 Stage stage = new Stage();

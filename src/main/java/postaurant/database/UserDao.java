@@ -22,11 +22,7 @@ public class UserDao implements UserDatabase {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    private final String testSQL="select * from dubdubs";
-    @Override
-    public List getTest(){
-        return jdbcTemplate.queryForList(testSQL,String.class);
-    }
+
 
     private final String retrieveUser = "SELECT * FROM dubdubs WHERE dub_id=?";
     @Override

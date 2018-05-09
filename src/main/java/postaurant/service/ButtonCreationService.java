@@ -47,6 +47,38 @@ public class ButtonCreationService {
         this.fxmLoaderService = fxmLoaderService;
     }
 
+    public ArrayList<Button> createUserButtons() {
+        try {
+            ArrayList<Button> userButtons=new ArrayList<>();
+            List<User> users = userService.getAllActiveUsers();
+            for (User u: users) {
+                String text =""+u.getUserID()+System.lineSeparator()+u.getFirstName().substring(0,1)+u.getLastName()+System.lineSeparator()+u.getPosition();
+                Button button = new Button(text);
+                button.setPrefHeight(70.0);
+                button.setPrefWidth(95.0);
+
+                button.setMnemonicParsing(false);
+                button.getStyleClass().add("UserButton");
+                if(u.getPosition().equals("DUBDUB")) {
+                    button.getStyleClass().add("DubButton");
+                }else if (u.getPosition().equals("MANAGER")){
+                    button.getStyleClass().add("ManagerButton");
+                }else if(u.getPosition().equals("KITCHEN")){
+                    button.getStyleClass().add("KitchenButton");
+                }else if(u.getPosition().equals("FOODRUNNER")){
+                    button.getStyleClass().add("FoodRunnerButton");
+                }
+                userButtons.add(button);
+            }
+            return userButtons;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
     public ArrayList<Button> createTableButtons(User user) {
         ArrayList<Button> tableButtonList = new ArrayList<>();
         try {

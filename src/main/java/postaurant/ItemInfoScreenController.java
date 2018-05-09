@@ -30,6 +30,7 @@ import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class ItemInfoScreenController {
     private final FXMLoaderService fxmLoaderService;
 
 
-    @Value("/FXML/ItemWrongInputWindow.fxml")
+    @Value("/FXML/ErrorWindow.fxml")
     private Resource wrongInputForm;
     @Value("/FXML/MenuScreen.fxml")
     private Resource menuScreenForm;
@@ -498,8 +499,8 @@ public class ItemInfoScreenController {
             } catch (InputValidationException eName) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("name");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong name");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -513,8 +514,8 @@ public class ItemInfoScreenController {
             } catch (Exception ePrice) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("price");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong price");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -528,8 +529,8 @@ public class ItemInfoScreenController {
             } catch (InputValidationException eType) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("type");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong type");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -544,8 +545,8 @@ public class ItemInfoScreenController {
             }catch(InputValidationException eStation){
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("station");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong station");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -559,8 +560,8 @@ public class ItemInfoScreenController {
             } catch (InputValidationException eSection) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("section");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong section");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -583,8 +584,8 @@ public class ItemInfoScreenController {
             } catch (InputValidationException eAvailability) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("availability");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong availability");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -601,8 +602,8 @@ public class ItemInfoScreenController {
             if ((item.getRecipe().isEmpty())) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("recipe");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong recipe");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -642,49 +643,3 @@ public class ItemInfoScreenController {
 
 }
 
-    /*
-    public class FormattedTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
-
-        public FormattedTableCellFactory() {
-        }
-
-        @Override
-        public TableCell<S, T> call(TableColumn<S, T> p) {
-            TableCell<S, T> cell = new TableCell<S, T>() {
-                @Override
-                protected void updateItem(Object item, boolean empty) {
-                    // CSS Styles
-                    int available=68;
-                    int almostGone=85;
-                    int unavailable=86;
-
-                    String cssStyle = "";
-                    Ingredient ingredient = null;
-                    if( getTableRow() != null ) {
-                        ingredient = (Ingredient) getTableRow().getItem();
-
-                        if (ingredient.getAvailability() == unavailable) {
-                            setStyle("-fx-background-color:red");
-                        } else if (ingredient.getAvailability() == almostGone) {
-                            setStyle("-fx-background-color:orange");
-                        }
-                    }
-
-                    //Set the CSS style on the cell and set the cell's text.
-                    getStyleClass().add(cssStyle);
-                    if( item != null ) {
-                        setText( item.toString()  );
-                    } else {
-                        setText( "" );
-                    }
-                }
-            };
-            return cell;
-        }
-    }
-
-
-}
-
-
-*/

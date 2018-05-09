@@ -23,6 +23,7 @@ import postaurant.database.UserDatabase;
 import postaurant.model.Item;
 import postaurant.model.KitchenOrderInfo;
 import postaurant.model.User;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +43,7 @@ public class MainScreenController {
     @Value("/FXML/ManagerScreen.fxml")
     private Resource managerForm;
 
-    @Value("/FXML/AccessBlocked.fxml")
+    @Value("/FXML/ErrorWindow.fxml")
     private Resource accessBlockedForm;
 
     @Value("/FXML/KitchenScreen.fxml")
@@ -76,10 +77,6 @@ public class MainScreenController {
         timeButton.setOnAction(e -> {
             try {
                 doTime();
-                List list=userDatabase.getTest();
-                for(Object o:list){
-                    System.out.println((String)o);
-                }
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -148,7 +145,10 @@ public class MainScreenController {
                         }
                     }
                     else{
-                        Parent parent = loaderService.getLoader(accessBlockedForm.getURL()).load();
+                        FXMLLoader loader1=loaderService.getLoader(accessBlockedForm.getURL());
+                        Parent parent = loader1.load();
+                        ErrorWindowController errorWindowController=loader1.getController();
+                        errorWindowController.setErrorLabel("Access for this user is blocked");
                         Scene scene1=new Scene(parent);
                         scene1.getStylesheets().add("POStaurant.css");
                         Stage stage1=new Stage();

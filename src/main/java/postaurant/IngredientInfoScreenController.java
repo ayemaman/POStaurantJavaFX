@@ -28,8 +28,8 @@ import postaurant.context.AllergenList;
 import postaurant.context.FXMLoaderService;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
-import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class IngredientInfoScreenController {
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
 
-    @Value("FXML/WrongInputWindowIngredient.fxml")
+    @Value("FXML/ErrorWindow.fxml")
     private Resource wrongInputForm;
     @Value("FXML/ConfirmationIngredientSave.fxml")
     private Resource confirmationSaveForm;
@@ -218,19 +218,21 @@ public class IngredientInfoScreenController {
         }
         if (stringProperty != null) {
             Button button = (Button) event.getSource();
-            switch (button.getText()) {
-                case "":
+            switch (button.getId()) {
+                case "capsKey":
                     setKeyboard(!lowercase);
                     break;
-                case "<--":
+                case "backspaceKey":
                     if (!stringProperty.getValue().equals("")) {
                         stringProperty.set(stringProperty.getValue().substring(0, stringProperty.getValue().length() - 1));
                     }
                     break;
-                case "DELETE":
+                case "deleteKey":
                     stringProperty.set("");
                     break;
-
+                case "spacebarKey":
+                    stringProperty.set(stringProperty.getValue() + " ");
+                    break;
                 default:
                     stringProperty.set(stringProperty.getValue() + button.getText());
                     break;
@@ -248,8 +250,8 @@ public class IngredientInfoScreenController {
             } catch (InputValidationException eName) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("name");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong name");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -263,8 +265,8 @@ public class IngredientInfoScreenController {
             } catch (Exception ePrice) {
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("amount");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong amount");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();
@@ -279,8 +281,8 @@ public class IngredientInfoScreenController {
             }catch (NumberFormatException NFe){
                 FXMLLoader loader = fxmLoaderService.getLoader(wrongInputForm.getURL());
                 Parent parent = loader.load();
-                ItemWrongInputController itemWrongInputController = loader.getController();
-                itemWrongInputController.setErrorLabelText("price");
+                ErrorWindowController errorWindowController = loader.getController();
+                errorWindowController.setErrorLabel("Wrong price");
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = new Stage();

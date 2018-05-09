@@ -46,9 +46,7 @@
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc8</artifactId>
-            <scope>system</scope>
             <version>1.0</version>
-            <systemPath>${project.basedir}/src/lib/ojdbc8.jar</systemPath>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -67,6 +65,7 @@
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.fxml</include>
+                    <include>**/*.png</include>
                 </includes>
             </resource>
         </resources>

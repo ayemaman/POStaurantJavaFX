@@ -4,6 +4,7 @@ package postaurant;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,6 +21,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.service.OrderService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.net.URL;
 
@@ -30,7 +32,7 @@ public class CreateOrderController {
     private final FXMLoaderService fxmlLoaderService;
     private final OrderService orderService;
 
-    @Value("/FXML/TableAlreadyExists.fxml")
+    @Value("/FXML/ErrorWindow.fxml")
     private Resource tableAlreadyExists;
 
 
@@ -68,8 +70,10 @@ public class CreateOrderController {
             boolean tableExists = orderService.tableExists(buffer.getValue());
             if (tableExists ) {
                 try {
-                    URL url = tableAlreadyExists.getURL();
-                    Parent root = fxmlLoaderService.getLoader(url).load();
+                    FXMLLoader loader=fxmlLoaderService.getLoader(tableAlreadyExists.getURL());
+                    Parent root = loader.load();
+                    ErrorWindowController errorWindowController=loader.getController();
+                    errorWindowController.setErrorLabel("THIS TABLE IS OCCUPIED");
                     Scene scene = new Scene(root);
                     scene.getStylesheets().add("mainScreen.css");
                     Stage stage = new Stage();

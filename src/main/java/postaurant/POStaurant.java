@@ -2,6 +2,7 @@ package postaurant;
 
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,15 +16,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
-import postaurant.database.UserDao;
-import postaurant.database.UserDatabase;
-import postaurant.model.Item;
-import postaurant.model.Order;
-import postaurant.model.User;
-
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -33,7 +25,7 @@ public class POStaurant extends Application{
     private FXMLoaderService fxmlLoaderService;
 
     @Value("/FXML/POStaurant.fxml")
-    private Resource sample;
+    private Resource postaurantScreen;
 
     @Override
     public void init(){
@@ -43,8 +35,8 @@ public class POStaurant extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        URL url=sample.getURL();
-        Parent root = fxmlLoaderService.getLoader(url).load();
+        FXMLLoader loader=fxmlLoaderService.getLoader(postaurantScreen.getURL());
+        Parent root = loader.load();
         primaryStage.setTitle("POStaurant");
         Scene scene= new Scene(root, 800, 600);
         String css = POStaurant.class.getResource("/POStaurant.css").toExternalForm();

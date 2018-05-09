@@ -30,6 +30,7 @@ import postaurant.exception.InputValidationException;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
+import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,7 +48,7 @@ public class NewUserScreenController {
 
     @Value("FXML/ConfirmationUserSave.fxml")
     private Resource confirmationForm;
-    @Value("FXML/WrongInputWindow.fxml")
+    @Value("FXML/ErrorWindow.fxml")
     private Resource wrongInputForm;
 
     @FXML
@@ -112,8 +113,10 @@ public class NewUserScreenController {
             }
             catch (InputValidationException wrongUserData) {
                 try {
-                    URL url = wrongInputForm.getURL();
-                    Parent root = fxmLoaderService.getLoader(url).load();
+                    FXMLLoader loader=fxmLoaderService.getLoader(wrongInputForm.getURL());
+                    Parent root = loader.load();
+                    ErrorWindowController errorWindowController=loader.getController();
+                    errorWindowController.setErrorLabel("WRONG NAME/SURNAME");
                     Scene scene = new Scene(root);
                     scene.getStylesheets().add("POStaurant.css");
                     Stage stage = new Stage();
@@ -121,7 +124,6 @@ public class NewUserScreenController {
                     stage.initStyle(StageStyle.UNDECORATED);
                     stage.setScene(scene);
                     stage.showAndWait();
-
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
