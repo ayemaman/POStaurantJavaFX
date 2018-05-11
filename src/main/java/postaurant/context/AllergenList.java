@@ -24,7 +24,7 @@ public class AllergenList {
         allergens.add("FISH");
         allergens.add("LUPIN");
         allergens.add("LACTOSE");
-        allergens.add("MOLLUSCS");
+        allergens.add("MOLLUSKS");
         allergens.add("MUSTARD");
         allergens.add("NUTS");
         allergens.add("SESAME SEEDS");

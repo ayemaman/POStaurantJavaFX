@@ -97,7 +97,7 @@ public class MenuScreenController {
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
                 setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
-                setItemButtonsForSection(gridPane, 16, false, itemButtonList, currentTab);
+                setItemButtonsForSection(gridPane, 16, false, itemButtonList);
             } else {
                 setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
             }
@@ -110,7 +110,7 @@ public class MenuScreenController {
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
                 setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
-                setItemButtonsForSection(gridPane, 16, true, itemButtonList, currentTab);
+                setItemButtonsForSection(gridPane, 16, true, itemButtonList);
             } else {
                 setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
             }
@@ -274,25 +274,14 @@ public class MenuScreenController {
                     AnchorPane anchorPane = (AnchorPane) t.getContent();
                     GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
                     setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText(),true));
-                    setItemButtonsForSection(gridPane, 16, true, itemButtonList, t);
+                    setItemButtonsForSection(gridPane, 16, true, itemButtonList);
                 });
                 sectionTabPane.getTabs().add(t);
             }
         }
     }
 
-    private boolean isNextPage(int page, List<Button> list, int size) {
-        try {
-            if (page > 0) {
-                list.get((page * size));
-            } else {
-                list.get((size));
-            }
-        } catch (IndexOutOfBoundsException e) {
-            return false;
-        }
-        return true;
-    }
+
 
 
     public void setIngredientButtons(GridPane gridPane, Integer size, boolean forward, List<Button> list) {
@@ -300,14 +289,13 @@ public class MenuScreenController {
         int x = 0;
         int y = 0;
         if (forward) {
-
             if (pageIngredients == 0) {
                 start = 0;
             } else {
                 start = pageIngredients * size;
             }
             //if all buttons don't fit in gridPane
-            if (isNextPage(pageIngredients, list, size)) {
+            if (buttonCreationService.isNextPage(pageIngredients, list, size)) {
                 for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
@@ -325,7 +313,7 @@ public class MenuScreenController {
                     }
                     pageIngredients++;
                 } else {
-                    if (isNextPage(pageIngredients + 1, list, size)) {
+                    if (buttonCreationService.isNextPage(pageIngredients + 1, list, size)) {
                         for (int i = start; i < start + size; i++) {
                             gridPane.add(list.get(i), x, y);
                             GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
@@ -401,7 +389,7 @@ public class MenuScreenController {
     }
 
 
-    public void setItemButtonsForSection(GridPane gridPane, Integer size, boolean forward, List<Button> list, Tab tab) {
+    public void setItemButtonsForSection(GridPane gridPane, Integer size, boolean forward, List<Button> list) {
         int start;
         int x = 0;
         int y = 0;
@@ -413,7 +401,7 @@ public class MenuScreenController {
                 start = pageItems * size;
             }
             //if all buttons don't fit in gridPane
-            if (isNextPage(pageItems, list, size)) {
+            if (buttonCreationService.isNextPage(pageItems, list, size)) {
                 for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
@@ -433,7 +421,7 @@ public class MenuScreenController {
                     pageItems++;
                 }
                 else {
-                    if (isNextPage(pageItems + 1, list, size)) {
+                    if (buttonCreationService.isNextPage(pageItems + 1, list, size)) {
 
                         for (int i = start; i < start + size; i++) {
                             gridPane.add(list.get(i), x, y);

@@ -97,6 +97,7 @@ public class ModifyItemWindowController {
                     item.setPrice(this.item.getPrice()+total);
                     item.setType(this.item.getType());
                     item.setSection(this.item.getSection());
+                    item.setStation(this.item.getStation());
                     item.setAvailability(this.item.getAvailability());
                     for(Ingredient ingredient:recipeList){
                         item.addIngredient(ingredient,1);

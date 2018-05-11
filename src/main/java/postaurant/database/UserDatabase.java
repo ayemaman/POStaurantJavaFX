@@ -11,8 +11,12 @@ import java.util.Map;
 public interface UserDatabase {
     User getUser(String userId);
     List<Order> getUserOrders(User user);
+    List<Order> getTransferableOrders(User user);
+    void transferTable(Long orderId, User user);
     void addItemToOrder(Long orderId, Long itemId, Integer qty);
     Order getOrderById(Long orderId);
+    void createNewOrder(Double tableNo, String dubId, LocalDateTime timeOpened,String status,LocalDateTime lastTimeChecked);
+    Order getLatestCreatedOrder(String dubId);
     void setCheckedByDub(Order order, Date date);
     List<KitchenOrderInfo> getKitchenOrderInfo();
     List<KitchenOrderInfo> getQCOrderInfo();

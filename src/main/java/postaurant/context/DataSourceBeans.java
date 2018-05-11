@@ -22,7 +22,6 @@ public class DataSourceBeans {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(oracle.jdbc.driver.OracleDriver.class.getName());
         ds.setUrl("jdbc:oracle:thin:@localhost:1521:GDB01");
-
         ds.setUsername("C##MANAGER");
 
         ds.setPassword("entangle");
@@ -30,21 +29,8 @@ public class DataSourceBeans {
 
     }
 
-
-    /*
     
-     */
-/*
-    @Bean
-    public DataSource mySQLDataSource(){
-        DriverManagerDataSource ds= new DriverManagerDataSource();
-        ds.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-        ds.setUrl("jdbc:mysql://hostname:port/dbname");
-        ds.setUsername();
-        ds.setPassword();
-        return ds;
-    }
-*/
+
 
 
 }

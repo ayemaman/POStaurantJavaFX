@@ -1,7 +1,5 @@
 package postaurant;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -10,24 +8,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
-import postaurant.database.UserDatabase;
-import postaurant.model.Item;
-import postaurant.model.KitchenOrderInfo;
 import postaurant.model.User;
+import postaurant.service.TimeService;
 import postaurant.serviceWindowsControllers.ErrorWindowController;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 
 @Component
@@ -55,28 +45,29 @@ public class MainScreenController {
 
 
     private final FXMLoaderService loaderService;
+    private final TimeService timeService;
 
-    //todo
-    private final UserDatabase userDatabase;
+
 
     private User user;
 
     @FXML private Button loginButton;
-    @FXML private TextField textField;
+    @FXML private TextField timeField;
     @FXML private BorderPane borderPane;
     @FXML private Button timeButton;
     private final Integer startTime = 1;
     private Integer seconds = startTime;
 
-    public MainScreenController(FXMLoaderService loaderService, UserDatabase userDatabase){
+    public MainScreenController(FXMLoaderService loaderService,TimeService timeService){
         this.loaderService = loaderService;
-        this.userDatabase=userDatabase;
+        this.timeService=timeService;
+
     }
 
     public void initialize() {
         timeButton.setOnAction(e -> {
             try {
-                doTime();
+                timeService.doTime(timeField);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -163,44 +154,10 @@ public class MainScreenController {
             }
         });
     }
-    public String createTime() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formatDateTime = now.format(formatter);
-        return formatDateTime;
-
-    }
-
-    public void doTime(){
-        VBox newVBox=(VBox) borderPane.getChildren().get(0);
-        TextField newText= (TextField)newVBox.getChildren().get(1);
-        newText.setText(createTime());
-        ((VBox) borderPane.getChildren().get(0)).getChildren().remove(1);
-        ((VBox) borderPane.getChildren().get(0)).getChildren().add(1,newText);
 
 
-        Timeline time=new Timeline();
-        KeyFrame frame= new KeyFrame(Duration.seconds(3), event -> {
-            seconds--;
-            if(seconds<=0) {
-                VBox newnewVBox=(VBox) borderPane.getChildren().get(0);
-                TextField newnewText=(TextField)newnewVBox.getChildren().get(1);
-                newnewText.setText("");
-                ((VBox) borderPane.getChildren().get(0)).getChildren().remove(1);
-                ((VBox) borderPane.getChildren().get(0)).getChildren().add(1,newnewText);
 
 
-                ((VBox) borderPane.getChildren().get(0)).getChildren().remove(1);
-                ((VBox) borderPane.getChildren().get(0)).getChildren().add(1,textField);
-                time.stop();
-
-
-            }
-        });
-        time.getKeyFrames().add(frame);
-        time.setCycleCount(Timeline.INDEFINITE);
-        time.play();
-    }
 
 
 

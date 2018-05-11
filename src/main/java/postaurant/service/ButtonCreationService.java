@@ -17,6 +17,7 @@ import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import postaurant.DubScreenController;
 import postaurant.OrderWindowController;
 import postaurant.context.FXMLoaderService;
 import postaurant.context.KeyboardList;
@@ -25,6 +26,7 @@ import postaurant.model.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Component
@@ -32,6 +34,8 @@ public class ButtonCreationService {
 
     @Value("/FXML/OrderWindow.fxml")
     private Resource orderWindow;
+    @Value("/FXML/DubScreen.fxml")
+    private Resource dubScreen;
 
     @Value("/img/upArrow.png")
     private Resource upArrow;
@@ -39,12 +43,14 @@ public class ButtonCreationService {
     private final KeyboardList keyboardList;
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
+    private final TimeService timeService;
 
-    public ButtonCreationService(UserService userService, KeyboardList keyboardList, MenuService menuService, FXMLoaderService fxmLoaderService) {
+    public ButtonCreationService(UserService userService, KeyboardList keyboardList, MenuService menuService, FXMLoaderService fxmLoaderService, TimeService timeService) {
         this.userService = userService;
         this.keyboardList = keyboardList;
         this.menuService = menuService;
         this.fxmLoaderService = fxmLoaderService;
+        this.timeService=timeService;
     }
 
     public ArrayList<Button> createUserButtons() {
@@ -78,6 +84,63 @@ public class ButtonCreationService {
     }
 
 
+    public boolean isNextPage(int page, List<Button> list, int size) {
+        try {
+            if (page > 0) {
+                list.get((page * size));
+            } else {
+                list.get((size));
+            }
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public ArrayList<Button> createTransferTables(User user){
+        ArrayList<Button> tableButtonList=new ArrayList<>();
+        try {
+            List<Order> tables = userService.getTransferableOrders(user);
+            if (tables != null) {
+                for (Order o : tables) {
+                    String text = "" + o.getTableNo();
+                    Button button = new Button(text);
+                    button.setPrefHeight(70.0);
+                    button.setPrefWidth(95.0);
+                    button.setMnemonicParsing(false);
+                    if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(),LocalDateTime.now())>10){
+                        button.setStyle("-fx-background-color:red");
+                    }
+                    if(o.getTimeBumped()!=null){
+                        button.setStyle("-fx-background-color: yellow");
+                    }
+                    button.setOnAction(e -> {
+                        try {
+                            userService.transferTable(o.getId(),user);
+                            FXMLLoader loader = fxmLoaderService.getLoader(dubScreen.getURL());
+                            Parent parent = loader.load();
+                            DubScreenController dubScreenController = loader.getController();
+                            dubScreenController.setUser(user);
+                            Scene scene = new Scene(parent);
+                            scene.getStylesheets().add("POStaurant.css");
+                            Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                            stage.setScene(scene);
+                            stage.show();
+                        } catch (Exception eX) {
+                            eX.printStackTrace();
+                        }
+
+                    });
+
+                    tableButtonList.add(button);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tableButtonList;
+
+    }
 
     public ArrayList<Button> createTableButtons(User user) {
         ArrayList<Button> tableButtonList = new ArrayList<>();
@@ -90,6 +153,12 @@ public class ButtonCreationService {
                     button.setPrefHeight(70.0);
                     button.setPrefWidth(95.0);
                     button.setMnemonicParsing(false);
+                    if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(),LocalDateTime.now())>10){
+                        button.setStyle("-fx-background-color:red");
+                    }
+                    if(o.getTimeBumped()!=null){
+                        button.setStyle("-fx-background-color: yellow");
+                    }
                     button.setOnAction(e -> {
                         try {
                             FXMLLoader loader = fxmLoaderService.getLoader(orderWindow.getURL());
@@ -97,6 +166,7 @@ public class ButtonCreationService {
                             OrderWindowController orderWindowController = loader.getController();
                             orderWindowController.setOrderId(o.getId());
                             orderWindowController.setUser(user);
+                            orderWindowController.setLabels(o.getTableNo(),o.getId(),user,o.getTimeOpened());
                             Scene scene = new Scene(parent);
                             scene.getStylesheets().add("POStaurant.css");
                             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();

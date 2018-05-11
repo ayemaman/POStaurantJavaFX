@@ -37,7 +37,7 @@ public class CreateOrderController {
 
 
     private StringProperty buffer = new SimpleStringProperty("");
-    private int tableNum=-1;
+    private Double tableNum=-1.0;
 
 
     @FXML
@@ -68,11 +68,11 @@ public class CreateOrderController {
      buttonCREATE.setOnAction(e-> {
         try {
             boolean tableExists = orderService.tableExists(buffer.getValue());
-            if (tableExists ) {
+            if (tableExists) {
                 try {
-                    FXMLLoader loader=fxmlLoaderService.getLoader(tableAlreadyExists.getURL());
+                    FXMLLoader loader = fxmlLoaderService.getLoader(tableAlreadyExists.getURL());
                     Parent root = loader.load();
-                    ErrorWindowController errorWindowController=loader.getController();
+                    ErrorWindowController errorWindowController = loader.getController();
                     errorWindowController.setErrorLabel("THIS TABLE IS OCCUPIED");
                     Scene scene = new Scene(root);
                     scene.getStylesheets().add("mainScreen.css");
@@ -86,8 +86,27 @@ public class CreateOrderController {
                     e2.printStackTrace();
 
                 }
+            }else if(buffer.getValue().equals("")){
+                try {
+                    FXMLLoader loader = fxmlLoaderService.getLoader(tableAlreadyExists.getURL());
+                    Parent root = loader.load();
+                    ErrorWindowController errorWindowController = loader.getController();
+                    errorWindowController.setErrorLabel("NO TABLE NUMBER HAS BEEN ENTERED");
+                    Scene scene = new Scene(root);
+                    scene.getStylesheets().add("mainScreen.css");
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+                    buffer.setValue("");
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+
+                }
+
             } else{
-                setTableNum(Integer.parseInt(buffer.getValue()));
+                setTableNum(Double.parseDouble(buffer.getValue()));
                 buttonCREATE.getScene().getWindow().hide();
             }
         } catch (Exception e2) {
@@ -111,10 +130,10 @@ public class CreateOrderController {
 
     }
 
-    public void setTableNum(int i){
+    public void setTableNum(Double i){
         this.tableNum=i;
     }
-    public int getTableNum(){
+    public Double getTableNum(){
         return this.tableNum;
     }
 }

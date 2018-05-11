@@ -3,16 +3,17 @@ package postaurant.model;
 
 import postaurant.exception.InputValidationException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Order{
     private Long id;
     private Double tableNo;
-    private Date timeOpened;
+    private LocalDateTime timeOpened;
     private String status;
-    private Date lastTimeChecked;
-    private Date timeBumped;
-    private Date timeClosed;
+    private LocalDateTime lastTimeChecked;
+    private LocalDateTime timeBumped;
+    private LocalDateTime timeClosed;
     private Map<Item, Integer> orderItems;
 
     //private Map<Item, Map<Integer,Date> orderItems;
@@ -25,7 +26,7 @@ public class Order{
         orderItems=new HashMap<>();
     }
 
-    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped){
+    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked, LocalDateTime timeBumped){
         this();
         setId(orderID);
         setTableNo(tableNo);
@@ -35,7 +36,7 @@ public class Order{
         setTimeBumped(timeBumped);
     }
 
-    public Order(long orderID, Double tableNo, Date timeOpened, String status, Date lastTimeChecked, Date timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
+    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked, LocalDateTime timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
         this(orderID,tableNo,timeOpened,status,lastTimeChecked,timeBumped);
         setOrderItems(orderItems);
     }
@@ -58,11 +59,11 @@ public class Order{
         this.tableNo = tableNo;
     }
 
-    public Date getTimeOpened() {
+    public LocalDateTime getTimeOpened() {
         return timeOpened;
     }
 
-    public void setTimeOpened(Date timeOpened) {
+    public void setTimeOpened(LocalDateTime timeOpened) {
         this.timeOpened = timeOpened;
     }
 
@@ -74,27 +75,27 @@ public class Order{
         this.status = status;
     }
 
-    public Date getLastTimeChecked() {
+    public LocalDateTime getLastTimeChecked() {
         return lastTimeChecked;
     }
 
-    public void setLastTimeChecked(Date lastTimeChecked) {
+    public void setLastTimeChecked(LocalDateTime lastTimeChecked) {
         this.lastTimeChecked = lastTimeChecked;
     }
 
-    public Date getTimeBumped() {
+    public LocalDateTime getTimeBumped() {
         return timeBumped;
     }
 
-    public void setTimeBumped(Date timeBumped) {
+    public void setTimeBumped(LocalDateTime timeBumped) {
         this.timeBumped = timeBumped;
     }
 
-    public Date getTimeClosed() {
+    public LocalDateTime getTimeClosed() {
         return timeClosed;
     }
 
-    public void setTimeClosed(Date timeClosed) {
+    public void setTimeClosed(LocalDateTime timeClosed) {
         this.timeClosed = timeClosed;
         setTotal();
     }

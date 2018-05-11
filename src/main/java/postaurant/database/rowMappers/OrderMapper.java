@@ -16,8 +16,12 @@ public class OrderMapper implements RowMapper<Order> {
 
     //todo
     public LocalDateTime convertToLocalDateTimeViaSqlTimestamp(Date dateToConvert) {
-        return new java.sql.Timestamp(
-                dateToConvert.getTime()).toLocalDateTime();
+        if(dateToConvert!=null) {
+            return new java.sql.Timestamp(
+                    dateToConvert.getTime()).toLocalDateTime();
+        }else{
+            return null;
+        }
     }
     //readjust to make usage od ItemIngredient Class
     @Override
@@ -29,12 +33,6 @@ public class OrderMapper implements RowMapper<Order> {
             map.put(ingredient, ingredientQuantity);
             Integer itemQuantity = rs.getInt("item_qty");
             try {
-                /*
-                public LocalDateTime convertToLocalDateTimeViaSqlTimestamp(Date dateToConvert) {
-    return new java.sql.Timestamp(
-      dateToConvert.getTime()).toLocalDateTime();
-}
-                 */
                 Item item = new Item(rs.getLong("item_id"), rs.getString("item_name"), rs.getDouble("item_price"), rs.getString("item_type"), rs.getString("item_section"),rs.getString("item_station"), rs.getInt("item_availability"), map, rs.getString("item_kitchen_status"), rs.getDate("item_date_added"), (convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_ordered"))));
                 TreeMap<Item, Integer> map2 = new TreeMap<>((o1, o2) -> {
                     int idCmp = Long.compare(o1.getId(), o2.getId());
@@ -50,7 +48,7 @@ public class OrderMapper implements RowMapper<Order> {
                 map2.put(item, itemQuantity);
 
                 try {
-                    return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), rs.getDate("time_opened"), rs.getString("status"), rs.getDate("last_time_checked"), rs.getDate("time_bumped"), map2);
+                    return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_opened")), rs.getString("status"),convertToLocalDateTimeViaSqlTimestamp(rs.getDate("last_time_checked")), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_bumped")), map2);
 
                 } catch (InputValidationException iEx) {
                     iEx.printStackTrace();

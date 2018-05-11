@@ -37,7 +37,13 @@ public class UserService {
     public List<Order> getUserOrders(User user){
         return userDatabase.getUserOrders(user);
     }
+    public List<Order> getTransferableOrders(User user){
+        return userDatabase.getTransferableOrders(user);
+    }
 
+    public void transferTable(Long orderId, User user){
+        userDatabase.transferTable(orderId,user);
+    }
     /*
     public List<Order> getUserOrders(User user) {
         try {

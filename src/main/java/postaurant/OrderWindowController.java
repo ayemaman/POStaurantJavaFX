@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,6 +26,7 @@ import postaurant.context.FXMLoaderService;
 import postaurant.database.UserDatabase;
 import postaurant.model.Item;
 import postaurant.model.Order;
+import postaurant.model.OrderItem;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
@@ -68,9 +70,17 @@ public class OrderWindowController {
     private Resource dubScreen;
     @Value("POStaurant.css")
     private Resource css;
+    @Value("/FXML/SetAllergyWindow.fxml")
+    private Resource setAllergyForm;
 
     @FXML
     private Label labelTableNo;
+    @FXML
+    private Label labelDubId;
+    @FXML
+    private Label labelOrderId;
+    @FXML
+    private Label labelTimeOpened;
     @FXML
     private GridPane itemGrid;
     @FXML
@@ -89,6 +99,10 @@ public class OrderWindowController {
     private Button voidButton;
     @FXML
     private Button sendButton;
+    @FXML
+    private Button exitButton;
+    @FXML
+    private Button setAllergyButton;
     @FXML
     private TextField totalTextField;
     @FXML
@@ -112,8 +126,43 @@ public class OrderWindowController {
         sectionButtonList=buttonCreationService.createOrderSectionButtons(true);
         addOnActionToSectionButtons();
         setSectionButtons(sectionGrid,16,true, sectionButtonList);
+
+        setAllergyButton.setOnAction(e->{
+            try {
+                FXMLLoader loader=fxmLoaderService.getLoader(setAllergyForm.getURL());
+                Parent parent=loader.load();
+                Scene scene=new Scene(parent);
+                scene.getStylesheets().add("POStaurant.css");
+                Stage stage=new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+
+        exitButton.setOnAction(e->{
+            try {
+                FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
+                Parent parent=loader.load();
+                DubScreenController dubScreenController=loader.getController();
+                dubScreenController.setUser(user);
+                Scene scene=new Scene(parent);
+                scene.getStylesheets().add("POStaurant.css");
+                Stage stage=(Stage)((Node)e.getSource()).getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+
         sendButton.setOnAction(event -> {
-            orderService.setCheckedByDub(this.order,new Date());
+            if(!originalOrder.isEmpty() && !observableOrder.isEmpty()){
+                orderService.setCheckedByDub(this.order, new Date());
+            }
             if(originalOrder.equals(observableOrder)){
                 try {
                     FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
@@ -121,6 +170,7 @@ public class OrderWindowController {
                     DubScreenController dubScreenController=loader.getController();
                     dubScreenController.setUser(this.user);
                     Scene scene=new Scene(parent);
+                    scene.getStylesheets().add("POStaurant.css");
                     Stage stage= (Stage)((Button) event.getSource()).getScene().getWindow();
                     stage.setScene(scene);
                     stage.show();
@@ -130,6 +180,7 @@ public class OrderWindowController {
 
             }else {
                 //searching for new items
+
                 for (int i = 0; i < observableOrder.size(); ) {
                     if (originalOrder.contains(observableOrder.get(i))) {
                         observableOrder.remove(observableOrder.get(i));
@@ -137,24 +188,36 @@ public class OrderWindowController {
                         i++;
                     }
                 }
+
+
                 //adding together similar items
                 for(int i=0;i<observableOrder.size()-1;){
-                    if(observableOrder.get(i).getKey().compareTo(observableOrder.get(i+1).getKey())!=0){
-                        observableOrder.get(i).setValue(observableOrder.get(i).getValue()+observableOrder.get(i+1).getValue());
-                        observableOrder.remove(observableOrder.get(i+1));
+                    for(int j=i+1;j<observableOrder.size();) {
+                        if (observableOrder.get(i).getKey().compareTo(observableOrder.get(j).getKey()) == 0) {
+                            observableOrder.get(i).setValue(observableOrder.get(i).getValue() + observableOrder.get(j).getValue());
+                            observableOrder.remove(observableOrder.get(j));
+                        } else {
+                            j++;
+                        }
                     }
-                    else{
-                        i++;
-                    }
+                    i++;
                 }
 
-                orderService.sendOrder(this.order.getId(),observableOrder);
+                if(this.order==null) {
+                    //todo
+                    orderService.createNewOrder(Double.parseDouble(labelTableNo.getText()), user.getUserID(), LocalDateTime.now(), "OPENED", LocalDateTime.now());
+                    this.order=orderService.getLatestSavedOrder(user.getUserID());
+                }
+
+                orderService.sendOrder(this.order.getId(), observableOrder);
+
                 try {
                     FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
                     Parent parent=loader.load();
                     DubScreenController dubScreenController=loader.getController();
                     dubScreenController.setUser(this.user);
                     Scene scene=new Scene(parent);
+                    scene.getStylesheets().add("POStaurant.css");
                     Stage stage= (Stage)((Button) event.getSource()).getScene().getWindow();
                     stage.setScene(scene);
                     stage.show();
@@ -183,26 +246,44 @@ public class OrderWindowController {
                         ioE.printStackTrace();
                     }
                 } else {
-                    try {
-                        FXMLLoader loader = fxmLoaderService.getLoader(modifyItemWindow.getURL());
-                        Parent parent = loader.load();
-                        ModifyItemWindowController modifyItemWindowController = loader.getController();
-                        modifyItemWindowController.setup(entry.getKey());
-                        Scene scene = new Scene(parent);
-                        scene.getStylesheets().add(css.getURL().toString());
-                        Stage stage = new Stage();
-                        stage.initModality(Modality.APPLICATION_MODAL);
-                        stage.initStyle(StageStyle.UNDECORATED);
-                        stage.setScene(scene);
-                        stage.showAndWait();
-                        Item item=modifyItemWindowController.getItem();
-                        observableOrder.remove(entry);
-                        TreeMap<Item,Integer> treeMap=new TreeMap<>();
-                        treeMap.put(item,entry.getValue());
-                        Map.Entry<Item, Integer> entryNew=treeMap.entrySet().iterator().next();
-                        observableOrder.add(entryNew);
-                    } catch (IOException ioE) {
-                        ioE.printStackTrace();
+                    if (entry.getKey().getName().substring(0, 6).matches("CUSTOM")) {
+                        try {
+                            FXMLLoader loader = fxmLoaderService.getLoader(errorWindow.getURL());
+                            Parent parent = loader.load();
+                            ErrorWindowController errorWindowController = loader.getController();
+                            errorWindowController.setErrorLabel("You can't modify CUSTOM items.");
+                            Scene scene = new Scene(parent);
+                            scene.getStylesheets().add(css.getURL().toString());
+                            Stage stage = new Stage();
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.initStyle(StageStyle.UNDECORATED);
+                            stage.setScene(scene);
+                            stage.showAndWait();
+                        }catch (IOException ioE){
+                            ioE.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            FXMLLoader loader = fxmLoaderService.getLoader(modifyItemWindow.getURL());
+                            Parent parent = loader.load();
+                            ModifyItemWindowController modifyItemWindowController = loader.getController();
+                            modifyItemWindowController.setup(entry.getKey());
+                            Scene scene = new Scene(parent);
+                            scene.getStylesheets().add(css.getURL().toString());
+                            Stage stage = new Stage();
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.initStyle(StageStyle.UNDECORATED);
+                            stage.setScene(scene);
+                            stage.showAndWait();
+                            Item item = modifyItemWindowController.getItem();
+                            observableOrder.remove(entry);
+                            TreeMap<Item, Integer> treeMap = new TreeMap<>();
+                            treeMap.put(item, entry.getValue());
+                            Map.Entry<Item, Integer> entryNew = treeMap.entrySet().iterator().next();
+                            observableOrder.add(entryNew);
+                        } catch (IOException ioE) {
+                            ioE.printStackTrace();
+                        }
                     }
                 }
             }else{
@@ -297,8 +378,22 @@ public class OrderWindowController {
                         setTotal();
                         orderTableView.refresh();
                     } else {
-                        //todo
-                        System.out.println("You can't do that");
+                        try {
+                            FXMLLoader loader=fxmLoaderService.getLoader(errorWindow.getURL());
+                            Parent parent=loader.load();
+                            ErrorWindowController errorWindowController=loader.getController();
+                            errorWindowController.setErrorLabel("Qty. is 1");
+                            Scene scene=new Scene(parent);
+                            scene.getStylesheets().add("POStaurant.css");
+                            Stage stage=new Stage();
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.initStyle(StageStyle.UNDECORATED);
+                            stage.setScene(scene);
+                            stage.show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 } else {
                     try {
@@ -382,10 +477,16 @@ public class OrderWindowController {
         this.user=user;
     }
     public void setOrderId(Long id) {
-        this.order = userDatabase.getOrderById(id);
-        this.observableOrder.addAll(order.getOrderItems().entrySet());
-        this.originalOrder.addAll(order.getOrderItems().entrySet());
-        setTotal();
+        if (id != null) {
+            this.order = userDatabase.getOrderById(id);
+            this.observableOrder.addAll(order.getOrderItems().entrySet());
+            Comparator<Map.Entry<Item,Integer>> byTime = Comparator.comparing(s1 -> s1.getKey().getDateOrdered());
+            Comparator<Map.Entry<Item,Integer>> byName = Comparator.comparing(s1 -> s1.getKey().getName());
+            this.originalOrder.addAll(order.getOrderItems().entrySet());
+            FXCollections.sort(observableOrder,byTime.thenComparing(byName));
+            FXCollections.sort(originalOrder, byTime.thenComparing(byName));
+            setTotal();
+        }
 
         totalTextField.textProperty().bindBidirectional(total, new NumberStringConverter());
 
@@ -403,7 +504,6 @@ public class OrderWindowController {
                         if (entry != null) {
                             if (entry.getKey().getKitchenStatus().equals("SENT")) {
                                 this.setStyle("-fx-background-color: blue");
-                                SimpleDateFormat ft = new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
 
                             } else if(entry.getKey().getKitchenStatus().equals("SEEN")) {
                                 //if 20 minutes has passed since ordering
@@ -415,7 +515,7 @@ public class OrderWindowController {
                                     this.setStyle("-fx-background-color:yellow");
                                 }
 
-                            } else if(entry.getKey().getKitchenStatus().equals("COOKED")) {
+                            } else if(entry.getKey().getKitchenStatus().equals("READY")) {
                                 this.setStyle("-fx-background-color:#90EE90");
                             }else if(entry.getKey().getKitchenStatus().equals("BUMPED")){
                                 this.setStyle("-fx-background-color:green");
@@ -443,10 +543,19 @@ public class OrderWindowController {
         total.setValue(totalDouble);
     }
 
-
-    public void setTableNo(int i){
-        String text=""+i;
-        labelTableNo.setText(text);
+    public void setLabels(Double tableNo, Long orderId, User user,LocalDateTime timeOpened){
+        labelTableNo.setText(""+tableNo);
+        if(orderId!=null) {
+            labelOrderId.setText("Order ID: " + orderId);
+        }else{
+            labelOrderId.setText("Order ID: N/A");
+        }
+        labelDubId.setText(user.getFirstName());
+        if(timeOpened!=null) {
+            labelTimeOpened.setText(""+timeOpened);
+        }else{
+            labelTimeOpened.setText("TIME OPENED: N/A");
+        }
     }
 
     private boolean isNextPage(int page, List<Button> list, int size) {
@@ -587,9 +696,9 @@ public class OrderWindowController {
                 if(!b.getId().equals("86")){
                     Item item = menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     TreeMap<Item, Integer> treeMap = new TreeMap<>();
-                    item.setDateOrdered(LocalDateTime.now());
                     treeMap.put(item, 1);
                     observableOrder.add(treeMap.entrySet().iterator().next());
+                    orderTableView.refresh();
                     orderTableView.getSelectionModel().selectLast();
                     setTotal();
                 }

@@ -16,8 +16,7 @@
     <top>
         <VBox BorderPane.alignment="CENTER">
             <children>
-                <Region VBox.vgrow="ALWAYS" />
-                <TextField id="textField" fx:id="textField" alignment="BOTTOM_RIGHT" editable="false" prefHeight="44.0" prefWidth="478.0">
+                <TextField id="textField" fx:id="timeField" alignment="BOTTOM_RIGHT" editable="false" prefHeight="44.0" prefWidth="478.0">
                     <font>
                         <Font size="20.0" />
                     </font>

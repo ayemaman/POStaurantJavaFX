@@ -32,7 +32,7 @@ public class UserDao implements UserDatabase {
 
 
     private final String getOrderSQL="select * from orders WHERE order_id=?";
-    private final String getOrderItemSQL="select * from order_has_items WHERE order_id=?";
+    private final String getOrderItemSQL="select * from order_has_items WHERE order_id=? ORDER BY  time_ordered";
 
     @Override
     public Order getOrderById(Long orderId){
@@ -56,6 +56,14 @@ public class UserDao implements UserDatabase {
         }
 
         return order;
+    }
+
+    private final String createNewOrderSQL="INSERT INTO orders (table_no, dub_id, time_opened, status, last_time_checked) VALUES (?,?,?,?,?)";
+
+    @Override
+    public void createNewOrder(Double tableNo, String  dubId, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked) {
+        jdbcTemplate.update(createNewOrderSQL,tableNo,dubId,timeOpened,status,lastTimeChecked);
+
     }
 
     private final String tableGotCheckedSQL="UPDATE orders SET last_time_checked=? WHERE order_id=?";
@@ -85,6 +93,17 @@ public class UserDao implements UserDatabase {
         return items;
     }
      */
+
+
+    private final String getLatestCreatedOrderSQL="SELECT * FROM(SELECT * From orders WHERE dub_id=? AND status='OPENED' ORDER BY time_opened desc) WHERE ROWNUM=1";
+
+    @Override
+    public Order getLatestCreatedOrder(String dubId){
+        return jdbcTemplate.queryForObject(getLatestCreatedOrderSQL,new EmptyOrderMapper(),dubId);
+    }
+
+
+
     private final String getUserOrdersSQL="SELECT * FROM orders WHERE dub_id=? AND status<>'CLOSED' ORDER BY table_no";
     private final String getOrderItemIdsSQL="SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items WHERE dub_id=? AND status<>'CLOSED'";
 
@@ -114,6 +133,39 @@ public class UserDao implements UserDatabase {
         return orders;
     }
 
+    private final String getTransferableOrdersSQL="SELECT * FROM orders WHERE dub_id<>? AND status<>'CLOSED' ORDER BY table_no";
+    private final String getTransferableOrderItemIdsSQL="SELECT * FROM orders NATURAL JOIN order_has_items NATURAL JOIN items WHERE dub_id<>? AND status<>'CLOSED'";
+    @Override
+    public List<Order> getTransferableOrders(User user){
+        Map<Integer,Item> items=getAllItemsMap();
+        List<Order> orders=jdbcTemplate.query(getTransferableOrdersSQL,new EmptyOrderMapper(), user.getUserID());
+        Map<Integer, Order> orderMap = orders.stream().collect(Collectors.toMap(or->or.getId().intValue(), or->or ));
+
+        List<OrderItem> orderItems=jdbcTemplate.query(getTransferableOrderItemIdsSQL, new OrderItemRowMapper(), user.getUserID());
+
+        for(OrderItem orderItem: orderItems){
+            Order order= orderMap.get(orderItem.getOrderId());
+            Item item= items.get(orderItem.getItemId());
+            try{
+                Item newItem=new Item(item.getId(), item.getName(), item.getPrice(), item.getType(), item.getSection(),item.getStation(), item.getAvailability(), item.getDateCreated());
+                newItem.setKitchenStatus(orderItem.getKitchenStatus());
+                newItem.setDateOrdered(orderItem.getDateOrdered());
+                order.addItem(newItem, orderItem.getAmount());
+            }catch (InputValidationException iE){
+                iE.printStackTrace();
+            }
+
+
+        }
+        return orders;
+    }
+
+    private final String transferTableSQL="UPDATE orders SET dub_id=? WHERE order_id=?";
+    @Override
+    public void transferTable(Long orderId, User user) {
+        jdbcTemplate.update(transferTableSQL,user.getUserID(),orderId);
+    }
+
     private final String addItemToOrderSQL="INSERT INTO order_has_items (order_id, item_id, item_qty) VALUES(?,?,?)";
     @Override
     public void addItemToOrder(Long orderId, Long itemId, Integer qty) {
@@ -121,7 +173,7 @@ public class UserDao implements UserDatabase {
     }
 
 
-    private final String openTableExists = "SELECT count(*) FROM orders WHERE status='OPEN' AND table_no=?";
+    private final String openTableExists = "SELECT count(*) FROM orders WHERE status='OPENED' AND table_no=?";
     @Override
     public boolean openTableExists(String value) {
         int openTableCount = jdbcTemplate.queryForObject(openTableExists, Integer.class, value);
@@ -339,10 +391,11 @@ public class UserDao implements UserDatabase {
         jdbcTemplate.update(setNewItemSQL,item.getName(),item.getId());
     }
 
-    private final String saveCustomItemSQL ="INSERT INTO items(item_name, item_price, item_type, item_section, item_station, item_availability, custom) VALUES(?,?,?,?,?,1)";
+    private final String saveCustomItemSQL ="INSERT INTO items(item_name, item_price, item_type, item_section, item_station, item_availability, custom) VALUES(?,?,?,?,?,?,?)";
     @Override
     public void saveNewCustomItem(Item item){
-        if(jdbcTemplate.update(saveCustomItemSQL,item.getName(),item.getPrice(),item.getType(),item.getSection(),item.getStation(),item.getAvailability())==1){
+        if(jdbcTemplate.update(saveCustomItemSQL,item.getName(),item.getPrice(),item.getType(),item.getSection(),item.getStation(),item.getAvailability(),1)==1){
+            System.out.println("ne here");
             Item savedItem=jdbcTemplate.queryForObject(getSavedItemSQL,new EmptyItemMapper(),item.getName());
             for (Map.Entry<Ingredient, Integer> entry : item.getRecipe().entrySet()) {
                 jdbcTemplate.update(insertIngredients, savedItem.getId(), entry.getKey().getId(), entry.getValue());
