@@ -72,7 +72,7 @@ public class CreateOrderController {
                     ErrorWindowController errorWindowController = loader.getController();
                     errorWindowController.setErrorLabel("THIS TABLE IS OCCUPIED");
                     Scene scene = new Scene(root);
-                    scene.getStylesheets().add("mainScreen.css");
+                    scene.getStylesheets().add("POStaurant.css");
                     Stage stage = new Stage();
                     stage.initModality(Modality.APPLICATION_MODAL);
                     stage.initStyle(StageStyle.UNDECORATED);
@@ -90,7 +90,7 @@ public class CreateOrderController {
                     ErrorWindowController errorWindowController = loader.getController();
                     errorWindowController.setErrorLabel("NO TABLE NUMBER HAS BEEN ENTERED");
                     Scene scene = new Scene(root);
-                    scene.getStylesheets().add("mainScreen.css");
+                    scene.getStylesheets().add("POStaurant.css");
                     Stage stage = new Stage();
                     stage.initModality(Modality.APPLICATION_MODAL);
                     stage.initStyle(StageStyle.UNDECORATED);

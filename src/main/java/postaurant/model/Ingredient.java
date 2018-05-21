@@ -1,3 +1,7 @@
+/**
+ * Class that represents Ingredients in this system
+ * Implements Comparable interface and has overwritten compareTo(Object o) method
+ */
 package postaurant.model;
 
 
@@ -44,6 +48,12 @@ public class Ingredient implements Comparable<Ingredient> {
         return name;
     }
 
+    /**
+     * Ingredient's name Setter
+     * Checks using regular expressions if name String consists of ASCII characters and it's length is larger than 1 and smaller than 31;
+     * @throws InputValidationException if not
+     * @param name name of Ingredient
+     */
     public void setName(String name) throws InputValidationException {
         if(name.matches("(\\p{ASCII}){2,30}")) {
             this.name = name.toUpperCase();
@@ -87,9 +97,7 @@ public class Ingredient implements Comparable<Ingredient> {
         this.allergy = allergy;
     }
 
-    public Date getDateCreated(){
-        return this.dateCreated;
-    }
+
     public void setDateCreated(Date dateCreated){
         this.dateCreated=dateCreated;
     }
@@ -111,32 +119,18 @@ public class Ingredient implements Comparable<Ingredient> {
         return buffer.toString();
     }
 
-    public SimpleLongProperty getIDProperty(){
-        return new SimpleLongProperty(getId());
-    }
-    public SimpleStringProperty getNameProperty(){
-        return new SimpleStringProperty(getName());
-    }
-    public SimpleStringProperty getAmountProperty(){
-        String amount=""+getAmount();
-        return new SimpleStringProperty(amount);
-    }
-    public SimpleStringProperty getPriceProperty(){
-        String price=""+getPrice();
-        return new SimpleStringProperty(price);
-    }
-    public SimpleStringProperty getAllergyProperty(){
-        return new SimpleStringProperty(getAllergy());
-    }
-
-
+    /**
+     * Compare method, that compares Ingredients by Name and Amount
+     * @param ingredient Ingredient that is being compared to
+     * @return A number representing whether it is before or after another Ingredient
+     */
     @Override
-    public int compareTo(Ingredient o) {
-        int nameCmp=this.getName().compareTo(o.getName());
+    public int compareTo(Ingredient ingredient) {
+        int nameCmp=this.getName().compareTo(ingredient.getName());
         if(nameCmp!=0){
             return nameCmp;
         }
-        return this.getAmount()-(o.getAmount());
+        return this.getAmount()-(ingredient.getAmount());
     }
 
 }

@@ -1,7 +1,13 @@
+/**
+ * Class that represents Items in this system
+ * Implements Comparable interface and has overwritten compareTo(Object o) method
+ */
+
 package postaurant.model;
 
 import javafx.beans.property.SimpleStringProperty;
 
+import postaurant.context.StationList;
 import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 
@@ -78,7 +84,13 @@ public class Item implements Comparable<Item> {
     public SimpleStringProperty getNameProperty(){
         return new SimpleStringProperty(getName());
     }
-
+    /**
+     * Item's name Setter
+     * Checks using regular expressions if name String consists of ASCII characters and it's length is larger than 1 and smaller than 31;
+     * Then removes all Spaces from string and sets it to UPPERCASE
+     * @throws InputValidationException if not
+     * @param name name of Item;
+     */
     public void setName(String name) throws InputValidationException {
         if(name.matches("(\\p{ASCII}){2,30}")) {
             String noSpace= name.replaceAll(" ", "");
@@ -92,6 +104,12 @@ public class Item implements Comparable<Item> {
         return price;
     }
 
+    /**
+     * Item's price Setter
+     * Doesn't let price to be set to null
+     * @throws InputValidationException if price==null
+     * @param price Item's price
+     */
     public void setPrice(Double price) throws InputValidationException {
         if(price!=null) {
             this.price = price;
@@ -104,6 +122,13 @@ public class Item implements Comparable<Item> {
         return type;
     }
 
+    /**
+     * Item's Type Setter
+     * Checks if given String matches any of pre-defined Item Type's
+     * @see TypeList
+     * @throws InputValidationException if not
+     * @param type Item's Type
+     */
     public void setType(String type) throws InputValidationException {
         boolean match=false;
         for(String s: TypeList.getItemTypes()) {
@@ -122,10 +147,25 @@ public class Item implements Comparable<Item> {
         return station;
     }
 
+    /**
+     * Item Station Setter
+     * Sets String to upperCase
+     * Checks if given String matches any of predefined Stations
+     * @see StationList
+     * @throws InputValidationException if not
+     * @param station Items Station Name
+     *
+     */
     public void setStation(String station) throws InputValidationException {
         String buffer = station.toUpperCase();
-        if (buffer.matches("FRY") || buffer.matches("GRILL") || buffer.matches("PLATE/SAUTE") || buffer.matches("DESSERTS")||buffer.matches("BAR")) {
-            this.station = station.toUpperCase();
+        boolean match=false;
+        for(String s: StationList.getStationTypes()){
+            if(buffer.matches(s)){
+                match=true;
+            }
+        }
+        if(match){
+            this.station=buffer;
         } else {
             throw new InputValidationException();
         }
@@ -134,6 +174,13 @@ public class Item implements Comparable<Item> {
         return section;
     }
 
+    /**
+     * Item's section Setter
+     * Sets it to UPPERCASE
+     * Checks using regular expressions if name String consists of ASCII characters and it's length is larger than 1 and smaller than 31;
+     * @throws InputValidationException if not
+     * @param section Item's Section name
+     */
     public void setSection(String section) throws InputValidationException {
         if (section.matches("(\\p{Alpha}){2,30}")) {
             this.section = section.toUpperCase();
@@ -146,6 +193,12 @@ public class Item implements Comparable<Item> {
         return recipe;
     }
 
+    /**
+     * Item recipe Setter
+     * Checks if given map is not empty
+     * @throws InputValidationException if map is empty
+     * @param recipe Item's recipe Map
+     */
     public void setRecipe(Map<Ingredient,Integer> recipe) throws InputValidationException{
         if(!recipe.isEmpty()) {
             this.recipe = recipe;
@@ -154,6 +207,13 @@ public class Item implements Comparable<Item> {
         }
     }
 
+    /**
+     * Checks if given ingredient EntryKey already exists.
+     * If yes -> adds amount to EntryValue
+     * If no-> adds new EntryKey with specified EntryValue
+     * @param ingredient Ingredient being added to recipe
+     * @param amount amount of Ingredient being added to recipe
+     */
     public void addIngredient(Ingredient ingredient, Integer amount){
         if(!getRecipe().isEmpty()) {
             Ingredient buffer=null;
@@ -177,6 +237,12 @@ public class Item implements Comparable<Item> {
         return availability;
     }
 
+    /**
+     * item's availability Setter
+     * Checks if availability equals 68 or 86 or 85
+     * @throws InputValidationException if not
+     * @param availability number code for Item availability
+     */
     public void setAvailability(int availability) throws InputValidationException {
         if((availability!=68) && (availability!=86) && (availability!=85)) {
             throw new InputValidationException();
@@ -209,16 +275,6 @@ public class Item implements Comparable<Item> {
     }
 
 
-
-    public String testString(){
-        StringBuilder buffer= new StringBuilder();
-        buffer.append("Name:").append(getName()).append("\n ID: ").append(getId()).append("\n Section: ").append(getSection()).append("\n TYPE: ").append(getType()).append("\n AVAIL: ").append(getAvailability());
-        for (Map.Entry<Ingredient,Integer > entry : getRecipe().entrySet()){
-            buffer.append("\nIngr:").append(entry.getKey()).append(" ID:").append(entry.getKey().getId()).append(" Amount:").append(entry.getValue()).append("/ ");
-        }
-        return buffer.toString();
-    }
-
     public String toString(){
         StringBuilder buffer= new StringBuilder();
         buffer.append("Name:").append(getName());
@@ -239,6 +295,18 @@ public class Item implements Comparable<Item> {
         return buffer.toString();
     }
 
+    /**
+     * Equals method that is being used in MenuService to distinguish different items
+     * Checks if name/price/type/section/station/recipe are equal
+     * if no -> return false
+     *
+     * If those fields are equal, checks if any of dateOrdered are equal to null
+     * if yes -> return true
+     *
+     * If non dateOrdered are equal to null, returns result of their equals
+     * @param item to be compared to
+     * @return boolean if items are equal or not
+     */
 
     public boolean specialEquals (Item item) {
         if (!this.name.equals(item.getName())) {
@@ -276,13 +344,17 @@ public class Item implements Comparable<Item> {
 
     }
 
-
+    /**
+     * Compare method, that compares Items by id and Date Ordered
+     * @param item item that is being compared to
+     * @return A number representing whether it is before or after another Item
+     */
     @Override
-    public int compareTo(Item o) {
-        int idCmp=Long.compare(getId(),o.getId());
+    public int compareTo(Item item) {
+        int idCmp=Long.compare(getId(),item.getId());
         if(idCmp==0) {
             if (this.dateOrdered != null) {
-                return getDateOrdered().compareTo(o.getDateOrdered());
+                return getDateOrdered().compareTo(item.getDateOrdered());
             }
         }
         return idCmp;

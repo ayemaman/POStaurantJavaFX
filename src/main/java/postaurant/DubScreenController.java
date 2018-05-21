@@ -41,8 +41,7 @@ public class DubScreenController {
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
     private final TimeService timeService;
-    private final OrderService orderService;
-    private final ReportService reportService;
+
 
     @Value("/FXML/POStaurant.fxml")
     private Resource mainScreenForm;
@@ -99,8 +98,6 @@ public class DubScreenController {
         this.fxmLoaderService = loaderService;
         this.buttonCreationService=buttonCreationService;
         this.timeService=timeService;
-        this.orderService = orderService;
-        this.reportService = reportService;
     }
 
     public void initialize() throws IOException {

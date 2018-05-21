@@ -54,10 +54,6 @@ public class ConfirmationIngredientSaveController {
                     topConfirmationBox.getChildren().remove(topConfirmationBox.getChildren().get(0));
                     times++;
                 }
-                System.out.println("HERE");
-                for(Node n: topConfirmationBox.getChildren()){
-                    System.out.println(n);
-                }
                 confirmationLabel.setText("Successfully saved");
                 bottomConfirmationBox.getChildren().add(confirmationLabel);
                 Button button = new Button("OK");

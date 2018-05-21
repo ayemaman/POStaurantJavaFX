@@ -1,3 +1,6 @@
+/**
+ * Class, used to store ObservableList<String> that holds name of allergies that are used in this application
+ */
 package postaurant.context;
 
 import javafx.collections.FXCollections;
@@ -5,14 +8,11 @@ import javafx.collections.ObservableList;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-
 public class AllergenList {
     private static ObservableList<String> allergens=FXCollections.observableArrayList();
 
@@ -33,6 +33,7 @@ public class AllergenList {
         Collections.sort(allergens);
         allergens.add(0,"NOALLERGY");
     }
+
 
     public static ObservableList<String> getAllergens() {
         return allergens;

@@ -1,3 +1,6 @@
+/**
+ * Class that represents Orders in this system
+ */
 package postaurant.model;
 
 
@@ -12,13 +15,9 @@ public class Order{
     private LocalDateTime timeOpened;
     private String status;
     private LocalDateTime lastTimeChecked;
-    private LocalDateTime timeBumped;
     private LocalDateTime timeClosed;
     private Map<Item, Integer> orderItems;
 
-    //private Map<Item, Map<Integer,Date> orderItems;
-
-    //private List<Item> orderItems = new ArrayList<>();
 
     private double total;
 
@@ -26,18 +25,18 @@ public class Order{
         orderItems=new HashMap<>();
     }
 
-    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked, LocalDateTime timeBumped){
+
+    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked){
         this();
         setId(orderID);
         setTableNo(tableNo);
         setTimeOpened(timeOpened);
         setStatus(status);
         setLastTimeChecked(lastTimeChecked);
-        setTimeBumped(timeBumped);
     }
 
-    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked, LocalDateTime timeBumped, Map<Item,Integer> orderItems)throws InputValidationException{
-        this(orderID,tableNo,timeOpened,status,lastTimeChecked,timeBumped);
+    public Order(long orderID, Double tableNo, LocalDateTime timeOpened, String status, LocalDateTime lastTimeChecked, Map<Item,Integer> orderItems)throws InputValidationException{
+        this(orderID,tableNo,timeOpened,status,lastTimeChecked);
         setOrderItems(orderItems);
     }
 
@@ -67,9 +66,6 @@ public class Order{
         this.timeOpened = timeOpened;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
     public void setStatus(String status) {
         this.status = status;
@@ -83,23 +79,10 @@ public class Order{
         this.lastTimeChecked = lastTimeChecked;
     }
 
-    public LocalDateTime getTimeBumped() {
-        return timeBumped;
-    }
 
-    public void setTimeBumped(LocalDateTime timeBumped) {
-        this.timeBumped = timeBumped;
-    }
-
-    public LocalDateTime getTimeClosed() {
-        return timeClosed;
-    }
-
-    public void setTimeClosed(LocalDateTime timeClosed) {
-        this.timeClosed = timeClosed;
-        setTotal();
-    }
-
+    /**
+     * Calculates total price for whole order from counting order_items_price*qty;
+     */
     private void setTotal(){
         this.total=0;
         if(!getOrderItems().isEmpty()) {
@@ -113,7 +96,12 @@ public class Order{
     public Map<Item, Integer> getOrderItems(){ return this.orderItems;}
 
 
-
+    /**
+     * Order's OrderItems Setter
+     * Checks if given Map is not empty
+     * @throws InputValidationException if Map is empty
+     * @param orderItems
+     */
     public void setOrderItems(Map<Item, Integer> orderItems) throws InputValidationException {
         if (!orderItems.isEmpty()) {
             this.orderItems = orderItems;
@@ -123,6 +111,13 @@ public class Order{
         setTotal();
     }
 
+    /**
+     * Checks if order already has this item,
+     * if yes-> adds amount to EntryValue
+     * if no-> adds new EntryKey with specified EntryValue
+     * @param item Item being added to order
+     * @param amount of Item being added to order
+     */
     public void addItem(Item item, Integer amount){
         if(!getOrderItems().isEmpty()) {
             if(getOrderItems().containsKey(item)){

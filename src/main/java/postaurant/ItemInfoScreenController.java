@@ -28,6 +28,7 @@ import postaurant.context.TypeList;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
+import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import postaurant.service.TimeService;
@@ -40,13 +41,11 @@ import java.util.*;
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ItemInfoScreenController {
 
+    private User user;
     private int page;
     private ArrayList<Button> ingredientButtonList;
     private Item item;
     private ObservableList<Ingredient> ingredientsList;
-    private ObservableList<String> sectionsList;
-    private ObservableList<String> typeList;
-    private ObservableList<String> stationList;
 
     private boolean lowercase = true;
     private StringProperty name;
@@ -131,15 +130,15 @@ public class ItemInfoScreenController {
         section = new SimpleStringProperty("");
         station = new SimpleStringProperty("");
 
-        sectionsList = FXCollections.observableArrayList();
+        ObservableList<String> sectionsList = FXCollections.observableArrayList();
         sectionsList.addAll(menuService.getSections());
         sectionComboBox.setItems(sectionsList);
 
-        typeList = FXCollections.observableArrayList();
+        ObservableList<String> typeList = FXCollections.observableArrayList();
         typeList.addAll(TypeList.getItemTypes());
         typeComboBox.setItems(typeList);
 
-        stationList= FXCollections.observableArrayList();
+        ObservableList<String> stationList = FXCollections.observableArrayList();
         stationList.addAll(StationList.getStationTypes());
         stationComboBox.setItems(stationList);
 
@@ -171,6 +170,8 @@ public class ItemInfoScreenController {
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
                 Parent parent = loader.load();
+                MenuScreenController menuScreenController=loader.getController();
+                menuScreenController.setUser(user);
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -183,11 +184,11 @@ public class ItemInfoScreenController {
         });
 
 
-        nameField.textProperty().bind(name);
-        priceField.textProperty().bind(price);
-        typeComboBox.valueProperty().bind(type);
-        stationComboBox.valueProperty().bind(station);
-        sectionComboBox.valueProperty().bind(section);
+        nameField.textProperty().bindBidirectional(name);
+        priceField.textProperty().bindBidirectional(price);
+        typeComboBox.valueProperty().bindBidirectional(type);
+        stationComboBox.valueProperty().bindBidirectional(station);
+        sectionComboBox.valueProperty().bindBidirectional(section);
         currentTextField = nameField;
         nameField.setOnMouseClicked(e -> this.currentTextField = nameField);
         priceField.setOnMouseClicked(e -> this.currentTextField = priceField);
@@ -241,9 +242,9 @@ public class ItemInfoScreenController {
         setItem(item);
         try {
             availabilityButton.getStyleClass().clear();
-            if (item.getAvailability() == 86) {
+            if (this.item.getAvailability() == 86) {
                 availabilityButton.getStyleClass().add("Availability86");
-            } else if (item.getAvailability() == 85) {
+            } else if (this.item.getAvailability() == 85) {
                 availabilityButton.getStyleClass().add("Availability85");
             } else {
                 availabilityButton.getStyleClass().add("Availability68");
@@ -284,6 +285,10 @@ public class ItemInfoScreenController {
                 setStyle("");
             }
         }
+    }
+
+    public void setUser(User user){
+        this.user=user;
     }
 
     public void setItem(Item item) {
@@ -636,6 +641,8 @@ public class ItemInfoScreenController {
                 if (confirmationItemSaveController.isSaved()) {
                     loader = fxmLoaderService.getLoader(menuScreenForm.getURL());
                     parent = loader.load();
+                    MenuScreenController menuScreenController=loader.getController();
+                    menuScreenController.setUser(user);
                     scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage1 = (Stage) ((Node) e.getSource()).getScene().getWindow();

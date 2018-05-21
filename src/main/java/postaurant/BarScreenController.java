@@ -14,8 +14,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.Ingredient;
-import postaurant.model.ItemIngredientTreeCellValues;
-import postaurant.model.KitchenOrderInfo;
+import postaurant.context.ItemIngredientTreeCellValues;
+import postaurant.context.OrderInfo;
 import postaurant.service.MenuService;
 import postaurant.service.TimeService;
 
@@ -52,7 +52,7 @@ public class BarScreenController {
     private ImageView logoImage;
 
     private TreeItem<ItemIngredientTreeCellValues> root;
-    private List<KitchenOrderInfo> itemList;
+    private List<OrderInfo> itemList;
 
     public BarScreenController(FXMLoaderService fxmLoaderService, MenuService menuService, TimeService timeService) {
         this.fxmLoaderService = fxmLoaderService;
@@ -110,7 +110,7 @@ public class BarScreenController {
             boolean run=true;
             while (run) {
                 try {
-                    List<KitchenOrderInfo> buffer = menuService.getAllOrderedItemsForBar();
+                    List<OrderInfo> buffer = menuService.getAllOrderedItemsForBar();
                     if (!itemList.equals(buffer)) {
                         itemList = buffer;
                         addNewItemsToTreeViewRoots();
@@ -138,7 +138,7 @@ public class BarScreenController {
         itemsTreeView.setRoot(root);
         itemsTreeView.setShowRoot(false);
         itemList=menuService.getAllOrderedItemsForBar();
-        for (KitchenOrderInfo k : itemList) {
+        for (OrderInfo k : itemList) {
             ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
             TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, root);
             for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
@@ -150,7 +150,7 @@ public class BarScreenController {
 
     public void addNewItemsToTreeViewRoots() {
         for (int i = root.getChildren().size(); i < itemList.size(); i++) {
-            KitchenOrderInfo k = itemList.get(i);
+            OrderInfo k = itemList.get(i);
             ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
             TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, root);
             for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {

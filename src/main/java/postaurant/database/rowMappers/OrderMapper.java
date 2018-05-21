@@ -48,7 +48,7 @@ public class OrderMapper implements RowMapper<Order> {
                 map2.put(item, itemQuantity);
 
                 try {
-                    return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_opened")), rs.getString("status"),convertToLocalDateTimeViaSqlTimestamp(rs.getDate("last_time_checked")), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_bumped")), map2);
+                    return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_opened")), rs.getString("status"),convertToLocalDateTimeViaSqlTimestamp(rs.getDate("last_time_checked")), map2);
 
                 } catch (InputValidationException iEx) {
                     iEx.printStackTrace();

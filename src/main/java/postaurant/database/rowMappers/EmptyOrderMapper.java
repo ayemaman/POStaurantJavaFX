@@ -16,7 +16,7 @@ public class EmptyOrderMapper implements RowMapper<Order> {
 
     @Override
     public Order mapRow(ResultSet rs, int i) throws SQLException {
-        return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_opened")), rs.getString("status"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("last_time_checked")), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_bumped")));
+        return new Order(rs.getLong("order_id"), rs.getDouble("table_no"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("time_opened")), rs.getString("status"), convertToLocalDateTimeViaSqlTimestamp(rs.getDate("last_time_checked")));
 
     }
     public LocalDateTime convertToLocalDateTimeViaSqlTimestamp(Date dateToConvert) {

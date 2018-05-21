@@ -1,3 +1,6 @@
+/**
+ * Class that represents Cash Payments in this system
+ */
 package postaurant.model;
 
 
@@ -21,10 +24,6 @@ public class Payment {
         return paymentId;
     }
 
-    public void setPaymentId(Long paymentId) {
-        this.paymentId = paymentId;
-    }
-
     public Long getOrderId() {
         return orderId;
     }
@@ -36,6 +35,12 @@ public class Payment {
     public Double getAmount() {
         return amount;
     }
+
+    /**
+     * Payment's amount Setter
+     * @throws InputValidationException if amount is 0
+     * @param amount
+     */
 
     public void setAmount(Double amount) throws InputValidationException{
         if(amount!=0) {

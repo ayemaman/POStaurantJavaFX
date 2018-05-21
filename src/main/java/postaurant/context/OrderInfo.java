@@ -1,8 +1,8 @@
-package postaurant.model;
+package postaurant.context;
 
 
-import org.springframework.cglib.core.Local;
 import postaurant.exception.InputValidationException;
+import postaurant.model.Item;
 
 import java.awt.*;
 import java.awt.print.PageFormat;
@@ -11,14 +11,14 @@ import java.awt.print.PrinterException;
 import java.time.LocalDateTime;
 
 
-public class KitchenOrderInfo implements Printable {
+public class OrderInfo implements Printable {
 
     private Long orderId;
     private Double tableNo;
     private Item item;
     private int qty;
 
-    public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String status, int qty){
+    public OrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String status, int qty){
         try {
             Item item = new Item();
             item.setId(itemId);
@@ -34,7 +34,7 @@ public class KitchenOrderInfo implements Printable {
         }
     }
 
-    public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String station, String status, int qty) {
+    public OrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String station, String status, int qty) {
         try {
             Item item = new Item();
             item.setId(itemId);
@@ -93,8 +93,8 @@ public class KitchenOrderInfo implements Printable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof KitchenOrderInfo) {
-            KitchenOrderInfo k = (KitchenOrderInfo) obj;
+        if (obj instanceof OrderInfo) {
+            OrderInfo k = (OrderInfo) obj;
             if (k.getItem().compareTo(getItem()) == 0) {
                 if (k.getQty() == getQty()) {
                     if (k.getOrderId().equals(getOrderId())) {

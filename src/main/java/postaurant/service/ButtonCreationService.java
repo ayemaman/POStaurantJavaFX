@@ -1,3 +1,8 @@
+/**
+ * Class, that is used to dynamically create Nodes for this application
+ * @see javafx.scene.control.Button
+ * @see postaurant.context.QCBox
+ */
 package postaurant.service;
 
 import javafx.collections.FXCollections;
@@ -20,6 +25,7 @@ import postaurant.DubScreenController;
 import postaurant.OrderWindowController;
 import postaurant.context.FXMLoaderService;
 import postaurant.context.KeyboardList;
+import postaurant.context.OrderInfo;
 import postaurant.context.QCBox;
 import postaurant.model.*;
 
@@ -39,19 +45,25 @@ public class ButtonCreationService {
     @Value("/img/upArrow.png")
     private Resource upArrow;
     private final UserService userService;
+    private final OrderService orderService;
     private final KeyboardList keyboardList;
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
     private final TimeService timeService;
 
-    public ButtonCreationService(UserService userService, KeyboardList keyboardList, MenuService menuService, FXMLoaderService fxmLoaderService, TimeService timeService) {
+    public ButtonCreationService(UserService userService, OrderService orderService, KeyboardList keyboardList, MenuService menuService, FXMLoaderService fxmLoaderService, TimeService timeService) {
         this.userService = userService;
+        this.orderService = orderService;
         this.keyboardList = keyboardList;
         this.menuService = menuService;
         this.fxmLoaderService = fxmLoaderService;
         this.timeService=timeService;
     }
 
+    /**
+     * Method that creates a Button for every active User in Database
+     * @return ArrayList<Button> that holds all Buttons representing users
+     */
     public ArrayList<Button> createUserButtons() {
         try {
             ArrayList<Button> userButtons=new ArrayList<>();
@@ -89,7 +101,13 @@ public class ButtonCreationService {
         return null;
     }
 
-
+    /**
+     * Method, that is used to figure out, if list holds enough items to fill next page.
+     * @param page current page number
+     * @param list that is being checked
+     * @param size of items that can fit on one page;
+     * @return boolean (True if next page is possible, False if not)
+     */
     public boolean isNextPage(int page, List list, int size) {
         try {
             if (page > 0) {
@@ -103,10 +121,15 @@ public class ButtonCreationService {
         return true;
     }
 
+    /**
+     * Method, that creates Buttons from all tables that are transferable for given user
+     * @param user
+     * @return ArrayList<Button> that holds Button for each table that can be transferred
+     */
     public ArrayList<Button> createTransferTables(User user){
         ArrayList<Button> tableButtonList=new ArrayList<>();
         try {
-            List<Order> tables = userService.getTransferableOrders(user);
+            List<Order> tables = orderService.getTransferableOrders(user);
             if (tables != null) {
                 for (Order o : tables) {
                     String text = "" + o.getTableNo();
@@ -133,7 +156,7 @@ public class ButtonCreationService {
 
                     button.setOnAction(e -> {
                         try {
-                            userService.transferTable(o.getId(),user);
+                            orderService.transferTable(o.getId(),user);
                             FXMLLoader loader = fxmLoaderService.getLoader(dubScreen.getURL());
                             Parent parent = loader.load();
                             DubScreenController dubScreenController = loader.getController();
@@ -159,14 +182,19 @@ public class ButtonCreationService {
 
     }
 
+    /**
+     * Method, that creates Buttons from all tables that are served by given user;
+     * @param user
+     * @return ArrayList<Button> that holds Button for each table that given user is in charge of;
+     */
     public ArrayList<Button> createTableButtons(User user) {
         ArrayList<Button> tableButtonList = new ArrayList<>();
         try {
             List<Order> tables;
             if(user.getPosition().equals("MANAGER")){
-                tables=userService.getAllOpenOrders();
+                tables=orderService.getAllOpenOrders();
             }else {
-                tables =userService.getUserOrders(user);
+                tables =orderService.getUserOrders(user);
             }
             if (tables != null) {
                 for (Order o : tables) {
@@ -221,6 +249,14 @@ public class ButtonCreationService {
         return tableButtonList;
     }
 
+    /**
+     * Method, that creates KeyBoard Buttons
+     * @param lowercase that specifies if it's for lowercase, or uppercase
+     * @param buttonWidth width of buttons
+     * @param spacebarWidth width of spaceBar
+     * @param height height of buttons
+     * @return ArrayList<Button>
+     */
     public ArrayList<Button> createKeyboardButtons(boolean lowercase, double buttonWidth, double spacebarWidth, double height) {
 
         ArrayList<String> list = (keyboardList.getQwerty());
@@ -354,6 +390,13 @@ public class ButtonCreationService {
         return tabs;
     }
 
+    /**
+     * Method that creates item Buttons for sections that are used in Order Window and don't hold any of specified allergy.
+     * @param section name of section
+     * @param large boolean to specify button size
+     * @param allergyList restricted allergy
+     * @return ArrayList<Button>
+     */
     public ArrayList<Button> createItemButtonsForSection(String section, boolean large, ArrayList<String> allergyList) {
         ArrayList<Button> buttons = new ArrayList<>();
         Map<String, List<Item>> sectionsWithItems = menuService.getSectionsWithItems();
@@ -368,7 +411,6 @@ public class ButtonCreationService {
                         iterator.remove();
                     }
                 }
-
             }
 
         }
@@ -445,9 +487,11 @@ public class ButtonCreationService {
         return buttons;
     }
 
-    //if(i.getName().substring(0,1).equals("A") || i.getName().substring(0,1).equals("B") || i.getName().substring(0,1).equals("C") )
-
-    public Map<String, List<Button>> createIngredientButtonsForSections(int version) {
+    /**
+     * Method that creates Ingredient buttons that are grouped by their first letter of their name;
+     * @return Map<String,List<Button>> that holds Ingredient Buttons grouped by first letters of their name;
+     */
+    public Map<String, List<Button>> createIngredientButtonsForSections() {
         Map<String, List<Ingredient>> map = menuService.getAZSectionsWithIngredients();
         Map<String, List<Button>> map2 = new HashMap<>();
         for (Map.Entry<String, List<Ingredient>> entry : map.entrySet()) {
@@ -457,22 +501,9 @@ public class ButtonCreationService {
         for (Map.Entry<String, List<Ingredient>> entry : map.entrySet()) {
             for (Ingredient i : entry.getValue()) {
                 Button button = new Button();
-                if (version == 1) {
-                    button.setText(+i.getId() + "\n" + i.getName() + "\namount(g.):\n " + i.getAmount());
-                    button.setMinWidth(73);
-                    button.setMinHeight(82.5);
-                    button.setStyle("-fx-font-size:9px");
-                } else if (version == 2) {
-                    button.setText(i.getId() + "\n" + i.getName() + "\namount: " + i.getAmount() + "g\nprice: " + i.getPrice() + "£");
-                    button.setMinWidth(100);
-                    button.setMinHeight(120);
-                    button.setStyle("-fx-font-size:10px");
-                } else if (version == 3) {
-                    button.setText(i.getId() + "\n" + i.getName() + "\nAmount: " + i.getAmount() + "g\nPrice: " + i.getPrice() + "£");
-                    button.setMinWidth(140);
-                    button.setMinHeight(110);
-                }
-
+                button.setText(i.getId() + "\n" + i.getName() + "\nAmount: " + i.getAmount() + "g\nPrice: " + i.getPrice() + "£");
+                button.setMinWidth(140);
+                button.setMinHeight(110);
                 if (i.getAvailability() == 86) {
                     button.setStyle("-fx-background-color:red");
                 } else if (i.getAvailability() == 85) {
@@ -487,6 +518,11 @@ public class ButtonCreationService {
         return map2;
     }
 
+    /**
+     * Method, that creates Ingredient Buttons.
+     * @param version int, you can specify button size: 1=small, 2=large;
+     * @return ArrayList<Button>
+     */
     public ArrayList<Button> createIngredientButtons(int version) {
         ArrayList<Button> buttons = new ArrayList<>();
         List<Ingredient> list = menuService.getAllIngredients();
@@ -503,10 +539,6 @@ public class ButtonCreationService {
                 button.setMinWidth(100);
                 button.setMinHeight(120);
                 button.setStyle("-fx-font-size:10px");
-            } else if (version == 3) {
-                button.setText(i.getId() + "\n" + i.getName() + "\nAmount: " + i.getAmount() + "g\nPrice: " + i.getPrice() + "£");
-                button.setMinWidth(140);
-                button.setMinHeight(110);
             }
 
             if (i.getAvailability() == 86) {
@@ -521,9 +553,15 @@ public class ButtonCreationService {
         return buttons;
     }
 
+    /**
+     * Method, that creates QCBoxes
+     * @param bar specifies QC origin: true=bar, false=kitchen;
+     * @return ArrayList<QCBox>
+     * @see QCBox
+     */
     public ArrayList<QCBox> createQCNodes(Boolean bar) {
         ArrayList<QCBox> list = new ArrayList<>();
-        List<KitchenOrderInfo> orders;
+        List<OrderInfo> orders;
         if(!bar) {
             orders = menuService.getAllOrderedItemsForQC();
         }else{
@@ -531,14 +569,14 @@ public class ButtonCreationService {
         }
         Double currentTable = -1.0;
         LocalDateTime currentTime = LocalDateTime.now().minusYears(1);
-        ListView<KitchenOrderInfo> currentListView=null;
+        ListView<OrderInfo> currentListView=null;
 
-        for (KitchenOrderInfo k : orders) {
+        for (OrderInfo k : orders) {
             if(currentTable.equals(k.getTableNo())) {
                 if (currentListView != null) {
                     LocalDateTime timeOrdered=k.getItem().getDateOrdered();
                     if((ChronoUnit.DAYS.between(timeOrdered,currentTime)==0)&&(ChronoUnit.HOURS.between(timeOrdered,currentTime)==0)&&ChronoUnit.MINUTES.between(timeOrdered,currentTime)==0){
-                        ObservableList<KitchenOrderInfo> observableList = currentListView.getItems();
+                        ObservableList<OrderInfo> observableList = currentListView.getItems();
                         observableList.add(k);
                     }else{
                         QCBox qcBox = new QCBox();
@@ -547,10 +585,10 @@ public class ButtonCreationService {
                         label.setPrefSize(160, 40);
                         label.setText(" Table: " + k.getTableNo());
                         label.setId("UnselectedLabel");
-                        ListView<KitchenOrderInfo> listView = new ListView<>();
+                        ListView<OrderInfo> listView = new ListView<>();
                         listView.setPrefSize(160, 160);
                         listView.setCellFactory(lv -> {
-                            ListCell<KitchenOrderInfo> cell = new ListCell<>();
+                            ListCell<OrderInfo> cell = new ListCell<>();
                             cell.itemProperty().addListener((obs, oldItem, newItem) -> {
                                 if (newItem == null) {
                                     cell.setText(null);
@@ -568,7 +606,7 @@ public class ButtonCreationService {
                             return cell;
                         });
 
-                        ObservableList<KitchenOrderInfo> observableList = FXCollections.observableArrayList();
+                        ObservableList<OrderInfo> observableList = FXCollections.observableArrayList();
                         observableList.add(k);
                         listView.setItems(observableList);
                         listView.setId("QCListView");
@@ -591,10 +629,10 @@ public class ButtonCreationService {
                     label.setPrefSize(160, 40);
                     label.setText(" Table: " + k.getTableNo());
                     label.setId("UnselectedLabel");
-                    ListView<KitchenOrderInfo> listView = new ListView<>();
+                    ListView<OrderInfo> listView = new ListView<>();
                     listView.setPrefSize(160, 160);
                     listView.setCellFactory(lv -> {
-                        ListCell<KitchenOrderInfo> cell = new ListCell<>();
+                        ListCell<OrderInfo> cell = new ListCell<>();
                         cell.itemProperty().addListener((obs, oldItem, newItem) -> {
                             if (newItem == null) {
                                 cell.setText(null);
@@ -612,7 +650,7 @@ public class ButtonCreationService {
                         return cell;
                     });
 
-                    ObservableList<KitchenOrderInfo> observableList = FXCollections.observableArrayList();
+                    ObservableList<OrderInfo> observableList = FXCollections.observableArrayList();
                     observableList.add(k);
                     listView.setItems(observableList);
                     listView.setId("QCListView");

@@ -1,10 +1,15 @@
+/**
+ * Service, that works with database data related to Menu;
+ * @see postaurant.model.Item
+ * @see postaurant.model.Ingredient
+ */
 package postaurant.service;
 
 import org.springframework.stereotype.Component;
 import postaurant.database.UserDatabase;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
-import postaurant.model.KitchenOrderInfo;
+import postaurant.context.OrderInfo;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -21,21 +26,37 @@ public class MenuService {
         this.userDatabase=userDatabase;
     }
 
-
+    /**
+     * Creates a list of all distinct items and filters it by distinct name;
+     * @return a Map, that holds Items grouped by Section;
+     */
     public Map<String, List<Item>> getSectionsWithItems() {
         List<Item> fullItemList = userDatabase.getMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
         return fullItemList.stream().collect(Collectors.groupingBy(Item::getSection));
     }
 
+    /**
+     * Creates a list of all food items and filters it by distinct name;
+     * @return a Map, that holds food items grouped by Section;
+     */
     public Map<String, List<Item>> getFoodSectionsWithItems(){
         List<Item> foodItemList = userDatabase.getFoodMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
         return foodItemList.stream().collect(Collectors.groupingBy(Item::getSection));
     }
 
+    /**
+     * Creates a list of all drink items and filters it by distinct name;
+     * @return a Map, that holds drink items grouped by Section;
+     */
     public Map<String, List<Item>> getDrinkSectionsWithItems(){
         List<Item> foodItemList = userDatabase.getDrinkMenu().stream().filter(distinctByKey(Item::getName)).collect(Collectors.toList());
         return foodItemList.stream().collect(Collectors.groupingBy(Item::getSection));
     }
+
+    /**
+     * Creates a list of all Ingredients and filters it by distinct name;
+     * @return a Map<String, List<Ingredient>> that holds Ingredients grouped by First Letter of it's name;
+     */
     public Map<String, List<Ingredient>> getAZSectionsWithIngredients(){
         List<Ingredient> fullIngredientList = userDatabase.getAllIngredients().stream().filter(distinctByKey(Ingredient::getName)).collect(Collectors.toList());
         Map<Character,List<Ingredient>> map=fullIngredientList.stream().collect(Collectors.groupingBy(Ingredient::getFirstLetter));
@@ -185,59 +206,64 @@ public class MenuService {
         return map2;
     }
 
+    /**
+     *Method, that is used in filtering List to get distinct Items by name
+     */
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
     }
 
+    /**
+     * Method, that retrieves Item with specific id
+     * @param itemID item's id number
+     * @return Item that is specific to param ID
+     */
     public Item getItemById(long itemID) {
-        List<Item> list = userDatabase.getItemById(itemID);
-        if (!list.isEmpty()) {
-            Item item = list.get(0);
-           for(int i=0;i<list.size()-1;){
-               Map.Entry<Ingredient,Integer> entry=list.get(i+1).getRecipe().entrySet().iterator().next();
-               list.get(i).addIngredient(entry.getKey(),entry.getValue());
-               list.remove(i+1);
-           }
-            return item;
-        } else {
-            return null;
-        }
+        return userDatabase.getItemById(itemID);
     }
 
+    /**
+     * Method, that retrieves last saved Item from database with given name
+     * @param name item's name
+     * @return last saved Item from database with given name
+     */
     public Item getLatestSavedItemByName(String name){
-        List<Item> list= userDatabase.getItemByName(name);
-        if(!list.isEmpty()) {
-            Item item = list.get(0);
-            Date newestEntry = list.get(0).getDateCreated();
-            for (int i = 1; i < list.size(); ) {
-                if (list.get(i).getDateCreated().getTime()==(newestEntry.getTime())) {
-                    Map.Entry<Ingredient, Integer> entry = list.get(i).getRecipe().entrySet().iterator().next();
-                    item.addIngredient(entry.getKey(), entry.getValue());
-                    list.remove(i);
-                } else {
-                    i++;
-                }
-            }
-
-            return item;
-        }else{
-            return null;
-        }
+        return userDatabase.getItemByName(name);
     }
 
+    /**
+     * Method that returns all custom items that are specific to this name
+     * @param name item's name
+     * @return List<Item> of all custom items that has given name
+     */
     public List<Item> getCustomItemsByName(String name){
         return userDatabase.getCustomItemsByName(name);
 
     }
 
+    /**
+     * Method that returns all Ingredients saved in database;
+     * @return List<Ingredient> that holds all Ingredients;
+     */
     public List<Ingredient> getAllIngredients(){
         return userDatabase.getAllIngredients();
     }
 
+    /**
+     * Method that returns Ingredient with given id from database;
+     * @param id Ingredient's id;
+     * @return Ingredient with given id;
+     */
     public Ingredient getIngredientById(long id){
         return userDatabase.getIngredientById(id);
     }
+
+    /**
+     * Method that saves new custom Item to database and set's all previous Custom items availability with given name to "86" ->unavailable
+     * @param item that's about to get saved
+     * @return saved Item
+     */
     public Item saveNewCustomItem(Item item) {
         List<Item> previousCustomItems = getCustomItemsByName(item.getName());
         for (Item i : previousCustomItems) {
@@ -251,32 +277,48 @@ public class MenuService {
         return getItemById(itemSaved.getId());
     }
 
-    public List<KitchenOrderInfo> getAllOrderItemsForBarQC(){
-        List<KitchenOrderInfo> items=userDatabase.getQCBarOrderInfo();
+    /**
+     * Gets BAR info on all drink Items that are currently ordered
+     * @return List<OrderInfo> of all currently ordered drink Items
+     */
+    public List<OrderInfo> getAllOrderItemsForBarQC(){
+        List<OrderInfo> items=userDatabase.getQCBarOrderInfo();
         return items;
     }
 
-    public List<KitchenOrderInfo> getAllOrderedItemsForBar(){
-        List<KitchenOrderInfo> items=userDatabase.getBarOrderInfo();
+    /**
+     * Gets BAR QC info on all drink Items that are currently ordered
+     * @return List<OrderInfo> of all currently ordered drink Items
+     */
+    public List<OrderInfo> getAllOrderedItemsForBar(){
+        List<OrderInfo> items=userDatabase.getBarOrderInfo();
         return items;
     }
 
-    public List<KitchenOrderInfo> getAllOrderedItemsForQC(){
-        List<KitchenOrderInfo> items=userDatabase.getQCOrderInfo();
+    /**
+     * Method that returns QC info on all food Items that are currently ordered
+     * @return List<OrderInfo> of all currently ordered food Items
+     */
+    public List<OrderInfo> getAllOrderedItemsForQC(){
+        List<OrderInfo> items=userDatabase.getQCOrderInfo();
+        return items;
+    }
+
+    /**
+     * Method that returns Kitchen info on all food Items that are currently ordered
+     * @return List<OrderInfo> of all currently ordered food Items
+     */
+    public List<OrderInfo> getAllOrderedItemsForKitchen(){
+        List<OrderInfo> items=userDatabase.getKitchenOrderInfo();
         return items;
     }
 
 
-    public List<KitchenOrderInfo> getAllOrderedItemsForKitchen(){
-        List<KitchenOrderInfo> items=userDatabase.getKitchenOrderInfo();
-        return items;
-    }
-
-
-
-
-
-
+    /**
+     * Merhod that save's new Item and connect it to Ingredients
+     * @param item that is beeing saved to Database
+     * @return saved Item
+     */
     public Item saveNewItem(Item item) {
         Item item1 = getLatestSavedItemByName(item.getName());
         if (item1 != null) {
@@ -304,10 +346,19 @@ public class MenuService {
         }
     }
 
+    /**
+     * Method that returns all sections that are used in database
+     * @return List<String> of section names
+     */
     public List<String> getSections(){
         return userDatabase.getSections();
     }
 
+    /**
+     * Method that saves new Ingredient to database
+     * @param ingredient to be saved
+     * @return saved Ingredient
+     */
     public Ingredient saveNewIngredient(Ingredient ingredient){
         Ingredient ingredient1=getIngredientByNameAmountPrice(ingredient.getName(), ingredient.getAmount(), ingredient.getPrice());
         if(ingredient1!=null) {
@@ -324,18 +375,43 @@ public class MenuService {
         }
     }
 
+    /**
+     * Method get specific Ingredient from database with given parameters
+     * @param name of Ingredient
+     * @param amount of Ingredient
+     * @param price of Ingredient
+     * @return specific Ingredient
+     */
     public Ingredient getIngredientByNameAmountPrice(String name, Integer amount, Double price){
         return userDatabase.getIngredientByNameAmountPrice(name,amount,price);
     }
 
+    /**
+     * Method, that sets ordered items status to 'SEEN'
+     * @param orderId that holds this item
+     * @param itemId that is being modified
+     * @param timeOrdered time this item was ordered
+     */
     public void setKitchenStatusToSeen(Long orderId, Long itemId, LocalDateTime timeOrdered){
         userDatabase.setKitchenStatusToSeen(orderId, itemId, timeOrdered);
     }
 
+    /**
+     * Method, that sets ordered items status to 'READY'
+     * @param orderId that holds this item
+     * @param itemId that is being modified
+     * @param timeOrdered time this item was ordered
+     */
     public void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered){
         userDatabase.setKitchenStatusToReady(orderId, itemId, timeOrdered);
     }
 
+    /**
+     * Method, that sets ordered items status to 'BUMPED'
+     * @param orderId that holds this item
+     * @param itemId that is being modified
+     * @param timeOrdered time this item was ordered
+     */
     public void setKitchenStatusToBumped(Long orderId, Long itemId, LocalDateTime timeOrdered){
         userDatabase.setKitchenStatusToBumped(orderId,itemId,timeOrdered);
     }

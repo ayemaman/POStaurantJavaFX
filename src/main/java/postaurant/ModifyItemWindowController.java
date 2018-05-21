@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import postaurant.exception.InputValidationException;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
+import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import java.util.*;
@@ -21,7 +22,6 @@ import java.util.*;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ModifyItemWindowController {
-
 
     private int ingredientPage;
     private Item item;
@@ -136,7 +136,7 @@ public class ModifyItemWindowController {
 
         //FXCollections.copy(recipeList,originalRecipeList);
         itemNameLabel.textProperty().bind(item.getNameProperty());
-        ingredientButtonsAZ = buttonCreationService.createIngredientButtonsForSections(3);
+        ingredientButtonsAZ = buttonCreationService.createIngredientButtonsForSections();
         for (Map.Entry<String, List<Button>> entry : ingredientButtonsAZ.entrySet()) {
             for (Button b : entry.getValue()) {
                 b.setOnAction(event -> {

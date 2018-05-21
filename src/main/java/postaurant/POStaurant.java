@@ -10,14 +10,14 @@ import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
 
-@Configuration
+@SpringBootConfiguration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "postaurant")
 public class POStaurant extends Application{

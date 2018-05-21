@@ -1,3 +1,6 @@
+/**
+ * Service that works with "time" Strings
+ */
 package postaurant.service;
 
 import javafx.animation.KeyFrame;
@@ -6,18 +9,19 @@ import javafx.scene.control.TextField;
 import javafx.util.Duration;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.DateFormatter;
-import java.text.DateFormat;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+
 
 
 @Component
 public class TimeService {
 
-
+    /**
+     * Creates formatted String of present date and time
+     * @return formatted String of present date and time
+     */
     public String createTime() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -25,12 +29,21 @@ public class TimeService {
 
     }
 
+    /**
+     * Creates formatted String of present time
+     * @return formatted String of present time
+     */
     public String createTimeOnly(){
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return now.format(formatter);
     }
 
+    /**
+     * Creates formatted String of present date and time from a given LocalDateTime
+     * @param date to be formatted
+     * @return formatted String of present date and time
+     */
     public String createDateOnly(LocalDateTime date){
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         String buffer=date.format(formatter);
@@ -38,7 +51,11 @@ public class TimeService {
 
     }
 
-
+    /**
+     * Creates LocalDateTime of the next day from given "time" String
+     * @param string String that represents time
+     * @return LocalDateTime of the next day from given "time" String
+     */
     public LocalDateTime createNextDayLocalDateTimeFromString(String string){
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         LocalDateTime time=LocalDateTime.parse(string,formatter);
@@ -48,7 +65,10 @@ public class TimeService {
     }
 
 
-
+    /**
+     * Sets specified TextField text to current time
+     * @param textField that is being modified
+     */
     public void doTime(TextField textField){
         textField.setText(createTime());
         Timeline time=new Timeline();

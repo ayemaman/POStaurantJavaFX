@@ -1,3 +1,6 @@
+/**
+ * Service that is used to print text files
+ */
 package postaurant.service;
 
 import org.springframework.stereotype.Component;
@@ -11,6 +14,12 @@ import javax.print.event.PrintJobEvent;
 import java.io.*;
 @Component
 public class PrintTextFileService {
+    /**
+     * Creates a print document  from a given file and executes a printJob with this document .
+     * @param file to be printed
+     * @throws PrintException if printJob execution fails
+     * @throws IOException if file is missing
+     */
     public void printFileTest(File file)throws PrintException, IOException {
         PrintService service = PrintServiceLookup.lookupDefaultPrintService();
         FileInputStream in = new FileInputStream(file);
@@ -29,6 +38,10 @@ public class PrintTextFileService {
 
     }
 
+    /**
+     * Test Method for System view.
+     * Listens for printer jobs and reports progress
+     */
     private class PrintJobWatcher {
         boolean done = false;
         PrintJobWatcher(DocPrintJob job) {

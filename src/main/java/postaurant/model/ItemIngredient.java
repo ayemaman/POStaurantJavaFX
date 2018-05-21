@@ -1,3 +1,6 @@
+/**
+ * Class that represents item connection to ingredients
+ */
 package postaurant.model;
 
 public class ItemIngredient {

@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -18,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 
+import postaurant.database.UserDatabase;
 import postaurant.model.User;
 import postaurant.service.TimeService;
 
@@ -63,25 +63,26 @@ public class MainScreenController {
 
 
 
+
+
     private User user;
 
     @FXML private Button loginButton;
     @FXML private TextField timeField;
-    @FXML private BorderPane borderPane;
     @FXML private Button timeButton;
     @FXML private ImageView logoImg;
-    private final Integer startTime = 1;
-    private Integer seconds = startTime;
 
-    public MainScreenController(FXMLoaderService loaderService, TimeService timeService){
+    public MainScreenController(FXMLoaderService loaderService, TimeService timeService, UserDatabase userDatabase){
         this.loaderService = loaderService;
         this.timeService=timeService;
+
     }
 
     public void initialize() throws IOException {
         logoImg.setImage(new Image(logo.getURL().toExternalForm()));
         timeButton.setOnAction(e -> {
             try {
+
                 timeService.doTime(timeField);
             } catch (Exception e1) {
                 e1.printStackTrace();

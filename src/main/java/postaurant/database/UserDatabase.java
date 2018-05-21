@@ -1,10 +1,9 @@
 package postaurant.database;
 
+import postaurant.context.OrderInfo;
 import postaurant.model.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface UserDatabase {
@@ -19,12 +18,11 @@ public interface UserDatabase {
     void createNewOrder(Double tableNo, String dubId, LocalDateTime timeOpened,LocalDateTime lastTimeChecked);
     Order getLatestCreatedOrder(String dubId);
     void setCheckedByDub(Order order, LocalDateTime date);
-    List<KitchenOrderInfo> getKitchenOrderInfo();
-    List<KitchenOrderInfo> getQCOrderInfo();
-    List<KitchenOrderInfo> getBarOrderInfo();
-    List<KitchenOrderInfo> getQCBarOrderInfo();
+    List<OrderInfo> getKitchenOrderInfo();
+    List<OrderInfo> getQCOrderInfo();
+    List<OrderInfo> getBarOrderInfo();
+    List<OrderInfo> getQCBarOrderInfo();
     boolean openTableExists(String value);
-    List<String> retrieveItemsForSection(String section);
     List<User> retrieveAllActiveUsers();
     User saveNewUser(User user);
     void blockUser(User user);
@@ -32,13 +30,13 @@ public interface UserDatabase {
     List<Item> getFoodMenu();
     List<Item> getDrinkMenu();
     List<Item> getAllItems();
-    List<Item> getItemById(long itemID);
-    List<Item> getItemByName(String name);
+    Item getItemById(long itemID);
+    Item getItemByName(String name);
     List<Item> getCustomItemsByName(String name);
     void changeItemAvailability(Item item, Integer integer);
     List<Ingredient> getAllIngredients();
     Ingredient getIngredientById(long id);
-    List<Item> saveNewItem(Item item);
+    Item saveNewItem(Item item);
     void saveNewCustomItem(Item item);
     void setNewItem(Item item);
     List<String> getSections();
@@ -62,6 +60,8 @@ public interface UserDatabase {
     List<Payment> getDubReport(User user, String start, String end);
     List<Order> areAllTablesPaid(User user, String start, String end);
     List<Order> areAllTablesPaid(String start, String end);
+
+
 
 }
 

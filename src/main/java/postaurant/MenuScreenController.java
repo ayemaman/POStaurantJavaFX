@@ -135,6 +135,7 @@ public class MenuScreenController {
                 ItemInfoScreenController itemInfoScreenController = loader.getController();
                 itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(1));
                 itemInfoScreenController.setup(null);
+                itemInfoScreenController.setUser(user);
                 Scene scene = new Scene(parent);
                 scene.getStylesheets().add(css.getURL().toExternalForm());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -183,6 +184,7 @@ public class MenuScreenController {
                 Parent parent=loader.load();
                 ManagerScreenController managerScreenController=loader.getController();
                 managerScreenController.setUser(user);
+                System.out.println(user);
                 Scene scene=new Scene(parent);
                 scene.getStylesheets().addAll(css.getURL().toExternalForm());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -218,6 +220,7 @@ public class MenuScreenController {
                     itemInfoScreenController.setIngredientButtonList(buttonCreationService.createIngredientButtons(1));
                     Item item=menuService.getItemById(Long.parseLong(b.getText().substring(0, b.getText().indexOf("\n"))));
                     itemInfoScreenController.setup(item);
+                    itemInfoScreenController.setUser(user);
                     Scene scene = new Scene(parent);
                     scene.getStylesheets().add(css.getURL().toExternalForm());
                     Stage stage = (Stage) ((Node) event1.getSource()).getScene().getWindow();

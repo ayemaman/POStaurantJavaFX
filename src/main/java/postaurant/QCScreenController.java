@@ -23,7 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.context.QCBox;
-import postaurant.model.KitchenOrderInfo;
+import postaurant.context.OrderInfo;
 import postaurant.service.*;
 
 import javax.print.PrintException;
@@ -38,11 +38,11 @@ import java.util.List;
 public class QCScreenController {
 
     private List<QCBox> qcNodes;
-    private List<KitchenOrderInfo> kitchenOrderInfos;
+    private List<OrderInfo> orderInfos;
 
 
 
-    private ListView<KitchenOrderInfo> currentOrder;
+    private ListView<OrderInfo> currentOrder;
     private int page;
 
     @Value("/FXML/POStaurant.fxml")
@@ -97,7 +97,7 @@ public class QCScreenController {
     public void initialize() {
         page = 0;
         qcNodes = buttonCreationService.createQCNodes(false);
-        kitchenOrderInfos = menuService.getAllOrderedItemsForQC();
+        orderInfos = menuService.getAllOrderedItemsForQC();
         for (VBox v : qcNodes) {
             System.out.println(v);
         }
@@ -138,7 +138,7 @@ public class QCScreenController {
                     ioE.printStackTrace();
                 }
             } else {
-                for (KitchenOrderInfo k : currentOrder.getItems()) {
+                for (OrderInfo k : currentOrder.getItems()) {
                     if (!k.getItem().getKitchenStatus().equals("READY")) {
                         allReady = false;
                     }
@@ -161,9 +161,9 @@ public class QCScreenController {
                     }
                 } else {
                     orderService.createQCBump(currentOrder.getItems());
-                    for (KitchenOrderInfo k : currentOrder.getItems()) {
+                    for (OrderInfo k : currentOrder.getItems()) {
                         menuService.setKitchenStatusToBumped(k.getOrderId(), k.getItem().getId(), k.getItem().getDateOrdered());
-                        kitchenOrderInfos.remove(k);
+                        orderInfos.remove(k);
                     }
                     qcNodes = buttonCreationService.createQCNodes(false);
                     styleQCVBoxes();
@@ -195,20 +195,20 @@ public class QCScreenController {
         });
 
         refreshButton.setOnAction(e->{
-            List<KitchenOrderInfo> buffer=menuService.getAllOrderedItemsForQC();
+            List<OrderInfo> buffer=menuService.getAllOrderedItemsForQC();
             boolean equal=true;
-            if(kitchenOrderInfos.size()!=buffer.size()){
+            if(orderInfos.size()!=buffer.size()){
                 equal=false;
             }else {
-                for (int i = 0; i < kitchenOrderInfos.size(); i++) {
-                    if (!kitchenOrderInfos.get(i).getItem().getKitchenStatus().equals(buffer.get(i).getItem().getKitchenStatus())) {
+                for (int i = 0; i < orderInfos.size(); i++) {
+                    if (!orderInfos.get(i).getItem().getKitchenStatus().equals(buffer.get(i).getItem().getKitchenStatus())) {
                         equal = false;
                     }
                 }
             }
             if(!equal){
                 System.out.println("SETTING ITEMS");
-                kitchenOrderInfos=buffer;
+                orderInfos =buffer;
                 qcNodes=buttonCreationService.createQCNodes(false);
                 page--;
                 setQCNodes(gridPane,10,true,qcNodes);
@@ -243,7 +243,7 @@ public class QCScreenController {
 
     private void styleQCVBoxes(){
         for(QCBox q:qcNodes){
-            ListView<KitchenOrderInfo> bufferList =(ListView<KitchenOrderInfo>) q.getChildren().get(1);
+            ListView<OrderInfo> bufferList =(ListView<OrderInfo>) q.getChildren().get(1);
             q.setOnMouseClicked(e->{
                 currentOrder=bufferList;
                 for(QCBox q2:qcNodes){

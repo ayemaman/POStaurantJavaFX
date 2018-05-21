@@ -1,3 +1,6 @@
+/**
+ * Class that represents order connection to items
+ */
 package postaurant.model;
 
 

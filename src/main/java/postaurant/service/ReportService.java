@@ -1,3 +1,7 @@
+/**
+ * Service that works with database data related to Payments
+ * @see postaurant.model.Payment
+ */
 package postaurant.service;
 
 import org.springframework.stereotype.Component;
@@ -22,6 +26,12 @@ public class ReportService {
         this.printTextFileService = printTextFileService;
     }
 
+    /**
+     * Get total sales for given period of time for all users
+     * @param start date
+     * @param end date
+     * @return 0.00 if no sales exist on those dates, or TOTAL of all sales for this period
+     */
     public Double getTotalSales(String start, String end) {
         Double buffer = userDatabase.getTotalSoldSQL(start, end);
         if (buffer == null) {
@@ -31,6 +41,13 @@ public class ReportService {
         }
     }
 
+    /**
+     * Get total sales dor given period of time for specific user
+     * @param user who generates report
+     * @param start date
+     * @param end date
+     * @return 0.00 if no sales exist on those dates, or TOTAL of all sales for this period and user
+     */
     public Double getTotalSales(User user,String start, String end){
         Double buffer= userDatabase.getDubTotalSold(user,start,end);
         if(buffer==null){
@@ -40,13 +57,29 @@ public class ReportService {
         }
     }
 
+    /**
+     * Get's list of payments for specific user and date
+     * @param user who holds payments
+     * @param date when payments were made
+     * @return list of Payments for this date and user
+     */
     public List<Payment> getReport(User user, String date){
             return userDatabase.getDubReport(user,date,(timeService.createDateOnly(timeService.createNextDayLocalDateTimeFromString(date))) );
     }
+
+    /**
+     * Get's list of payments for specific date for all users
+     * @param date when payments were made
+     * @return list of Payments for this date
+     */
     public List<Payment> getDayReport(String date){
         return userDatabase.getDayReport(date,(timeService.createDateOnly(timeService.createNextDayLocalDateTimeFromString(date))));
     }
 
+    /**
+     * Generetes and prints .txt file with information on Sales/payments for full day for all users
+     * @param date for which report is generated
+     */
     public void createFullReport(String date){
         try{
             List<Payment> paymentList=getDayReport(date);
@@ -122,7 +155,11 @@ public class ReportService {
         }
     }
 
-
+    /**
+     * Generetes and prints .txt file with information on Sales/payments for full day for specific user
+     * @param user who generates report
+     * @param date for which report is generated
+     */
     public void createDubReport(User user,String date){
         try{
             List<Payment> paymentList=getReport(user,date);

@@ -1,15 +1,17 @@
+/**
+ * Service, that works with database data related to Orders
+ * @see postaurant.model.Order
+ */
 package postaurant.service;
 
-import org.mockito.internal.matchers.Or;
 import org.springframework.stereotype.Component;
-import postaurant.context.QCBox;
+import postaurant.context.OrderInfo;
 import postaurant.database.UserDatabase;
 import postaurant.model.*;
 
 import javax.print.PrintException;
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,49 +27,89 @@ public class OrderService {
         this.printTextFileService = printTextFileService;
     }
 
+    /**
+     * Verifies if specified table number is occupied at the moment
+     * @param value table number
+     * @return true if table is occupied, false if not.
+     */
     public boolean tableExists(String value) {
         return userDatabase.openTableExists(value);
     }
 
-    public List<String> getItemsForSection(String section) {
-        return userDatabase.retrieveItemsForSection(section);
-    }
 
+    /**
+     * Saves new order/order updates to database
+     * @param orderId orders id that is being modified
+     * @param newOrderItems new food/drink items for that order
+     */
     public void sendOrder(Long orderId, List<Map.Entry<Item, Integer>> newOrderItems) {
         for (Map.Entry<Item, Integer> entry : newOrderItems) {
             entry.getKey().setDateOrdered(LocalDateTime.now());
             userDatabase.addItemToOrder(orderId, entry.getKey().getId(), entry.getValue());
         }
     }
+
+    /**
+     * Removes item from order in database
+     * @param orderId orders id that holds removable item
+     * @param itemId item id to be removed
+     * @param qty item qty specific to that item
+     */
     public void voidItemFromOrder(Long orderId, Long itemId, Integer qty){
         userDatabase.voidItemFromOrder(orderId,itemId,qty);
     }
 
+    /**
+     * Updates orders last_time_checked to present time
+     * @param order order to be updated
+     */
     public void setCheckedByDub(Order order) {
         userDatabase.setCheckedByDub(order, LocalDateTime.now());
     }
 
+    /**
+     * Adds new Order to database
+     * @param tableNo orders table number
+     * @param dubId servers id
+     * @param timeOpened time table was open
+     * @param lastTimeChecked time table was last checked
+     */
     public void createNewOrder(Double tableNo, String dubId, LocalDateTime timeOpened, LocalDateTime lastTimeChecked) {
         userDatabase.createNewOrder(tableNo, dubId, timeOpened, lastTimeChecked);
     }
 
+    /**
+     * Retrieves newly saved order (to get access to automatically generated order ID)
+     * @param dubId servers id
+     * @return last saved Order
+     */
     public Order getLatestSavedOrder(String dubId) {
         return userDatabase.getLatestCreatedOrder(dubId);
 
     }
 
+    /**
+     * "CLOSES" table in database. Sets order status to "PAID" and TIME_CLOSED to present time
+     * @param orderID order that is being modified
+     * @param user server that modifies order
+     */
     public void setClosed(Long orderID,User user) {
         userDatabase.setTableStatusToClosed(orderID,user);
     }
 
-    public void createQCBump(List<KitchenOrderInfo> list){
+    /**
+     * Generates and prints .txt file, with information on QC order info
+     * @param list that holds OrderInfos to be printed
+     * @see PrintTextFileService
+     */
+    public void createQCBump(List<OrderInfo> list){
         try{
             PrintWriter out = new PrintWriter("./checks/qcCheck.txt");
             out.println("DATE: "+timeService.createTime());
             out.println("TABLE NO: "+list.get(0).getTableNo());
             out.println("Item name\t\t  Item Qty ");
             out.println("-------------------------------------");
-            for(KitchenOrderInfo k:list){
+            for(OrderInfo k:list){
                 StringBuilder name;
                 if(k.getItem().getName().length()>15){
                     name = new StringBuilder(k.getItem().getName().substring(0, 14));
@@ -97,6 +139,12 @@ public class OrderService {
         }
     }
 
+    /**
+     * Generates and prints .txt file, with information on order with prices("Pre-Check")
+     * @param list of items that were ordered
+     * @param order Order that is being printed
+     * @param user server printing the Pre-Check
+     */
     public void createPreCheck(List<Map.Entry<Item,Integer>> list, Order order, User user){
         try {
             PrintWriter out = new PrintWriter("./checks/precheck.txt");
@@ -151,7 +199,12 @@ public class OrderService {
     }
 
 
-
+    /**
+     * Generates and prints payment receipt for order that was just paid
+     * @param paymentList list, that holds all Payments for this order
+     * @param order that holds info
+     * @param user server of this order
+     */
     public void createReceipt(List<Payment> paymentList, Order order, User user) {
         try {
             PrintWriter out = new PrintWriter( "./checks/receipt.txt");
@@ -223,6 +276,12 @@ public class OrderService {
 
     }
 
+    /**
+     * Checks if all orders for this user and date are set to status "PAID"
+     * @param user server who holds orders
+     * @param date date to be checked for
+     * @return true= if all paid, false= if not all paid
+     */
     public boolean areAllTablesPaid(User user, String date){
         List<Order> list=userDatabase.areAllTablesPaid(user,date,timeService.createDateOnly(timeService.createNextDayLocalDateTimeFromString(date)));
         if(list.isEmpty()){
@@ -231,6 +290,12 @@ public class OrderService {
             return false;
         }
     }
+
+    /**
+     * Checks if all orders for this date for all users are set to status "PAID"
+     * @param date date to be checked for
+     * @return if all paid, false= if not all paid
+     */
     public boolean areAllTablesPaid(String date){
         List<Order> list=userDatabase.areAllTablesPaid(date,timeService.createDateOnly(timeService.createNextDayLocalDateTimeFromString(date)));
         if(list.isEmpty()){
@@ -239,4 +304,35 @@ public class OrderService {
             return false;
         }
     }
+    /**
+     * Retrieves all Orders that are not set to status "PAID" and are served by this user
+     * @param user who is in charge of orders
+     * @return List<Order> that holds all orders that are not "PAID" and are served by this user
+     */
+    public List<Order> getUserOrders(User user){
+        return userDatabase.getUserOrders(user);
+    }
+
+    /**
+     * Retrieves all Orders that are not set to status "PAID" and are not served by this user
+     * @param user who is not in charge of orders
+     * @return List<Order> that holds all orders that are not "PAID" and are not served by this user
+     */
+    public List<Order> getTransferableOrders(User user){
+        return userDatabase.getTransferableOrders(user);
+    }
+
+    /**
+     * Retrieves all Orders that are not set to status "PAID"
+     * @return List<Order> that holds all orders that are not set to status "PAID"
+     */
+    public List<Order> getAllOpenOrders(){return userDatabase.getAllOpenOrders();}
+
+    /**
+     * Sets specified order dub_id to specified user id
+     * @param orderId of order to be transferred
+     * @param user -> new owner of order
+     */
+    public void transferTable(Long orderId, User user){ userDatabase.transferTable(orderId,user);}
+
 }
