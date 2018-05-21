@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -16,13 +18,13 @@ import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 
 import postaurant.model.Ingredient;
-import postaurant.model.Item;
 import postaurant.model.ItemIngredientTreeCellValues;
 import postaurant.model.KitchenOrderInfo;
 import postaurant.service.MenuService;
+import postaurant.service.TimeService;
+
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,21 +33,31 @@ import java.util.stream.Collectors;
 @Component
 public class KitchenScreenController {
 
+    private Thread databaseInfoPulling;
+
     private List<KitchenOrderInfo> itemList;
     private List<KitchenOrderInfo> fryList;
     private List<KitchenOrderInfo> grillList;
     private List<KitchenOrderInfo> sauteList;
     private List<KitchenOrderInfo> dessertList;
 
-    private Tab currenTab;
+    private Tab currentTab;
     private TreeView<ItemIngredientTreeCellValues> currentTreeView;
     private List<KitchenOrderInfo> currentList;
+    private TreeItem<ItemIngredientTreeCellValues> fryRoot;
+    private TreeItem<ItemIngredientTreeCellValues> grillRoot;
+    private TreeItem<ItemIngredientTreeCellValues> sauteRoot;
+    TreeItem<ItemIngredientTreeCellValues> dessertsRoot;
 
     private final FXMLoaderService fxmLoaderService;
     private final MenuService menuService;
+    private final TimeService timeService;
 
     @Value("FXML/POStaurant.fxml")
     private Resource postaurantScreen;
+
+    @Value("img/logo.png")
+    private Resource logo;
 
 
 
@@ -70,31 +82,55 @@ public class KitchenScreenController {
     private TreeView<ItemIngredientTreeCellValues> dessertsTreeView;
 
     @FXML
+    private TextField timeTextField;
+
+    @FXML
     private Button seenButton;
     @FXML
     private Button bumpButton;
     @FXML
     private Button exitButton;
+    @FXML
+    private Button timeButton;
+
+    @FXML
+    private ImageView logoImage;
 
 
 
 
-    public KitchenScreenController(FXMLoaderService fxmLoaderService, MenuService menuService){
+    public KitchenScreenController(FXMLoaderService fxmLoaderService, MenuService menuService,TimeService timeService){
         this.fxmLoaderService=fxmLoaderService;
         this.menuService=menuService;
+        this.timeService=timeService;
     }
 
 
-    public void initialize(){
+    public void initialize() throws IOException {
+        logoImage.setImage(new Image(logo.getURL().toExternalForm()));
+        itemList = menuService.getAllOrderedItemsForKitchen();
+        currentTreeView=fryTreeView;
+        currentList=fryList;
+        currentTab=fryTab;
+        setupTVCellFactory(fryTreeView);
+        setupTVCellFactory(sauteTreeView);
+        setupTVCellFactory(grillTreeView);
+        setupTVCellFactory(dessertsTreeView);
+        setTreeViewRoot();
+        timeButton.setOnAction(e->{
+           timeService.doTime(timeTextField);
+        });
 
         exitButton.setOnAction(e->{
             try {
                 FXMLLoader loader=fxmLoaderService.getLoader(postaurantScreen.getURL());
                 Parent parent=loader.load();
                 Scene scene=new Scene(parent);
+                scene.getStylesheets().add("POStaurant.css");
                 Stage stage=(Stage)((Node)e.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
+                databaseInfoPulling.interrupt();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -107,9 +143,8 @@ public class KitchenScreenController {
                 ItemIngredientTreeCellValues cellValue = treeItem.getValue();
                 menuService.setKitchenStatusToReady(cellValue.getOrderId(), cellValue.getItemId(), cellValue.getDateOrdered());
                 itemList = menuService.getAllOrderedItemsForKitchen();
-                filterItemLists();
-                Tab tab = getCurrenTab();
-                switch (tab.getText()) {
+                filterItemLists(itemList);
+                switch (getCurrentTab().getText()) {
                     case "FRY":
                         currentList = fryList;
                         break;
@@ -123,9 +158,9 @@ public class KitchenScreenController {
                         currentList = sauteList;
                         break;
                 }
-                setupCurrentTableView();
-                setTreeView(currentList, currentTreeView);
+                currentTreeView.getRoot().getChildren().remove(treeItem);
                 currentTreeView.refresh();
+
             }
         });
 
@@ -134,150 +169,254 @@ public class KitchenScreenController {
             TreeItem<ItemIngredientTreeCellValues> treeItem=i.get(0);
             if(treeItem!=null) {
                 ItemIngredientTreeCellValues cellValue = treeItem.getValue();
-                menuService.setKitchenStatusToSeen(cellValue.getOrderId(), cellValue.getItemId(), cellValue.getDateOrdered());
-                itemList = menuService.getAllOrderedItemsForKitchen();
-                filterItemLists();
-                Tab tab = getCurrenTab();
-                switch (tab.getText()) {
-                    case "FRY":
-                        currentList = fryList;
-                        break;
-                    case "GRILL":
-                        currentList = grillList;
-                        break;
-                    case "DESSERTS":
-                        currentList = dessertList;
-                        break;
-                    case "PLATE/SAUTE":
-                        currentList = sauteList;
-                        break;
+                if (!cellValue.getStatus().equals("SEEN")) {
+                    menuService.setKitchenStatusToSeen(cellValue.getOrderId(), cellValue.getItemId(), cellValue.getDateOrdered());
+
+                    itemList = menuService.getAllOrderedItemsForKitchen();
+                    filterItemLists(itemList);
+
+                    Tab tab = getCurrentTab();
+                    switch (tab.getText()) {
+                        case "FRY":
+                            currentList = fryList;
+                            break;
+                        case "GRILL":
+                            currentList = grillList;
+                            break;
+                        case "DESSERTS":
+                            currentList = dessertList;
+                            break;
+                        case "PLATE/SAUTE":
+                            currentList = sauteList;
+                            break;
+                    }
+                    cellValue.setStatus("SEEN");
+                    currentTreeView.refresh();
                 }
-                setupCurrentTableView();
-                setTreeView(currentList, currentTreeView);
-                currentTreeView.refresh();
             }
 
 
         });
 
-
-
-
             fryTab.setOnSelectionChanged(e -> {
-                currenTab = (Tab) e.getSource();
+                currentTab = (Tab) e.getSource();
                 currentList = fryList;
                 currentTreeView = fryTreeView;
-               setupCurrentTableView();
-                if (!currentList.isEmpty()) {
-                    setTreeView(currentList, currentTreeView);
-                }
+              // setupCurrentTableView();
+
             });
             grillTab.setOnSelectionChanged(e -> {
-                currenTab = (Tab) e.getSource();
+                currentTab = (Tab) e.getSource();
                 currentList = grillList;
                 currentTreeView = grillTreeView;
-                setupCurrentTableView();
-                if (!currentList.isEmpty()) {
-                    setTreeView(currentList, currentTreeView);
-                }
+               // setupCurrentTableView();
+
             });
             sauteTab.setOnSelectionChanged(e -> {
-                currenTab = (Tab) e.getSource();
+                currentTab = (Tab) e.getSource();
                 currentList = sauteList;
                 currentTreeView = sauteTreeView;
-                setupCurrentTableView();
-                if (!currentList.isEmpty()) {
-                    setTreeView(currentList, currentTreeView);
-                }
+              //  setupCurrentTableView();
+
             });
             dessertsTab.setOnSelectionChanged(e -> {
-                currenTab = (Tab) e.getSource();
+                currentTab = (Tab) e.getSource();
                 currentList = dessertList;
                 currentTreeView = dessertsTreeView;
-                setupCurrentTableView();
-                if (!currentList.isEmpty()) {
-                    setTreeView(currentList, currentTreeView);
-                }
+               // setupCurrentTableView();
+
             });
+
+        Runnable pullingFromDB = () -> {
+            boolean run=true;
+            while (run) {
+                try {
+                    List<KitchenOrderInfo> buffer = menuService.getAllOrderedItemsForKitchen();
+                        if (!itemList.equals(buffer)) {
+                            System.out.println("Updating");
+                            switch (getCurrentTab().getText()) {
+                                case "FRY":
+                                    currentList = fryList;
+                                    break;
+                                case "GRILL":
+                                    currentList = grillList;
+                                    break;
+                                case "DESSERTS":
+                                    currentList = dessertList;
+                                    break;
+                                case "PLATE/SAUTE":
+                                    currentList = sauteList;
+                                    break;
+                            }
+
+
+                            itemList = buffer;
+                            addNewItemsToTreeViewRoots();
+
+                        }
+                        Thread.sleep(10000);
+
+
+                } catch (InterruptedException e) {
+                    run=false;
+                }
+            }
+
+        };
+        databaseInfoPulling = new Thread(pullingFromDB);
+        databaseInfoPulling.setDaemon(true);
+        databaseInfoPulling.start();
+
     }
 
-    public void setup(){
-        itemList = menuService.getAllOrderedItemsForKitchen();
-        filterItemLists();
-        currenTab = fryTab;
-        currentList = fryList;
-        currentTreeView = fryTreeView;
-        setupCurrentTableView();
-        setTreeView(currentList, currentTreeView);
 
-    }
 
-    public void setupCurrentTableView(){
-        currentTreeView.setCellFactory(tv -> {
+    //Method to set a custom tree cell factory to a TreeView
+    public void setupTVCellFactory(TreeView<ItemIngredientTreeCellValues> treeV){
+        treeV.setCellFactory(tv -> {
             TreeCell<ItemIngredientTreeCellValues> cell = new TreeCell<>();
             cell.itemProperty().addListener((obs, oldItem, newItem) -> {
                 if (newItem == null) {
                     cell.setText(null);
-                    cell.setStyle("-fx-background-color:grey");
+                    cell.setId("");
                 } else {
                     cell.setText(newItem.toString());
+                    cell.setId("KTreeCell");
                     if (newItem.isItem()) {
                         if(newItem.getStatus().equals("SEEN")) {
-                            cell.setStyle("-fx-background-color:green");
-
+                            cell.setId("KTreeCellSeen");
                         }else{
                             if (newItem.getName().matches("^CUSTOM.*")) {
-                                cell.setStyle("-fx-background-color:red");
-                            } else {
-                                cell.setStyle("-fx-background-color:grey");
+                                cell.setId("KTreeCellCustom");
                             }
                         }
-                    } else {
-                        cell.setStyle("-fx-background-color:grey");
                     }
                 }
+
             });
             return cell;
+
         });
 
     }
+    //Method, that sets Items for each station screen
 
-    public void setTreeView(List<KitchenOrderInfo> list,TreeView<ItemIngredientTreeCellValues> treeView)
-    {
-        treeView.setOnEditCommit(tv-> tv.getSource().refresh());
-        TreeItem<ItemIngredientTreeCellValues> root=new TreeItem<>();
+    public void setTreeViewRoot() {
+        grillRoot = new TreeItem<>();
+        grillTreeView.setRoot(grillRoot);
+        grillTreeView.setShowRoot(false);
 
-        for(KitchenOrderInfo k:list){
-            ItemIngredientTreeCellValues cell=new ItemIngredientTreeCellValues(k.getOrderId(),k.getItem().getId(),k.getTableNo(),k.getItem().getName(),true,k.getQty(),k.getItem().getDateOrdered(),k.getItem().getKitchenStatus());
+        fryRoot = new TreeItem<>();
+        fryTreeView.setRoot(fryRoot);
+        fryTreeView.setShowRoot(false);
 
-            TreeItem<ItemIngredientTreeCellValues> itemRoot= makeBranch(cell,root);
-            for(Map.Entry<Ingredient,Integer> entry:k.getItem().getRecipe().entrySet()){
-                ItemIngredientTreeCellValues ingredientCell=new ItemIngredientTreeCellValues(k.getOrderId(),k.getItem().getId(),k.getTableNo(),entry.getKey().getName(),false,entry.getValue(),k.getItem().getDateOrdered(),k.getItem().getKitchenStatus());
+        dessertsRoot = new TreeItem<>();
+        dessertsTreeView.setRoot(dessertsRoot);
+        dessertsTreeView.setShowRoot(false);
 
-                makeBranch(ingredientCell,itemRoot);
+        sauteRoot = new TreeItem<>();
+        sauteTreeView.setRoot(sauteRoot);
+        sauteTreeView.setShowRoot(false);
+
+        filterItemLists(itemList);
+
+        for (KitchenOrderInfo k : fryList) {
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, fryRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
             }
         }
-        treeView.setRoot(root);
-        treeView.setShowRoot(false);
-        treeView.refresh();
+
+        for (KitchenOrderInfo k : grillList) {
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, grillRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+
+        for(KitchenOrderInfo k:sauteList){
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, grillRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+
+        for(KitchenOrderInfo k:dessertList){
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, grillRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+
+
     }
 
-    private void filterItemLists(){
-        fryList = itemList.stream().filter(k-> k.getItem().getStation().equals("FRY")).collect(Collectors.toList());
-        grillList=itemList.stream().filter(k-> k.getItem().getStation().equals("GRILL")).collect(Collectors.toList());
-        dessertList=itemList.stream().filter(k-> k.getItem().getStation().equals("DESSERTS")).collect(Collectors.toList());
-        sauteList=itemList.stream().filter(k-> k.getItem().getStation().equals("SAUTE")).collect(Collectors.toList());
+    public void addNewItemsToTreeViewRoots(){
+        filterItemLists(itemList);
+        for( int i=fryRoot.getChildren().size();i<fryList.size();i++){
+            KitchenOrderInfo k = fryList.get(i);
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, fryRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+        for( int i=grillRoot.getChildren().size();i<grillList.size();i++){
+            KitchenOrderInfo k = grillList.get(i);
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, grillRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+        for (int i=sauteRoot.getChildren().size();i<sauteList.size();i++){
+            KitchenOrderInfo k = sauteList.get(i);
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, sauteRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+        for(int i=dessertsRoot.getChildren().size();i<dessertList.size();i++){
+            KitchenOrderInfo k = dessertList.get(i);
+            ItemIngredientTreeCellValues cell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), k.getItem().getName(), true, k.getQty(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+            TreeItem<ItemIngredientTreeCellValues> itemRoot = makeBranch(cell, dessertsRoot);
+            for (Map.Entry<Ingredient, Integer> entry : k.getItem().getRecipe().entrySet()) {
+                ItemIngredientTreeCellValues ingredientCell = new ItemIngredientTreeCellValues(k.getOrderId(), k.getItem().getId(), k.getTableNo(), entry.getKey().getName(), false, entry.getValue(), k.getItem().getDateOrdered(), k.getItem().getKitchenStatus());
+                makeBranch(ingredientCell, itemRoot);
+            }
+        }
+
+    }
+
+
+    private void filterItemLists(List<KitchenOrderInfo> list){
+        fryList = list.stream().filter(k-> k.getItem().getStation().equals("FRY")).collect(Collectors.toList());
+        grillList=list.stream().filter(k-> k.getItem().getStation().equals("GRILL")).collect(Collectors.toList());
+        dessertList=list.stream().filter(k-> k.getItem().getStation().equals("DESSERTS")).collect(Collectors.toList());
+        sauteList=list.stream().filter(k-> k.getItem().getStation().equals("SAUTE")).collect(Collectors.toList());
 
     }
 
     private TreeItem<ItemIngredientTreeCellValues> makeBranch(ItemIngredientTreeCellValues cellValue, TreeItem<ItemIngredientTreeCellValues> parent){
         TreeItem<ItemIngredientTreeCellValues> treeItem= new TreeItem<>(cellValue);
-        treeItem.setExpanded(false);
         parent.getChildren().add(treeItem);
         return treeItem;
     }
 
-    public Tab getCurrenTab() {
-        return currenTab;
+    public Tab getCurrentTab() {
+        return currentTab;
     }
+
 }

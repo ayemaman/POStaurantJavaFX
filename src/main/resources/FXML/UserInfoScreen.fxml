@@ -16,7 +16,7 @@
                <children>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="ID:" textFill="RED">
+                        <Label text="ID:">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin></Label>
@@ -28,7 +28,7 @@
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="Name:" textFill="RED">
+                        <Label text="Name:">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin></Label>
@@ -39,7 +39,7 @@
                      </children></HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="Surname:" textFill="RED">
+                        <Label text="Surname:">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin></Label>
@@ -47,7 +47,7 @@
                      </children></HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="Position:" textFill="RED">
+                        <Label text="Position:">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin></Label>

@@ -7,6 +7,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -15,9 +17,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
+
 import postaurant.model.User;
 import postaurant.service.TimeService;
-import postaurant.serviceWindowsControllers.ErrorWindowController;
+
+import java.io.IOException;
 
 
 @Component
@@ -42,10 +46,20 @@ public class MainScreenController {
     @Value("/FXML/QCScreen.fxml")
     private Resource qcScreen;
 
+    @Value("/FXML/BarScreen.fxml")
+    private Resource barScreen;
+
+    @Value("/FXML/BarQCScreen.fxml")
+    private Resource barQCScreen;
+
+    @Value("img/logo.png")
+    private Resource logo;
+
 
 
     private final FXMLoaderService loaderService;
     private final TimeService timeService;
+
 
 
 
@@ -55,16 +69,17 @@ public class MainScreenController {
     @FXML private TextField timeField;
     @FXML private BorderPane borderPane;
     @FXML private Button timeButton;
+    @FXML private ImageView logoImg;
     private final Integer startTime = 1;
     private Integer seconds = startTime;
 
-    public MainScreenController(FXMLoaderService loaderService,TimeService timeService){
+    public MainScreenController(FXMLoaderService loaderService, TimeService timeService){
         this.loaderService = loaderService;
         this.timeService=timeService;
-
     }
 
-    public void initialize() {
+    public void initialize() throws IOException {
+        logoImg.setImage(new Image(logo.getURL().toExternalForm()));
         timeButton.setOnAction(e -> {
             try {
                 timeService.doTime(timeField);
@@ -94,6 +109,8 @@ public class MainScreenController {
                             if (user.getPosition().equals("MANAGER")) {
                                 loader = loaderService.getLoader(managerForm.getURL());
                                 Parent parent = loader.load();
+                                ManagerScreenController managerScreenController=loader.getController();
+                                managerScreenController.setUser(user);
                                 scene = new Scene(parent);
                                 scene.getStylesheets().add("POStaurant.css");
                                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -102,14 +119,11 @@ public class MainScreenController {
                             }else if(user.getPosition().equals("KITCHEN")){
                                 loader =loaderService.getLoader(kitchenForm.getURL());
                                 Parent parent = loader.load();
-                                KitchenScreenController kitchenScreenController=loader.getController();
-                                kitchenScreenController.setup();
                                 scene = new Scene(parent);
                                 scene.getStylesheets().add("POStaurant.css");
                                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                                 stage.setScene(scene);
                                 stage.show();
-
                             }
                             else if(user.getPosition().equals("FOODRUNNER")){
                                 loader =loaderService.getLoader(qcScreen.getURL());
@@ -119,6 +133,23 @@ public class MainScreenController {
                                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                                 stage.setScene(scene);
                                 stage.show();
+                            }else if(user.getPosition().equals("BAR")){
+                                loader=loaderService.getLoader(barScreen.getURL());
+                                Parent parent=loader.load();
+                                scene= new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage =(Stage)((Node)e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+                            }else if(user.getPosition().equals("DRINKRUNNER")){
+                                loader=loaderService.getLoader(barQCScreen.getURL());
+                                Parent parent=loader.load();
+                                scene= new Scene(parent);
+                                scene.getStylesheets().add("POStaurant.css");
+                                stage =(Stage)((Node)e.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+
                             }
                             else {
                                 loader = loaderService.getLoader(dubScreenForm.getURL());

@@ -20,12 +20,12 @@
                </VBox.margin></Label>
             <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <ToggleButton fx:id="testButton" mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="CELERIAC">
+                  <ToggleButton fx:id="testButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="CELERIAC">
                      <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="CRUSTACEANS">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="CRUSTACEANS">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -33,12 +33,12 @@
                         <Font size="11.0" />
                      </font>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="EGGS">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="EGGS">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="FISH">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="FISH">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -47,22 +47,22 @@
             </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="GLUTEN">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="GLUTEN">
                      <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="LUPIN">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="LUPIN">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="LACTOSE">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="LACTOSE">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="MOLLUSKS">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="MOLLUSKS">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -71,22 +71,22 @@
             </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="MUSTARD">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="MUSTARD">
                      <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="NUTS">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="NUTS">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SESAME SEEDS">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SESAME SEEDS">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </ToggleButton>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SOYA">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SOYA">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -95,7 +95,7 @@
             </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleAllergyButtons" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SULPHITES">
+                  <ToggleButton mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" styleClass="AllergyToggleButton" text="SULPHITES">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>

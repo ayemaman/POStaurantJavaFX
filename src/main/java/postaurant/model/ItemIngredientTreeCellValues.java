@@ -1,16 +1,10 @@
 package postaurant.model;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+
 public class ItemIngredientTreeCellValues {
     private Long orderId;
     private Long itemId;

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-border-color: yellow;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.NewPaymentController">
+   <children>
+      <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="450.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label prefHeight="25.0" text="AMOUNT:">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="PAYMENT TYPE:">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="Name:">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="Card:">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="Type:">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="Exp:">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="25.0" text="Bank:">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin></Label>
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </VBox>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="200.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TextField fx:id="amountField" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="350.0" promptText="0.00">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <ChoiceBox fx:id="typeBox" prefHeight="25.0" prefWidth="350.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </ChoiceBox>
+            <TextField fx:id="nameField" disable="true" maxWidth="-Infinity" prefHeight="25.0" prefWidth="350.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </TextField>
+            <TextField fx:id="cardField" disable="true" maxWidth="-Infinity" prefHeight="25.0" prefWidth="350.0" promptText="XXXX XXXX XXXX XXXX">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </TextField>
+            <ChoiceBox fx:id="cardTypeField" disable="true" maxWidth="-Infinity" prefHeight="25.0" prefWidth="350.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </ChoiceBox>
+            <TextField fx:id="expField" disable="true" maxWidth="-Infinity" prefHeight="25.0" prefWidth="350.0" promptText="XX/XX">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </TextField>
+            <TextField fx:id="bankField" disable="true" maxWidth="-Infinity" prefHeight="25.0" prefWidth="350.0" />
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="250.0">
+         <children>
+            <GridPane fx:id="keyboardGrid" alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="160.0" prefWidth="600.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="60.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+            </GridPane>
+            <HBox fx:id="spacebarHBox" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" />
+         </children>
+      </VBox>
+      <Button fx:id="addButton" mnemonicParsing="false" prefHeight="90.0" prefWidth="90.0" text="ADD" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+      <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="90.0" prefWidth="90.0" text="EXIT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0" />
+   </children>
+</AnchorPane>

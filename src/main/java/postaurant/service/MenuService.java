@@ -251,6 +251,16 @@ public class MenuService {
         return getItemById(itemSaved.getId());
     }
 
+    public List<KitchenOrderInfo> getAllOrderItemsForBarQC(){
+        List<KitchenOrderInfo> items=userDatabase.getQCBarOrderInfo();
+        return items;
+    }
+
+    public List<KitchenOrderInfo> getAllOrderedItemsForBar(){
+        List<KitchenOrderInfo> items=userDatabase.getBarOrderInfo();
+        return items;
+    }
+
     public List<KitchenOrderInfo> getAllOrderedItemsForQC(){
         List<KitchenOrderInfo> items=userDatabase.getQCOrderInfo();
         return items;
@@ -324,5 +334,9 @@ public class MenuService {
 
     public void setKitchenStatusToReady(Long orderId, Long itemId, LocalDateTime timeOrdered){
         userDatabase.setKitchenStatusToReady(orderId, itemId, timeOrdered);
+    }
+
+    public void setKitchenStatusToBumped(Long orderId, Long itemId, LocalDateTime timeOrdered){
+        userDatabase.setKitchenStatusToBumped(orderId,itemId,timeOrdered);
     }
 }

@@ -8,8 +8,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -36,13 +40,25 @@ public class TransferTableController {
     private final ButtonCreationService buttonCreationService;
     private final TimeService timeService;
 
+    @Value("/FXML/POStaurant.fxml")
+    private Resource mainScreenForm;
     @Value("/FXML/DubScreen.fxml")
     private Resource dubScreen;
+    @Value("/FXML/ConfirmationExitWindow.fxml")
+    private Resource confirmationWindow;
+    @Value("/FXML/ManagerScreen.fxml")
+    private Resource managerScreen;
+    @Value("img/logo.png")
+    private Resource logo;
+    @Value("/POStaurant.css")
+    private Resource css;
 
     @FXML
     private Button timeButton;
     @FXML
     private Button exitButton;
+    @FXML
+    private Button goBackButton;
     @FXML
     private Button upButton;
     @FXML
@@ -53,6 +69,8 @@ public class TransferTableController {
     private TextField userID;
     @FXML
     private TextField timeField;
+    @FXML
+    private ImageView logoImg;
 
 
     public TransferTableController(FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService, TimeService timeService){
@@ -62,12 +80,12 @@ public class TransferTableController {
 
     }
 
-    public void initialize(){
+    public void initialize() throws IOException {
+        logoImg.setImage(new Image(logo.getURL().toExternalForm()));
         timeButton.setOnAction(e->{
             timeService.doTime(timeField);
         });
-
-        exitButton.setOnAction(e->{
+        goBackButton.setOnAction(e->{
             try {
                 FXMLLoader loader=fxmLoaderService.getLoader(dubScreen.getURL());
                 Parent parent=loader.load();
@@ -82,6 +100,51 @@ public class TransferTableController {
                 e1.printStackTrace();
             }
         });
+        exitButton.setOnAction(e->{
+            try{
+                FXMLLoader loader=fxmLoaderService.getLoader(confirmationWindow.getURL());
+                Parent parent=loader.load();
+                ConfirmationExitWindowController confirmationExitWindowController =loader.getController();
+                confirmationExitWindowController.setConfirmationLabel("Are you sure you want to exit?");
+                Scene scene=new Scene(parent);
+                scene.getStylesheets().add("POStaurant.css");
+                Stage stage=new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setScene(scene);
+                stage.showAndWait();
+                if(confirmationExitWindowController.confirmed()){
+                    try {
+                        FXMLLoader loader1;
+                        Parent parent2;
+                        if(user.getPosition().equals("MANAGER")){
+                            loader1=fxmLoaderService.getLoader(managerScreen.getURL());
+                            parent2=loader1.load();
+                            ManagerScreenController managerScreenController=loader1.getController();
+                            managerScreenController.setUser(user);
+                        }else {
+                            loader1 = fxmLoaderService.getLoader(mainScreenForm.getURL());
+                            parent2=loader1.load();
+                        }
+                        Scene scene2=new Scene(parent2);
+                        scene2.getStylesheets().add(css.getURL().toString());
+                        Stage stage2=(Stage)((Node) e.getSource()).getScene().getWindow();
+                        stage2.setScene(scene2);
+                        stage2.show();
+                    }catch (IOException iOE){
+                        iOE.printStackTrace();
+                    }
+                }
+            }catch (IOException iOE){
+                iOE.printStackTrace();
+            }
+
+
+        });
+        upButton.setOnAction(e-> setTables(tablesGrid,16,false,tableButtonList));
+
+        downButton.setOnAction(e-> setTables(tablesGrid,16,true,tableButtonList));
+
     }
 
     public void setUser(User user){

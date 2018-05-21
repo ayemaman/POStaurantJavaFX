@@ -10,10 +10,12 @@ import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
 public class SetAllergyWindowController {
+    private List<String> allergyList;
 
 
     @FXML
@@ -22,9 +24,9 @@ public class SetAllergyWindowController {
     private VBox vBox;
     public void initialize(){
 
+
         saveButton.setOnAction(e->{
-            ArrayList<String> allergyList=new ArrayList<>();
-            int i=1;
+            allergyList=new ArrayList<>();
            for(Node n: vBox.getChildren()){
                if(n instanceof HBox){
                    for(Node n2: ((HBox) n).getChildren()){
@@ -36,21 +38,28 @@ public class SetAllergyWindowController {
                    }
                }
            }
-           for(String s:allergyList){
-               System.out.println(s);
-           }
+            ((Node)e.getSource()).getScene().getWindow().hide();
         });
     }
-    @FXML
-    private void handleAllergyButtons(ActionEvent event){
-        ToggleButton toggleButton=(ToggleButton)event.getSource();
-            if(toggleButton.isSelected()) {
-                toggleButton.setStyle("-fx-background-color: red");
-            }
-            else{
-                toggleButton.setStyle("-fx-background-color:green");
-            }
+
+    public List<String> getAllergyList() {
+        return allergyList;
     }
 
-
+    public void setAllergyList(List<String> allergyList) {
+        if (allergyList != null) {
+            this.allergyList = allergyList;
+            for (Node n : vBox.getChildren()) {
+                if (n instanceof HBox) {
+                    for (Node n2 : ((HBox) n).getChildren()) {
+                        if (n2 instanceof ToggleButton) {
+                            if (allergyList.contains(((ToggleButton) n2).getText())) {
+                                ((ToggleButton) n2).setSelected(true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

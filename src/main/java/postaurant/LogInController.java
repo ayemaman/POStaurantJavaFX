@@ -21,9 +21,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import postaurant.service.UserService;
-import postaurant.serviceWindowsControllers.ErrorWindowController;
-
-import java.net.URL;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)

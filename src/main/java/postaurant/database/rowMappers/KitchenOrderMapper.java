@@ -1,9 +1,8 @@
 package postaurant.database.rowMappers;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
+
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+
 import postaurant.model.KitchenOrderInfo;
 
 import java.sql.ResultSet;
@@ -11,8 +10,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class KitchenOrderMapper implements RowMapper<KitchenOrderInfo> {
     @Override
     public KitchenOrderInfo mapRow(ResultSet rs, int i) throws SQLException {

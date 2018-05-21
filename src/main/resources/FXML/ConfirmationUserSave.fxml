@@ -8,15 +8,15 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="150.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.ConfirmationUserSaveController">
+<AnchorPane prefHeight="150.0" prefWidth="300.0" style="-fx-border-color: yellow;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.ConfirmationUserSaveController">
     <children>
-        <VBox fx:id="topConfirmationBox" alignment="CENTER" prefHeight="75.0" prefWidth="100.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
-            <children>
-                <Label text="Are you sure you want to save this user:" textFill="#eb0101" />
-                <Region prefHeight="20.0" prefWidth="200.0" />
-                <Label fx:id="userLabel" text="Label" textFill="#ffbf00" />
-            </children>
-        </VBox>
+      <VBox fx:id="topConfirmationBox" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="75.0" prefWidth="100.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
+         <children>
+            <Label text="Are you sure you want to save this user:" />
+            <Region prefHeight="20.0" prefWidth="200.0" />
+            <Label fx:id="userLabel" text="Label" />
+         </children>
+      </VBox>
         <HBox fx:id="bottomConfirmationBox" alignment="CENTER" prefHeight="75.0" prefWidth="200.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
             <children>
                 <Button fx:id="yesButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" text="YES" />

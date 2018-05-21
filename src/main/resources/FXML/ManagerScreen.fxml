@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,16 +17,13 @@
    <top>
       <HBox alignment="BOTTOM_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="800.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fitHeight="90.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../img/logo.png" />
-               </image>
+            <ImageView fx:id="logoImage" fitHeight="90.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </ImageView>
             <Region prefHeight="200.0" prefWidth="450.0" />
-            <TextField alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="200.0">
+            <TextField fx:id="timeField" alignment="BOTTOM_RIGHT" editable="false" prefHeight="30.0" prefWidth="200.0">
                <HBox.margin>
                   <Insets />
                </HBox.margin></TextField>
@@ -49,22 +47,98 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="usersButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Users" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Button fx:id="usersButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <GridPane.margin>
                   <Insets />
-               </GridPane.margin></Button>
-             <Button fx:id="menuButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Menu" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               </GridPane.margin>
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="41.0">
+                     <children>
+                        <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/userIconFinal.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label style="-fx-text-fill: black;" text="Users">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </graphic></Button>
+             <Button fx:id="menuButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <GridPane.margin>
                   <Insets />
-               </GridPane.margin></Button>
-             <Button mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Orders" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+               </GridPane.margin>
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="41.0">
+                     <children>
+                        <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/menuIconFinal.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="65.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label style="-fx-text-fill: black;" text="Menu">
+                           <HBox.margin>
+                              <Insets left="40.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </graphic></Button>
+             <Button fx:id="ordersButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets />
-               </GridPane.margin></Button>
-             <Button mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" text="Report" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+               </GridPane.margin>
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="41.0">
+                     <children>
+                        <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/ordersIconFinal.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label style="-fx-text-fill: black;" text="Orders">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </graphic></Button>
+             <Button fx:id="reportButton" mnemonicParsing="false" prefHeight="150.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets />
-               </GridPane.margin></Button>
+               </GridPane.margin>
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="41.0">
+                     <children>
+                        <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/reportButtonVer2.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label style="-fx-text-fill: black;" text="Report">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </graphic></Button>
          </children>
       </GridPane>
    </center>
@@ -73,9 +147,9 @@
          <children>
             <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="EXIT" />
             <Region prefWidth="100.0" />
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="75.0" prefWidth="300.0" text="SHUT DOWN" />
+            <Button fx:id="shutDownButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="75.0" prefWidth="300.0" text="SHUT DOWN" />
             <Region prefWidth="100.0" />
-            <Button alignment="CENTER" contentDisplay="BOTTOM" mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="TIME" />
+            <Button fx:id="timeButton" alignment="CENTER" contentDisplay="BOTTOM" mnemonicParsing="false" prefHeight="75.0" prefWidth="150.0" text="TIME" />
          </children>
          <padding>
             <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />

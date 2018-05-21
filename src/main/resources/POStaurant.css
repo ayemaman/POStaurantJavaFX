@@ -1,46 +1,297 @@
 
+.root{
+    -fx-font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif,bold;
+    -fx-base: rgb(132, 145, 47);
+    -fx-background: #2F4F4F;
+
+}
+
+/*
+LoginScreen>LoginButton
+*/
+
+
+
+/*
+QCScreen>qcNodes
+*/
+#QCListView:focused{
+-fx-background-insets: 0;
+  -fx-padding: 0;
+}
+
+#QCCell{
+-fx-background-color:grey;
+-fx-text-fill:black;
+}
+#QCCell:filled:selected{
+-fx-background-color:grey;
+-fx-text-fill:black;
+}
+#QCCellReady{
+-fx-background-color:green;
+-fx-text-fill:black;
+}
+#QCCellReady:filled:selected{
+-fx-text-fill:black;
+}
+#QCCellSeen{
+-fx-background-color:blue;
+-fx-text-fill:black;
+}
+#QCCellSeen{
+-fx-text-fill:black;
+}
+
+/*
+KitchenScreen> TreeCells
+
+*/
+
+
+
+
+#KTreeCell{
+-fx-background-color:grey;
+}
+
+#KTreeCell:filled:selected{
+-fx-background-color:blue;
+}
+
+
+#KTreeCellSeen {
+    -fx-background-color:green;
+}
+
+#KTreeCellSeen:filled:selected{
+    -fx-background-color:blue;
+}
+
+#KTreeCellCustom{
+    -fx-background-color:red;
+}
+
+#KTreeCellCustom:filled:selected{
+    -fx-background-color:blue;
+
+}
+
+
+
+.toggle-button:selected{
+-fx-background-color:grey
+}
+
+
+/*
+SetAllergyWindow> allergyToggleButtons
+*/
+
+
 .AllergyToggleButton:pressed{
         -fx-background-color: black;
     }
 }
-.DubButton{
-    -fx-background-color: radial-gradient(center 50% -40%, radius 200%,grey  45%, green 50%);
-    -fx-background-radius: 8,7,6;
-    -fx-background-insets: 0,1,2;
-    -fx-text-fill: black;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+.AllergyToggleButton:selected{
+        -fx-background-color: red;
+    }
+}
+/*
+QCScreenController> QCNodes
+*/
+#UnselectedLabel{
+-fx-background-color:brown;
+-fx-text-fill:white;
+}
+#SelectedLabel{
+-fx-background-color:#73FBD3;
+-fx-text-fill:black;
 }
 
-.ManagerButton{
--fx-background-color: radial-gradient(center 50% -40%, radius 200%,grey  45%, pink 50%);
+
+/*
+OrderWindow > tableView
+*/
+#SeenCells{
+-fx-background-color:yellow;
+-fx-text-fill:white;
+}
+#SeenCells:selected{
+-fx-background-color: blue;
+-fx-text-fill:black;
+ }
+
+/*
+OrderWindow > SetAllergyButton
+*/
+
+#selectedAllergy{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, orange 45%, yellow 50%);
     -fx-background-radius: 8,7,6;
     -fx-background-insets: 0,1,2;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  }
 }
 
-.KitchenButton{
--fx-background-color: radial-gradient(center 50% -40%, radius 200%, grey 45%, blue 50%);
-    -fx-background-radius: 8,7,6;
-    -fx-background-insets: 0,1,2;
-    -fx-text-fill: black;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+#selectedAllergy:hover {
+       -fx-background-color:orange;
 }
-.FoodRunnerButton{
--fx-background-color: radial-gradient(center 50% -40%, radius 200%, grey 45%, yellow 50%);
-    -fx-background-radius: 8,7,6;
-    -fx-background-insets: 0,1,2;
-    -fx-text-fill: black;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
-}
-.UserButton:hover{
--fx-background-color:grey
-}
-.UserButton:pressed{
- -fx-background-color:black;
+#selectedAllergy:pressed {
+    -fx-background-color:yellow;
     -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
 }
 
+
+#nonSelectedAllergy{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  }
+}
+#nonSelectedAllergy:hover {
+       -fx-background-color:#b8ee36;
+}
+#nonSelectedAllergy:pressed {
+    -fx-background-color:#80c800;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+/*
+OrderWindow> TypeButtons
+*/
+#typeButton{
+ -fx-background-color: radial-gradient(center 50% -40%, radius 200%, #660000 45%, #812E2E 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: orange;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  }
+}
+
+#typeButton:hover {
+       -fx-background-color:#660000;
+}
+#typeButton:pressed {
+    -fx-background-color:#812E2E;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+/*
+OrderWindow> SectionButtons
+*/
+#sectionButton{
+ -fx-background-color: radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  }
+
+#sectionButton:selected{
+-fx-background-color:grey
+}
+
+/*
+UserScreenController> UserButtons
+
+*/
+.DrinkRunnerButton{
+    -fx-background-color: radial-gradient(center 50% -40%, radius 200%,#B29175  45%, #966842 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.DrinkRunnerButton:hover{
+-fx-background-color:#B29175;
+}
+.DrinkRunnerButton:pressed{
+ -fx-background-color:#966842;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+#DeleteButton, .ManagerButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%,#F99A9A  45%, #F44747 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#DeleteButton:hover, .ManagerButton:hover{
+-fx-background-color:#F99A9A;
+}
+#DeleteButton:pressed, .ManagerButton:pressed{
+ -fx-background-color:#F44747;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+#LoginButton, .KitchenButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, #F2E569 45%, #EEDC31 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#LoginButton:hover, .KitchenButton:hover{
+-fx-background-color:#F2E569;
+}
+#LoginButton:pressed, .KitchenButton:pressed{
+ -fx-background-color:#EEDC31;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+.FoodRunnerButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, #B9EBAD 45%, #7FDB6A 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+.FoodRunnerButton:hover{
+-fx-background-color:#B9EBAD;
+}
+.FoodRunnerButton:pressed{
+ -fx-background-color:#7FDB6A;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+#ExitButton, .DubButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, #7BACE4 45%, #0E68CE 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+#ExitButton:hover, .DubButton:hover{
+-fx-background-color:#7BACE4;
+}
+#ExitButton:pressed, .DubButton:pressed{
+ -fx-background-color:#0E68CE;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+.BarButton{
+-fx-background-color: radial-gradient(center 50% -40%, radius 200%, #FC9457 45%, #FC6C19 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+.BarButton:hover{
+-fx-background-color:#FC9457;
+}
+.BarButton:pressed{
+ -fx-background-color:#FC6C19;
+    -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
+
+
+
+/*
+General Buttons
+*/
 Button{
     -fx-background-color: radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
     -fx-background-radius: 8,7,6;
@@ -70,6 +321,12 @@ ToggleButton{
     -fx-background-color:green;
 }
 
+
+
+/*
+Ingredient info Screen> availability button && ingredient buttons
+Item Info Screen> availability button
+*/
 .Availability68{
 -fx-background-color:green;
 }

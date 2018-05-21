@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -19,6 +20,7 @@ import org.springframework.core.io.Resource;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.Ingredient;
 import postaurant.model.Item;
+import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
 import javafx.fxml.FXML;
@@ -27,6 +29,7 @@ import javafx.fxml.FXML;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import postaurant.service.TimeService;
 
 
 import java.util.List;
@@ -35,7 +38,7 @@ import java.util.List;
 @Component
 @Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MenuScreenController {
-
+    private User user;
     private List<Button> itemButtonList;
     private List<Button> ingredientButtonList;
     private List<Tab> sectionTabList;
@@ -46,6 +49,7 @@ public class MenuScreenController {
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
+    private final TimeService timeService;
     @Value("FXML/MenuScreen.fxml")
     private Resource menuScreen;
     @Value("/FXML/ItemInfoScreen.fxml")
@@ -75,17 +79,25 @@ public class MenuScreenController {
     @FXML
     private Button upButton;
     @FXML
+    private Button timeButton;
+    @FXML
     private Button managerScreenButton;
+    @FXML
+    private TextField timeField;
 
 
-    public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService) {
+    public MenuScreenController(MenuService menuService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService, TimeService timeService) {
         this.menuService = menuService;
         this.fxmLoaderService = fxmLoaderService;
         this.buttonCreationService = buttonCreationService;
+        this.timeService = timeService;
     }
 
     public void initialize() {
         setup();
+        timeButton.setOnAction(e->{
+            timeService.doTime(timeField);
+        });
         ingredientTab.setOnSelectionChanged(e->{
             pageItems=0;
             pageIngredients=0;
@@ -96,7 +108,7 @@ public class MenuScreenController {
                 Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true,null));
                 setItemButtonsForSection(gridPane, 16, false, itemButtonList);
             } else {
                 setIngredientButtons(ingredientGrid, 16, false, ingredientButtonList);
@@ -109,7 +121,7 @@ public class MenuScreenController {
                 Tab currentTab = sectionTabPane.getSelectionModel().getSelectedItem();
                 AnchorPane anchorPane = (AnchorPane) currentTab.getContent();
                 GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true));
+                setItemButtonList(buttonCreationService.createItemButtonsForSection(currentTab.getText(),true,null));
                 setItemButtonsForSection(gridPane, 16, true, itemButtonList);
             } else {
                 setIngredientButtons(ingredientGrid, 16, true, ingredientButtonList);
@@ -169,6 +181,8 @@ public class MenuScreenController {
             try{
                 FXMLLoader loader=fxmLoaderService.getLoader(managerScreen.getURL());
                 Parent parent=loader.load();
+                ManagerScreenController managerScreenController=loader.getController();
+                managerScreenController.setUser(user);
                 Scene scene=new Scene(parent);
                 scene.getStylesheets().addAll(css.getURL().toExternalForm());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -273,7 +287,7 @@ public class MenuScreenController {
                     pageIngredients=0;
                     AnchorPane anchorPane = (AnchorPane) t.getContent();
                     GridPane gridPane = (GridPane) anchorPane.getChildren().get(0);
-                    setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText(),true));
+                    setItemButtonList(buttonCreationService.createItemButtonsForSection(t.getText(),true,null));
                     setItemButtonsForSection(gridPane, 16, true, itemButtonList);
                 });
                 sectionTabPane.getTabs().add(t);
@@ -500,5 +514,8 @@ public class MenuScreenController {
 
         }
 
+    }
+    public void setUser(User user){
+        this.user=user;
     }
 }

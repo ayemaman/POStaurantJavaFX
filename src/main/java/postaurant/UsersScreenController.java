@@ -8,6 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
+import postaurant.service.TimeService;
 import postaurant.service.UserService;
 
 import java.io.IOException;
@@ -32,7 +36,9 @@ public class UsersScreenController {
      private final UserService userService;
      private final FXMLoaderService fxmLoaderService;
      private final ButtonCreationService buttonCreationService;
+     private final TimeService timeService;
 
+     private User user;
      private ArrayList<Button> userButtons;
      private int page;
 
@@ -42,6 +48,8 @@ public class UsersScreenController {
     private Resource managerScreenForm;
     @Value("FXML/UserInfoScreen.fxml")
     private Resource userInfoForm;
+    @Value("img/logo.png")
+    private Resource logo;
 
      @FXML
      private GridPane gridPane;
@@ -49,17 +57,25 @@ public class UsersScreenController {
      @FXML private Button managerScreenButton;
      @FXML private Button upButton;
      @FXML private Button downButton;
+     @FXML private Button timeButton;
+     @FXML private TextField timeField;
+     @FXML private ImageView logoImg;
 
 
-     public UsersScreenController(UserService userService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService){
+     public UsersScreenController(UserService userService, FXMLoaderService fxmLoaderService, ButtonCreationService buttonCreationService, TimeService timeService){
          this.fxmLoaderService=fxmLoaderService;
          this.userService=userService;
          this.buttonCreationService=buttonCreationService;
+         this.timeService = timeService;
      }
 
-    public void initialize() {
-         upButton.setOnAction(e-> setUsers(false));
-         downButton.setOnAction(e-> setUsers(true));
+    public void initialize() throws IOException {
+         logoImg.setImage(new Image(logo.getURL().toExternalForm()));
+         timeButton.setOnAction(e-> {
+             timeService.doTime(timeField);
+         });
+         upButton.setOnAction(e-> setTables(gridPane,16,false,userButtons));
+         downButton.setOnAction(e-> setTables(gridPane,16,true,userButtons));
          newUserButton.setOnAction(e->{
              try {
                  FXMLLoader loader=fxmLoaderService.getLoader(newUserForm.getURL());
@@ -73,6 +89,7 @@ public class UsersScreenController {
                  NewUserScreenController newUserScreenController=loader.getController();
                  stage.showAndWait();
                  if(newUserScreenController.getWasUserSaved()) {
+                     page--;
                      setUserButtons();
                  }
 
@@ -83,7 +100,11 @@ public class UsersScreenController {
 
          managerScreenButton.setOnAction(e->{
              try{
-                 Parent root=fxmLoaderService.getLoader(managerScreenForm.getURL()).load();
+                 FXMLLoader loader=fxmLoaderService.getLoader(managerScreenForm.getURL());
+
+                 Parent root=loader.load();
+                 ManagerScreenController managerScreenController=loader.getController();
+                 managerScreenController.setUser(user);
                  Scene scene= new Scene(root);
                  scene.getStylesheets().add("POStaurant.css");
                  Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -94,15 +115,6 @@ public class UsersScreenController {
          });
     }
 
-    private boolean isNextPage() {
-        try {
-           userButtons.get((this.page * 16));
-        } catch (IndexOutOfBoundsException e) {
-            return false;
-        }
-        return true;
-
-    }
 
     public void setUserButtons(){
          this.page=0;
@@ -110,28 +122,30 @@ public class UsersScreenController {
          for(Button b:userButtons){
              b.setOnAction(this::handleUserButtons);
          }
-         setUsers(true);
+         setTables(gridPane,16,true,userButtons);
     }
 
 
-    public void setUsers(boolean forward) {
+
+     public void setTables(GridPane gridPane, Integer size, boolean forward, List<Button> list) {
         int start;
         int x = 0;
         int y = 0;
         if (forward) {
-            if (this.page == 0) {
+            if (page == 0) {
                 start = 0;
             } else {
-                start = this.page * 16;
+                start = page * size;
             }
-            if (isNextPage()) {
-                for (int i = 0; i < (gridPane.getChildren()).size(); ) {
+            //if all buttons don't fit in gridPane
+            if (buttonCreationService.isNextPage(page, list, size)) {
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
                     gridPane.getChildren().remove(gridPane.getChildren().get(i));
                 }
-                if (userButtons.size() - start > 15) {
-                    for (int i = start; i < (start + 16); i++) {
-                        gridPane.add(userButtons.get(i), x, y);
-                        GridPane.setMargin(userButtons.get(i), new Insets(2, 2, 2, 2));
+                if (start == 0) {
+                    for (int i = start; i < size; i++) {
+                        gridPane.add(list.get(i), x, y);
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 10, 2));
                         if (x == 3) {
                             x = 0;
                             y++;
@@ -140,44 +154,85 @@ public class UsersScreenController {
                         }
 
                     }
+                    page++;
                 } else {
-                    for (int i = start; i < userButtons.size(); i++) {
-                        gridPane.add(userButtons.get(i), x, y);
-                        GridPane.setMargin(userButtons.get(i), new Insets(2, 2, 2, 2));
-                        if (x == 3) {
-                            x = 0;
-                            y++;
-                        } else {
-                            x++;
+                    if (buttonCreationService.isNextPage(page + 1, list, size)) {
+                        for (int i = start; i < start + size; i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 3) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
                         }
-
+                        page++;
+                    } else {
+                        for (int i = start; i < list.size(); i++) {
+                            gridPane.add(list.get(i), x, y);
+                            GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                            if (x == 3) {
+                                x = 0;
+                                y++;
+                            } else {
+                                x++;
+                            }
+                        }
+                        page++;
                     }
                 }
-                page++;
+            } else {
+                if (start == 0) {
+                    for (int i = 0; i < gridPane.getChildren().size(); ) {
+                        gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                    }
+                    for (int i = start; i < list.size(); i++) {
+
+
+                        gridPane.add(list.get(i), x, y);
+
+                        GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
+                        if (x == 3) {
+                            x = 0;
+                            y++;
+                        } else {
+                            x++;
+                        }
+                    }
+
+                    page++;
+                }
+
             }
         } else {
-            if (this.page > 1) {
-                if (this.page == 2) {
+            if (page > 1) {
+                for (int i = 0; i < gridPane.getChildren().size(); ) {
+                    gridPane.getChildren().remove(gridPane.getChildren().get(i));
+                }
+                if (page == 2) {
                     start = 0;
                 } else {
-                    start = (this.page - 2) * 16;
+                    start = (page - 2) * size;
                 }
-                for (int i = start; i < (start + 16); i++) {
-                    gridPane.add(userButtons.get(i), x, y);
-                    GridPane.setMargin(userButtons.get(i), new Insets(2, 2, 2, 2));
+                for (int i = start; i < (start + size); i++) {
+                    gridPane.add(list.get(i), x, y);
+                    GridPane.setMargin(list.get(i), new Insets(2, 2, 2, 2));
                     if (x == 3) {
                         x = 0;
                         y++;
                     } else {
                         x++;
                     }
-
                 }
                 page--;
             }
 
         }
     }
+
+
+
 
 
 
@@ -203,6 +258,10 @@ public class UsersScreenController {
                  e1.printStackTrace();
              }
 
+         }
+
+         public void setUser(User user){
+         this.user=user;
          }
 
     }

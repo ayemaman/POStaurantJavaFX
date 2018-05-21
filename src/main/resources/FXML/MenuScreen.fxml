@@ -56,7 +56,7 @@
                   <Insets bottom="20.0" top="20.0" />
                </VBox.margin>
             </TextField>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="TIME">
+            <Button fx:id="timeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="TIME">
                <font>
                   <Font size="18.0" />
                </font>

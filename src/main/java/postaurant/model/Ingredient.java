@@ -1,14 +1,14 @@
 package postaurant.model;
 
 
-import javafx.beans.property.SimpleIntegerProperty;
+
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import postaurant.exception.InputValidationException;
 
-import java.util.Comparator;
+
 import java.util.Date;
-import java.util.function.ToIntFunction;
+
 
 public class Ingredient implements Comparable<Ingredient> {
     private long id;

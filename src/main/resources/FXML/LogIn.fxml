@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="330.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.LogInController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="330.0" style="-fx-border-color: yellow;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.LogInController">
     <children>
         <VBox AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
             <children>
@@ -25,7 +25,7 @@
                                 <Insets left="10.0" />
                             </HBox.margin>
                         </TextField>
-                        <Button fx:id="buttonLOGIN" mnemonicParsing="false" prefHeight="70.0" prefWidth="95.0" text="LOGIN">
+                        <Button id="LoginButton" fx:id="buttonLOGIN" mnemonicParsing="false" prefHeight="70.0" prefWidth="95.0" text="LOGIN">
                             <HBox.margin>
                                 <Insets left="5.0" />
                             </HBox.margin></Button>
@@ -54,8 +54,8 @@
                         <Button fx:id="button8" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="8" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Button fx:id="button9" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="9" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                         <Button fx:id="button0" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Button fx:id="buttonDELETE" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="DELETE" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                        <Button fx:id="buttonEXIT" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="EXIT" GridPane.rowIndex="3" />
+                        <Button id="DeleteButton" fx:id="buttonDELETE" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="DELETE" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Button id="ExitButton" fx:id="buttonEXIT" mnemonicParsing="false" prefHeight="75.0" prefWidth="100.0" text="EXIT" GridPane.rowIndex="3" />
                     </children>
                     <VBox.margin>
                         <Insets />

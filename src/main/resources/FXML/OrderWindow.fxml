@@ -38,8 +38,8 @@
                 </GridPane>
             <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="100.0">
                <children>
-                  <Button fx:id="foodTypeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="FOOD" textFill="RED" />
-                  <Button fx:id="drinkTypeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="DRINKS" textFill="RED" />
+                  <Button fx:id="foodTypeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" styleClass="typeButton" text="FOOD" />
+                  <Button fx:id="drinkTypeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="DRINKS" />
                </children>
             </VBox>
             <Region prefHeight="0.0" prefWidth="50.0" />
@@ -48,10 +48,7 @@
                   <Insets top="20.0" />
                </HBox.margin></Button>
             <Region prefHeight="0.0" prefWidth="50.0" />
-            <ImageView fitHeight="140.0" fitWidth="110.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../img/logo.png" />
-               </image>
+            <ImageView fx:id="logoImg" fitHeight="140.0" fitWidth="110.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
@@ -90,7 +87,7 @@
                                         <Insets right="5.0" />
                                     </HBox.margin>
                                 </Label>
-                                <TextField fx:id="totalTextField" />
+                                <TextField fx:id="totalTextField" editable="false" />
                             </children>
                         </HBox>
                     </children>
@@ -100,15 +97,23 @@
                 </VBox>
                 <VBox prefHeight="400.0" prefWidth="100.0">
                     <children>
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="PRINT CHECK" />
-                        <Button fx:id="voidButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="VOID" />
-                        <Button fx:id="modifyButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="MODIFY" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="PAYMENT" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="EXIT" />
+                        <Button fx:id="printButton" mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" text="PRINT CHECK">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></Button>
+                        <Button fx:id="voidButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="VOID">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></Button>
+                        <Button fx:id="modifyButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="MODIFY">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></Button>
+                        <Button fx:id="payButton" mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" text="PAYMENT">
+                     <VBox.margin>
+                        <Insets bottom="50.0" />
+                     </VBox.margin></Button>
+                        <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" text="EXIT" />
                     </children>
                 </VBox>
             </children>
@@ -117,7 +122,7 @@
     <left>
         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0" BorderPane.alignment="CENTER">
             <children>
-                <GridPane fx:id="itemGrid" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="440.0" prefWidth="290.0">
+                <GridPane fx:id="itemGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="440.0" prefWidth="290.0">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -136,20 +141,30 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </HBox.margin>
                 </GridPane>
-                <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="100.0">
+                <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="100.0">
                     <children>
-                        <Button fx:id="setAllergyButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="SET ALLERGY" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
-                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Button" />
+                        <Button fx:id="setAllergyButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="240.0" prefWidth="100.0">
+                     <graphic>
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label text="A" textFill="BLACK" />
+                              <Label text="L" textFill="BLACK" />
+                              <Label text="L" textFill="BLACK" />
+                              <Label text="E" textFill="BLACK" />
+                              <Label text="R" textFill="BLACK" />
+                              <Label text="G" textFill="BLACK" />
+                              <Label text="Y" textFill="BLACK" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                     <VBox.margin>
+                        <Insets bottom="60.0" />
+                     </VBox.margin></Button>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                             <children>
                                 <VBox prefHeight="200.0" prefWidth="50.0">
                                     <children>
-                                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0">
+                                        <Button fx:id="upButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0">
                                             <graphic>
                                                 <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -157,7 +172,7 @@
                                        </image>
                                                 </ImageView>
                                             </graphic></Button>
-                                        <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0">
+                                        <Button fx:id="downButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0">
                                             <graphic>
                                                 <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -182,6 +197,8 @@
                         </VBox>
                             </children>
                         </HBox>
+                  <Label text="CURRENT TIME:" />
+                  <TextField fx:id="timeField" alignment="CENTER" editable="false" />
                     </children></VBox>
             </children>
         </HBox>

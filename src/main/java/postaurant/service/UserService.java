@@ -40,75 +40,12 @@ public class UserService {
     public List<Order> getTransferableOrders(User user){
         return userDatabase.getTransferableOrders(user);
     }
+    public List<Order> getAllOpenOrders(){return userDatabase.getAllOpenOrders();}
 
     public void transferTable(Long orderId, User user){
         userDatabase.transferTable(orderId,user);
     }
-    /*
-    public List<Order> getUserOrders(User user) {
-        try {
-            List<Order> sorted = userDatabase.retrieveUserOrders(user);
-            if (!sorted.isEmpty()){
-                Item lastItem = sorted.get(0).getOrderItems().keySet().iterator().next();
-                for (int i = 0; i < sorted.size() - 1; ) {
-                    //if order id are the same
-                    if (sorted.get(i).getId() == sorted.get(i + 1).getId()) {
-                        Map.Entry<Item, Integer> entry = sorted.get(i + 1).getOrderItems().entrySet().iterator().next();
-                        Integer qty = entry.getValue();
-                        Item item2 = entry.getKey();
 
-                        //if items are the same (checking by id and date_ordered)
-                        if (lastItem.compareTo(item2) == 0) {
-                            lastItem.getRecipe().put(item2.getRecipe().keySet().iterator().next(), item2.getRecipe().values().iterator().next());
-                            sorted.remove(i + 1);
-                        } else {
-                            sorted.get(i).getOrderItems().put(item2, qty);
-                            sorted.remove(i + 1);
-                            lastItem = item2;
-                        }
-                    } else {
-                        i++;
-                        lastItem = sorted.get(i).getOrderItems().keySet().iterator().next();
-                    }
-                }
-                return sorted;
-            }else{
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-*/
-            /*
-            Collections.sort(sorted, (o1, o2) -> {
-                long result = o1.getId() - o2.getId();
-                if(result==0) {
-                    return (int) result;
-                }
-
-                for(Map.Entry<Item,Integer> entry:o1.getOrderItems().entrySet()){
-                    entry.getKey().getDateOrdered()
-                }
-
-            });
-            for(int i=0;i<sorted.size()-1;) {
-                if (sorted.get(i).getId() == sorted.get(i + 1).getId()) {
-                    for (Map.Entry<Item, Integer> entry : sorted.get(i + 1).getOrderItems().entrySet()) {
-                        sorted.get(i).getOrderItems().put(entry.getKey(), entry.getValue());
-                    }
-                } else {
-                    i++;
-                }
-            }
-            return sorted;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-*/
     public List<User> getAllActiveUsers(){
         return userDatabase.retrieveAllActiveUsers();
 

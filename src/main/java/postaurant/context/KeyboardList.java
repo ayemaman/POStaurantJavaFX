@@ -50,7 +50,7 @@ import java.util.ArrayList;
             qwerty.add("b");
             qwerty.add("n");
             qwerty.add("m");
-            qwerty.add(",");
+            qwerty.add("/");
             qwerty.add(".");
 
             qwerty.add("Q");
@@ -81,7 +81,7 @@ import java.util.ArrayList;
             qwerty.add("B");
             qwerty.add("N");
             qwerty.add("M");
-            qwerty.add(",");
+            qwerty.add("/");
             qwerty.add(".");
         }
 

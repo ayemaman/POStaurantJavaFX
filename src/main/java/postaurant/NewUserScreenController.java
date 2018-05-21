@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -30,10 +31,8 @@ import postaurant.exception.InputValidationException;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.UserService;
-import postaurant.serviceWindowsControllers.ErrorWindowController;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -89,7 +88,7 @@ public class NewUserScreenController {
         currentTextField=nameField;
         nameField.textProperty().bind(name);
         surnameField.textProperty().bind(surname);
-        ObservableList<String> positionList = FXCollections.observableArrayList("DUBDUB", "MANAGER");
+        ObservableList<String> positionList = FXCollections.observableArrayList("DUBDUB", "MANAGER","FOODRUNNER","KITCHEN","BAR","DRINKRUNNER");
         choicePosition.setValue("DUBDUB");
         choicePosition.setItems(positionList);
 
@@ -137,7 +136,13 @@ public class NewUserScreenController {
                     Scene scene = new Scene(parent);
                     Stage stage = new Stage();
                     stage.setScene(scene);
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
                     stage.showAndWait();
+                    if(confirmationUserSaveController.wasSaved()) {
+                        setWasUserSaved(true);
+                        ((Node)(e.getSource())).getScene().getWindow().hide();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

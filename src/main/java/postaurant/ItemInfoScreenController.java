@@ -30,7 +30,7 @@ import postaurant.model.Ingredient;
 import postaurant.model.Item;
 import postaurant.service.ButtonCreationService;
 import postaurant.service.MenuService;
-import postaurant.serviceWindowsControllers.ErrorWindowController;
+import postaurant.service.TimeService;
 
 
 import java.io.IOException;
@@ -59,6 +59,7 @@ public class ItemInfoScreenController {
     private final ButtonCreationService buttonCreationService;
     private final MenuService menuService;
     private final FXMLoaderService fxmLoaderService;
+    private final TimeService timeService;
 
 
     @Value("/FXML/ErrorWindow.fxml")
@@ -77,6 +78,8 @@ public class ItemInfoScreenController {
     @FXML
     private TextField priceField;
     @FXML
+    private TextField timeField;
+    @FXML
     private ComboBox<String> sectionComboBox;
     @FXML
     private ComboBox<String> typeComboBox;
@@ -91,6 +94,8 @@ public class ItemInfoScreenController {
     private Button removeButton;
     @FXML
     private Button availabilityButton;
+    @FXML
+    private Button timeButton;
     @FXML
     private GridPane keyboardGrid;
     @FXML
@@ -107,10 +112,11 @@ public class ItemInfoScreenController {
     private Button downButton;
 
 
-    public ItemInfoScreenController(ButtonCreationService buttonCreationService, FXMLoaderService fxmLoaderService, MenuService menuService) {
+    public ItemInfoScreenController(ButtonCreationService buttonCreationService, FXMLoaderService fxmLoaderService, MenuService menuService, TimeService timeService) {
         this.buttonCreationService = buttonCreationService;
         this.fxmLoaderService = fxmLoaderService;
         this.menuService = menuService;
+        this.timeService = timeService;
     }
 
     public void setIngredientButtonList(ArrayList<Button> ingredientButtonList) {
@@ -139,6 +145,9 @@ public class ItemInfoScreenController {
 
         saveButton.setOnAction(this::saveButtonAction);
 
+        timeButton.setOnAction(e->{
+            timeService.doTime(timeField);
+        });
         removeButton.setOnAction(e -> {
             ObservableList<Ingredient> selected = ingredientTable.getSelectionModel().getSelectedItems();
             selected.forEach(ingredientsList::remove);

@@ -35,13 +35,10 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </VBox.margin>
                 </Button>
-                <ImageView fitHeight="250.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="logoImage" fitHeight="250.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
                     <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </VBox.margin>
-                    <image>
-                        <Image url="@../img/logo.png" />
-                    </image>
                 </ImageView>
             </children></VBox>
     </left>
@@ -61,7 +58,7 @@
                         <Insets right="5.0" />
                     </VBox.margin>
                     <children>
-                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="213.0" prefWidth="100.0">
+                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="213.0" prefWidth="85.0">
                             <children>
                                 <Button fx:id="upButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="75.0" prefWidth="75.0">
                                     <VBox.margin>
@@ -96,7 +93,21 @@
                                 </Button>
                             </children>
                         </VBox>
-                        <Region prefHeight="100.0" prefWidth="75.0" />
+                  <Button fx:id="reportButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="155.0" prefWidth="75.0">
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets top="25.0" />
+                     </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/reportButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                     </children>
                 </HBox>
                 <Button fx:id="exitButton" alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="EXIT">

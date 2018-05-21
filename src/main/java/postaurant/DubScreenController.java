@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -21,9 +23,12 @@ import org.springframework.stereotype.Component;
 import postaurant.context.FXMLoaderService;
 import postaurant.model.User;
 import postaurant.service.ButtonCreationService;
+import postaurant.service.OrderService;
+import postaurant.service.ReportService;
 import postaurant.service.TimeService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +41,8 @@ public class DubScreenController {
     private final FXMLoaderService fxmLoaderService;
     private final ButtonCreationService buttonCreationService;
     private final TimeService timeService;
+    private final OrderService orderService;
+    private final ReportService reportService;
 
     @Value("/FXML/POStaurant.fxml")
     private Resource mainScreenForm;
@@ -49,8 +56,19 @@ public class DubScreenController {
     @Value("/FXML/TransferTableWindow.fxml")
     private Resource transferTableForm;
 
+    @Value("/FXML/ConfirmationExitWindow.fxml")
+    private Resource confirmationWindow;
+
+    @Value("/FXML/PickADate.fxml")
+    private Resource pickDateForm;
+
+    @Value("/FXML/ManagerScreen.fxml")
+    private Resource managerScreen;
+
     @Value("/POStaurant.css")
     private Resource css;
+    @Value("/img/logo.png")
+    private Resource logo;
 
     private User user;
     @FXML
@@ -71,19 +89,45 @@ public class DubScreenController {
     private Button downButton;
     @FXML
     private Button transferButton;
+    @FXML
+    private Button reportButton;
+    @FXML
+    private ImageView logoImage;
 
 
-    public DubScreenController(FXMLoaderService loaderService, ButtonCreationService buttonCreationService, TimeService timeService) {
+    public DubScreenController(FXMLoaderService loaderService, ButtonCreationService buttonCreationService, TimeService timeService, OrderService orderService, ReportService reportService) {
         this.fxmLoaderService = loaderService;
         this.buttonCreationService=buttonCreationService;
         this.timeService=timeService;
+        this.orderService = orderService;
+        this.reportService = reportService;
     }
 
-    public void initialize() {
+    public void initialize() throws IOException {
+
+        logoImage.setImage(new Image(logo.getURL().toExternalForm()));
+
         timeButton.setOnAction(e->{
             timeService.doTime(timeField);
         });
 
+        reportButton.setOnAction(e->{
+            try {
+                FXMLLoader loader = fxmLoaderService.getLoader(pickDateForm.getURL());
+                Parent parent = loader.load();
+                PickADateController pickADateController=loader.getController();
+                pickADateController.setUser(user);
+                Scene scene = new Scene(parent);
+                scene.getStylesheets().add(css.getURL().toString());
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setScene(scene);
+                stage.showAndWait();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
         newButton.setOnAction(e ->{
             try {
                 FXMLLoader loader = fxmLoaderService.getLoader(createOrderForm.getURL());
@@ -103,7 +147,7 @@ public class DubScreenController {
                     OrderWindowController orderWindowController = loader.getController();
                     orderWindowController.setOrderId(null);
                     orderWindowController.setUser(user);
-                    orderWindowController.setLabels(tableNum,null,user,null);
+                    orderWindowController.setLabels(tableNum,null,user.getFirstName(),null);
                     scene = new Scene(parent);
                     scene.getStylesheets().add("POStaurant.css");
                     stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -117,17 +161,44 @@ public class DubScreenController {
         });
 
         exitButton.setOnAction(e->{
-            try {
-                Parent parent = fxmLoaderService.getLoader(mainScreenForm.getURL()).load();
+            try{
+                FXMLLoader loader=fxmLoaderService.getLoader(confirmationWindow.getURL());
+                Parent parent=loader.load();
+                ConfirmationExitWindowController confirmationExitWindowController =loader.getController();
+                confirmationExitWindowController.setConfirmationLabel("Are you sure you want to exit?");
                 Scene scene=new Scene(parent);
-                scene.getStylesheets().add(css.getURL().toString());
-                Stage stage=(Stage)((Node) e.getSource()).getScene().getWindow();
+                scene.getStylesheets().add("POStaurant.css");
+                Stage stage=new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
                 stage.setScene(scene);
-
-
+                stage.showAndWait();
+                if(confirmationExitWindowController.confirmed()){
+                    try {
+                        FXMLLoader loader1;
+                        Parent parent2;
+                        if(user.getPosition().equals("MANAGER")){
+                            loader1=fxmLoaderService.getLoader(managerScreen.getURL());
+                            parent2=loader1.load();
+                            ManagerScreenController managerScreenController=loader1.getController();
+                            managerScreenController.setUser(user);
+                        }else {
+                            loader1 = fxmLoaderService.getLoader(mainScreenForm.getURL());
+                            parent2=loader1.load();
+                        }
+                        Scene scene2=new Scene(parent2);
+                        scene2.getStylesheets().add(css.getURL().toString());
+                        Stage stage2=(Stage)((Node) e.getSource()).getScene().getWindow();
+                        stage2.setScene(scene2);
+                        stage2.show();
+                    }catch (IOException iOE){
+                        iOE.printStackTrace();
+                    }
+                }
             }catch (IOException iOE){
                 iOE.printStackTrace();
             }
+
         });
 
         upButton.setOnAction(e-> setTables(tablesGrid,16,false,tableButtonList));

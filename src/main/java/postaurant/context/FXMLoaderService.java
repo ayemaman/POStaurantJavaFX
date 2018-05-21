@@ -2,6 +2,8 @@ package postaurant.context;
 
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -27,4 +29,5 @@ public class FXMLoaderService {
         loader.setControllerFactory(param -> context.getBean(param));
         return loader;
     }
+
 }

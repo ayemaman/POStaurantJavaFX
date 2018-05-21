@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ import postaurant.DubScreenController;
 import postaurant.OrderWindowController;
 import postaurant.context.FXMLoaderService;
 import postaurant.context.KeyboardList;
-import postaurant.context.QCNode;
+import postaurant.context.QCBox;
 import postaurant.model.*;
 
 import java.io.IOException;
@@ -62,17 +61,24 @@ public class ButtonCreationService {
                 Button button = new Button(text);
                 button.setPrefHeight(70.0);
                 button.setPrefWidth(95.0);
-
                 button.setMnemonicParsing(false);
-                button.getStyleClass().add("UserButton");
                 if(u.getPosition().equals("DUBDUB")) {
                     button.getStyleClass().add("DubButton");
-                }else if (u.getPosition().equals("MANAGER")){
+                }
+                else if (u.getPosition().equals("MANAGER")) {
                     button.getStyleClass().add("ManagerButton");
-                }else if(u.getPosition().equals("KITCHEN")){
+                }
+                else if(u.getPosition().equals("KITCHEN")){
                     button.getStyleClass().add("KitchenButton");
-                }else if(u.getPosition().equals("FOODRUNNER")){
+                }
+                else if(u.getPosition().equals("FOODRUNNER")){
                     button.getStyleClass().add("FoodRunnerButton");
+                }
+                else if(u.getPosition().equals("DRINKRUNNER")){
+                    button.getStyleClass().add("DrinkRunnerButton");
+                }
+                else if(u.getPosition().equals("BAR")){
+                    button.getStyleClass().add("BarButton");
                 }
                 userButtons.add(button);
             }
@@ -84,7 +90,7 @@ public class ButtonCreationService {
     }
 
 
-    public boolean isNextPage(int page, List<Button> list, int size) {
+    public boolean isNextPage(int page, List list, int size) {
         try {
             if (page > 0) {
                 list.get((page * size));
@@ -108,12 +114,23 @@ public class ButtonCreationService {
                     button.setPrefHeight(70.0);
                     button.setPrefWidth(95.0);
                     button.setMnemonicParsing(false);
-                    if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(),LocalDateTime.now())>10){
+                    if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())>2){
                         button.setStyle("-fx-background-color:red");
                     }
-                    if(o.getTimeBumped()!=null){
-                        button.setStyle("-fx-background-color: yellow");
+                    if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())==1) {
+                        if ((60 - o.getLastTimeChecked().getMinute()) + LocalDateTime.now().getMinute() > 10) {
+                            button.setStyle("-fx-background-color:red");
+                        }else if(60-o.getLastTimeChecked().getMinute()+LocalDateTime.now().getMinute()>5){
+                            button.setStyle("-fx-background-color:yellow");
+                        }
+                    }else if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())==0){
+                            if (ChronoUnit.MINUTES.between(o.getLastTimeChecked(), LocalDateTime.now()) > 10) {
+                                button.setStyle("-fx-background-color:red");
+                            }else if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(), LocalDateTime.now())>5){
+                                button.setStyle("-fx-background-color:yellow");
+                            }
                     }
+
                     button.setOnAction(e -> {
                         try {
                             userService.transferTable(o.getId(),user);
@@ -145,7 +162,12 @@ public class ButtonCreationService {
     public ArrayList<Button> createTableButtons(User user) {
         ArrayList<Button> tableButtonList = new ArrayList<>();
         try {
-            List<Order> tables = userService.getUserOrders(user);
+            List<Order> tables;
+            if(user.getPosition().equals("MANAGER")){
+                tables=userService.getAllOpenOrders();
+            }else {
+                tables =userService.getUserOrders(user);
+            }
             if (tables != null) {
                 for (Order o : tables) {
                     String text = "" + o.getTableNo();
@@ -153,11 +175,21 @@ public class ButtonCreationService {
                     button.setPrefHeight(70.0);
                     button.setPrefWidth(95.0);
                     button.setMnemonicParsing(false);
-                    if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(),LocalDateTime.now())>10){
+                    if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())>1){
                         button.setStyle("-fx-background-color:red");
                     }
-                    if(o.getTimeBumped()!=null){
-                        button.setStyle("-fx-background-color: yellow");
+                    if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())==1) {
+                        if ((60 - o.getLastTimeChecked().getMinute()) + LocalDateTime.now().getMinute() > 10) {
+                            button.setStyle("-fx-background-color:red");
+                        }else if(60-o.getLastTimeChecked().getMinute()+LocalDateTime.now().getMinute()>5){
+                            button.setStyle("-fx-background-color:yellow");
+                        }
+                    }else if(ChronoUnit.HOURS.between(o.getLastTimeChecked(),LocalDateTime.now())==0){
+                        if (ChronoUnit.MINUTES.between(o.getLastTimeChecked(), LocalDateTime.now()) > 10) {
+                            button.setStyle("-fx-background-color:red");
+                        }else if(ChronoUnit.MINUTES.between(o.getLastTimeChecked(), LocalDateTime.now())>5){
+                            button.setStyle("-fx-background-color:yellow");
+                        }
                     }
                     button.setOnAction(e -> {
                         try {
@@ -166,7 +198,11 @@ public class ButtonCreationService {
                             OrderWindowController orderWindowController = loader.getController();
                             orderWindowController.setOrderId(o.getId());
                             orderWindowController.setUser(user);
-                            orderWindowController.setLabels(o.getTableNo(),o.getId(),user,o.getTimeOpened());
+                            if (user.getPosition().equals("MANAGER")) {
+                                orderWindowController.setLabels(o.getTableNo(), o.getId(),"MANAGER", o.getTimeOpened());
+                            } else{
+                                orderWindowController.setLabels(o.getTableNo(), o.getId(), user.getFirstName(), o.getTimeOpened());
+                            }
                             Scene scene = new Scene(parent);
                             scene.getStylesheets().add("POStaurant.css");
                             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -266,8 +302,8 @@ public class ButtonCreationService {
         return keyboardButtonList;
     }
 
-    public ArrayList<Button> createOrderSectionButtons(boolean food) {
-        ArrayList<Button> sectionButtons = new ArrayList<>();
+    public ArrayList<ToggleButton> createOrderSectionButtons(boolean food) {
+        ArrayList<ToggleButton> sectionButtons = new ArrayList<>();
         Map<String, List<Item>> sectionsWithItems;
         if (food) {
             sectionsWithItems = menuService.getFoodSectionsWithItems();
@@ -275,7 +311,7 @@ public class ButtonCreationService {
             sectionsWithItems = menuService.getDrinkSectionsWithItems();
         }
         for (Map.Entry<String, List<Item>> entry : sectionsWithItems.entrySet()) {
-            Button button = new Button(entry.getKey());
+            ToggleButton button = new ToggleButton(entry.getKey());
             button.setMinHeight(50);
             button.setMinWidth(100);
             button.setMnemonicParsing(false);
@@ -318,10 +354,24 @@ public class ButtonCreationService {
         return tabs;
     }
 
-    public ArrayList<Button> createItemButtonsForSection(String section, boolean large) {
+    public ArrayList<Button> createItemButtonsForSection(String section, boolean large, ArrayList<String> allergyList) {
         ArrayList<Button> buttons = new ArrayList<>();
         Map<String, List<Item>> sectionsWithItems = menuService.getSectionsWithItems();
         List<Item> items = sectionsWithItems.get(section);
+        if(allergyList!=null){
+            Iterator<Item> iterator=items.iterator();
+            while(iterator.hasNext()){
+                Item item=iterator.next();
+                for(Map.Entry<Ingredient,Integer> entry:item.getRecipe().entrySet()){
+                    String allergy=entry.getKey().getAllergy();
+                    if(allergyList.contains(allergy)){
+                        iterator.remove();
+                    }
+                }
+
+            }
+
+        }
         for (Item i : items) {
             Button button;
             if (large) {
@@ -470,39 +520,77 @@ public class ButtonCreationService {
         }
         return buttons;
     }
-    /*
-     public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String station, String status, int qty
-     private Long orderId;
-    private Double tableNo;
-    private Item item;
-    private int qty;
-     */
 
-    public ArrayList<VBox> createQCNodes() {
-        ArrayList<VBox> list = new ArrayList<>();
-        List<KitchenOrderInfo> orders = menuService.getAllOrderedItemsForQC();
+    public ArrayList<QCBox> createQCNodes(Boolean bar) {
+        ArrayList<QCBox> list = new ArrayList<>();
+        List<KitchenOrderInfo> orders;
+        if(!bar) {
+            orders = menuService.getAllOrderedItemsForQC();
+        }else{
+            orders=menuService.getAllOrderItemsForBarQC();
+        }
         Double currentTable = -1.0;
         LocalDateTime currentTime = LocalDateTime.now().minusYears(1);
-        VBox currentVBox = null;
+        ListView<KitchenOrderInfo> currentListView=null;
 
         for (KitchenOrderInfo k : orders) {
-
             if(currentTable.equals(k.getTableNo())) {
-                if (currentVBox != null) {
-                if (k.getItem().getDateOrdered().getMinute() - currentTime.getMinute() < 1) {
-                        ListView<KitchenOrderInfo> listView=(ListView<KitchenOrderInfo>) currentVBox.getChildren().get(1);
-                        ObservableList<KitchenOrderInfo> observableList = listView.getItems();
+                if (currentListView != null) {
+                    LocalDateTime timeOrdered=k.getItem().getDateOrdered();
+                    if((ChronoUnit.DAYS.between(timeOrdered,currentTime)==0)&&(ChronoUnit.HOURS.between(timeOrdered,currentTime)==0)&&ChronoUnit.MINUTES.between(timeOrdered,currentTime)==0){
+                        ObservableList<KitchenOrderInfo> observableList = currentListView.getItems();
                         observableList.add(k);
-                        System.out.println(k);
+                    }else{
+                        QCBox qcBox = new QCBox();
+                        qcBox.setPrefSize(160, 200);
+                        Label label = new Label();
+                        label.setPrefSize(160, 40);
+                        label.setText(" Table: " + k.getTableNo());
+                        label.setId("UnselectedLabel");
+                        ListView<KitchenOrderInfo> listView = new ListView<>();
+                        listView.setPrefSize(160, 160);
+                        listView.setCellFactory(lv -> {
+                            ListCell<KitchenOrderInfo> cell = new ListCell<>();
+                            cell.itemProperty().addListener((obs, oldItem, newItem) -> {
+                                if (newItem == null) {
+                                    cell.setText(null);
+                                } else {
+                                    cell.setText(newItem.getItem().getName() + " Qty: " + newItem.getQty());
+                                    if (newItem.getItem().getKitchenStatus().equals("SEEN")) {
+                                        cell.setId("QCCellSeen");
+                                    } else if (newItem.getItem().getKitchenStatus().equals("READY")) {
+                                        cell.setId("QCCellReady");
+                                    }else{
+                                        cell.setId("QCCell");
+                                    }
+                                }
+                            });
+                            return cell;
+                        });
+
+                        ObservableList<KitchenOrderInfo> observableList = FXCollections.observableArrayList();
+                        observableList.add(k);
                         listView.setItems(observableList);
+                        listView.setId("QCListView");
+                        qcBox.getChildren().add(label);
+                        qcBox.getChildren().add(listView);
+                        currentTable = k.getTableNo();
+                        currentTime = k.getItem().getDateOrdered();
+                        currentListView = listView;
+
+                        qcBox.setPadding(new Insets(1,1,1,1));
+                        list.add(qcBox);
+
                     }
                 }
-            }else {
-                    VBox vBox = new VBox();
-                    vBox.setPrefSize(160, 200);
+            }
+            else {
+                    QCBox qcBox = new QCBox();
+                    qcBox.setPrefSize(160, 200);
                     Label label = new Label();
                     label.setPrefSize(160, 40);
-                    label.setText("" + k.getTableNo());
+                    label.setText(" Table: " + k.getTableNo());
+                    label.setId("UnselectedLabel");
                     ListView<KitchenOrderInfo> listView = new ListView<>();
                     listView.setPrefSize(160, 160);
                     listView.setCellFactory(lv -> {
@@ -510,14 +598,14 @@ public class ButtonCreationService {
                         cell.itemProperty().addListener((obs, oldItem, newItem) -> {
                             if (newItem == null) {
                                 cell.setText(null);
-                                cell.setStyle("-fx-background-color:grey");
                             } else {
                                 cell.setText(newItem.getItem().getName() + " Qty: " + newItem.getQty());
                                 if (newItem.getItem().getKitchenStatus().equals("SEEN")) {
-                                    cell.setStyle("-fx-background-color:blue");
+                                    cell.setId("QCCellSeen");
                                 } else if (newItem.getItem().getKitchenStatus().equals("READY")) {
-                                    cell.setStyle("-fx-background-color:green");
-
+                                    cell.setId("QCCellReady");
+                                }else{
+                                    cell.setId("QCCell");
                                 }
                             }
                         });
@@ -527,15 +615,18 @@ public class ButtonCreationService {
                     ObservableList<KitchenOrderInfo> observableList = FXCollections.observableArrayList();
                     observableList.add(k);
                     listView.setItems(observableList);
-                    vBox.getChildren().add(label);
-                    vBox.getChildren().add(listView);
+                    listView.setId("QCListView");
+                    qcBox.getChildren().add(label);
+                    qcBox.getChildren().add(listView);
                     currentTable = k.getTableNo();
                     currentTime = k.getItem().getDateOrdered();
-                    currentVBox = vBox;
-                    list.add(vBox);
+                    currentListView = listView;
 
+                    qcBox.setPadding(new Insets(1,1,1,1));
+                    list.add(qcBox);
                 }
             }
+
         return list;
     }
 }

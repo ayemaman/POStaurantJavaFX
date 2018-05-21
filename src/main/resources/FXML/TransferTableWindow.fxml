@@ -18,15 +18,20 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="postaurant.TransferTableController">
     <left>
-        <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="210.0" BorderPane.alignment="CENTER">
+        <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="210.0" BorderPane.alignment="BOTTOM_CENTER">
             <children>
-                <ImageView fitHeight="250.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+            <Button fx:id="goBackButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="100.0" prefWidth="175.0" text="GO BACK">
+               <font>
+                  <Font size="24.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="90.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+                <ImageView fx:id="logoImg" fitHeight="250.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets left="5.0" right="5.0" />
                     </VBox.margin>
-                    <image>
-                        <Image url="@../img/logo.png" />
-                    </image>
                 </ImageView>
             </children></VBox>
     </left>
@@ -107,7 +112,7 @@
                             </VBox.margin></TextField>
                     </children>
                 </VBox>
-            <Label prefHeight="70.0" prefWidth="253.0" text="TRANSFER TABLE">
+            <Label prefHeight="70.0" prefWidth="253.0" text="TRANSFER TABLE" textFill="#ee9f15">
                <HBox.margin>
                   <Insets left="120.0" right="120.0" />
                </HBox.margin>

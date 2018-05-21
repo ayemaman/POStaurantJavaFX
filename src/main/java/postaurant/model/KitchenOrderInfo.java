@@ -1,21 +1,38 @@
 package postaurant.model;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.cglib.core.Local;
 import postaurant.exception.InputValidationException;
 
+import java.awt.*;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.time.LocalDateTime;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class KitchenOrderInfo{
+
+public class KitchenOrderInfo implements Printable {
 
     private Long orderId;
     private Double tableNo;
     private Item item;
     private int qty;
+
+    public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String status, int qty){
+        try {
+            Item item = new Item();
+            item.setId(itemId);
+            item.setName(itemName);
+            item.setDateOrdered(timeOrdered);
+            item.setKitchenStatus(status);
+            this.item=item;
+            setOrderId(orderId);
+            setTableNo(tableNo);
+            setQty(qty);
+        }catch (InputValidationException e){
+            e.printStackTrace();
+        }
+    }
 
     public KitchenOrderInfo(Long orderId, Double tableNo, Long itemId, String itemName, LocalDateTime timeOrdered, String station, String status, int qty) {
         try {
@@ -76,28 +93,42 @@ public class KitchenOrderInfo{
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof KitchenOrderInfo){
-            KitchenOrderInfo k=(KitchenOrderInfo) obj;
-            if(k.getItem().compareTo(getItem())==0){
-                if(k.getQty()==getQty()){
-                    if(k.getOrderId().equals(getOrderId())){
-                        if(k.getTableNo().equals(getTableNo())){
+        if (obj instanceof KitchenOrderInfo) {
+            KitchenOrderInfo k = (KitchenOrderInfo) obj;
+            if (k.getItem().compareTo(getItem()) == 0) {
+                if (k.getQty() == getQty()) {
+                    if (k.getOrderId().equals(getOrderId())) {
+                        if (k.getTableNo().equals(getTableNo())) {
                             return true;
-                        }else{
+                        } else {
                             return false;
                         }
-                    }else{
+                    } else {
                         return false;
                     }
-                }else{
+                } else {
                     return false;
                 }
-            }else{
+            } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
     }
+
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        if (pageIndex > 0) {   //Here
+            return NO_SUCH_PAGE;
+        }
+
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+        graphics.drawString("testing...", 100, 100);
+        return PAGE_EXISTS;
+    }
 }
+
+
 
