@@ -83,7 +83,8 @@ public class ReportService {
     public void createFullReport(String date){
         try{
             List<Payment> paymentList=getDayReport(date);
-            PrintWriter out=new PrintWriter("./checks/"+date+"dayReport.txt");
+            String name="./checks/DayReport.txt";
+            PrintWriter out=new PrintWriter(name);
             out.println("Date: " + timeService.createTime());
             out.println("Report for "+date);
             Double cash=0.00;
@@ -140,7 +141,7 @@ public class ReportService {
             out.println("MASTERCARD:   "+master);
             out.println("MAESTRO:      "+maestro);
             out.close();
-            File file=new File("./checks/"+date+"dayReport.txt");
+            File file=new File("./checks/DayReport.txt");
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
