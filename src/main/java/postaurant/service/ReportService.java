@@ -83,8 +83,8 @@ public class ReportService {
     public void createFullReport(String date){
         try{
             List<Payment> paymentList=getDayReport(date);
-            String name="./checks/DayReport.txt";
-            PrintWriter out=new PrintWriter(name);
+            File file=File.createTempFile("DayReport","txt");
+            PrintWriter out=new PrintWriter(file);
             out.println("Date: " + timeService.createTime());
             out.println("Report for "+date);
             Double cash=0.00;
@@ -141,7 +141,6 @@ public class ReportService {
             out.println("MASTERCARD:   "+master);
             out.println("MAESTRO:      "+maestro);
             out.close();
-            File file=new File("./checks/DayReport.txt");
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -164,7 +163,8 @@ public class ReportService {
     public void createDubReport(User user,String date){
         try{
             List<Payment> paymentList=getReport(user,date);
-            PrintWriter out=new PrintWriter("./checks/dubReport.txt");
+            File file=File.createTempFile("dubReport","txt");
+            PrintWriter out=new PrintWriter(file);
             out.println("Date: " + timeService.createTime());
             out.println("Report for "+date);
             out.println("Server name: " + user.getFirstName());
@@ -222,7 +222,6 @@ public class ReportService {
             out.println("MASTERCARD:   "+master);
             out.println("MAESTRO:      "+maestro);
             out.close();
-            File file=new File("./checks/dubReport.txt");
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {

@@ -104,7 +104,8 @@ public class OrderService {
      */
     public void createQCBump(List<OrderInfo> list){
         try{
-            PrintWriter out = new PrintWriter("./checks/qcCheck.txt");
+            File file=File.createTempFile("qcCheck","txt");
+            PrintWriter out = new PrintWriter(file);
             out.println("DATE: "+timeService.createTime());
             out.println("TABLE NO: "+list.get(0).getTableNo());
             out.println("Item name\t\t  Item Qty ");
@@ -123,7 +124,6 @@ public class OrderService {
                 }
                 out.println(name.toString()+"\t\t\t"+k.getQty());
                 out.close();
-                File file=new File("./checks/qcCheck.txt");
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String line;
                     while ((line = br.readLine()) != null) {
@@ -147,7 +147,8 @@ public class OrderService {
      */
     public void createPreCheck(List<Map.Entry<Item,Integer>> list, Order order, User user){
         try {
-            PrintWriter out = new PrintWriter("./checks/precheck.txt");
+            File file=File.createTempFile("preCheck","txt");
+            PrintWriter out = new PrintWriter(file);
             out.println("DATE: "+timeService.createTime());
             out.println("TABLE NO: "+order.getTableNo());
             out.println("Server name: "+ user.getFirstName());
@@ -183,7 +184,6 @@ public class OrderService {
             out.println("----------------------------------------------------------");
             out.println("TOTAL:\t\t\t\t\t\t   "+String.format("%.2f",total)+"£");
             out.close();
-            File file=new File("./checks/precheck.txt");
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -207,7 +207,8 @@ public class OrderService {
      */
     public void createReceipt(List<Payment> paymentList, Order order, User user) {
         try {
-            PrintWriter out = new PrintWriter( "./checks/receipt.txt");
+            File file=File.createTempFile("receipe","txt");
+            PrintWriter out = new PrintWriter( file);
             out.println("Date:+" + timeService.createTime());
             out.println("TABLE NO: " + order.getTableNo());
             out.println("Server name: " + user.getFirstName());
@@ -262,7 +263,6 @@ public class OrderService {
             out.println("PAID:\t\t\t\t\t\t   £" + String.format("%.2f", paid));
             out.println("CHANGE:\t\t\t\t\t\t   £" + String.format("%.2f", left));
             out.close();
-            File file=new File("./checks/receipt.txt");
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
